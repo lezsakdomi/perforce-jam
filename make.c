@@ -204,7 +204,8 @@ make0(
 
 	if( p && t->flags & T_FLAG_TEMP && 
 	    t->binding == T_BIND_MISSING && 
-	    p->binding != T_BIND_MISSING )
+	    p->binding != T_BIND_MISSING ||
+	    p && t->flags & T_FLAG_INTERNAL )
 	{
 	    t->binding = T_BIND_PARENTS;
 	    ptime = p;
