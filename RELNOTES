@@ -5,78 +5,14 @@
 Release notes for Jam 2.5
 (aka Jam - make(1) redux)
 
-0. Changes between 2.5rc1 and 2.5rc2:
-
-	Several uninitialized memory accesses have been corrected in
-	var_expand() and file_archscan(), thanks to Matt Armstrong.
-
-	Fix 'actions updated' broken by change 2487.  (See the
-	description to change 2612 for details).
-
-	Fix "includes of includes not being considered", broken by 2499.
-	(See the description to change 2614 for details).
-
-	Remove NT FQuote rule, as, \" is required to pass quotes on
-	the command line.
-
-	Porting change: allow jam to build with BorlandC 5.5
-
-	Porting change: for WinXP IA64; set MSVCNT to the root of the
-	SDK and MSVCVer to Win64; change handle type to long long (too
-	much to include windows.h?); bury IA64 in the library path in
-	Jambase.
-
-	Porting change: Mac classic MPW Codewarrior 7 upgrades: minor
-	compiling issues, new paths in Jambase for libraries and
-	includes, and separate out GenFile1 that sets PATH for UNIX
-	only, as it does't work under MPW (or anything other than with
-	sh).
-        
-	Porting change: Minor Cray porting: make hashitem()'s key
-	value unsigned so we're guaranteed no integer overflows.
-
-	SubDir's support for an externally set TOP variable was broken
-	in 2.5rc1.  It now works as it did in 2.4.  Further, using SubDir
-	to include a subpart of an SubDir tree now works.  Previously,
-	you could only include the root of another SubDir tree.  For example,
-
-		SubDir ALL src builds ;
-		SubInclude ALL src server support ;
-
-	Essentially includes the ../server/support/Jamfile, without getting
-	confused as to the current directory.
-
-0.1. Changes between 2.5rc2 and 2.5rc3:
-
-	More SubDir work after rc2: if a Jamrules invoked SubDir to 
-	establish other roots, and that Jamrules isn't in the current
-	directory, the roots it established were wrong.
-
-	Fix mysterious rebuild problem:  in an attempt to make 'jam -dc'
-	output report headers updates more accurately, internal (header
-	collection) targets were being bound as T_BIND_PARENTS so that
-	they could carry the timestamp of the actual source file.  But
-	that caused the fate of the internal node to be marked as
-	T_FATE_NEEDTMP if anything they included was newer, and that
-	easily happens among header files (something is always newer
-	than something else).  Now internal targets carry their parents
-	time, but with T_BIND_UNBOUND, like other NOTFILE targets.
-
-	Remove temp .bat files created on NT.  They used to all have
-	the same name and get reused, but with 2.5 the names were salted
-	with the PID and they would litter $TEMP.  Now they get removed
-	after being used.
-
-	Undocumented support for SUBDIRRULES, user-provided rules
-	to invoke at the end of the SubDir rule, and SUBDIRRESET,
-	SUBDIR variables to reset (like SUBDIRC++FLAGS, SUBDIRHDRS, etc)
-	for each new SubDir.
-
 1.  Release info:
 
 	Jam 2.5
-	January 20, 2002
+	August 19, 2004
 	VERSION 2.5
+
+	(n.b. Jam 2.5 is merely Jam 2.5rc3 of April 2003 with the rc3
+	moniker removed.)
 
 2.  Compatibility
 
@@ -106,6 +42,14 @@ Release notes for Jam 2.5
 	Jamrules.  Jamrules only included if present; no error issued
 	if no Jamrules file.
 
+	Using SubDir to include a subpart of an SubDir tree now works.
+	Previously, you could only include the root of another SubDir
+	tree.  This example includes the ../server/support/Jamfile,
+	without getting confused as to the current directory:
+
+		SubDir ALL src builds ;
+		SubInclude ALL src server support ;
+
 	$(RMDIR) has been defined for NT and defaulted to $(RM) 
 	everwhere else.  Not much tested.  For Michael Champigny.
 
@@ -114,6 +58,11 @@ Release notes for Jam 2.5
 	not need to be in the global path.  It is the rare case where a
 	target bound in the current directory can't be used directly,
 	so we fudge it by setting PATH.
+
+	Undocumented support for SUBDIRRULES, user-provided rules
+	to invoke at the end of the SubDir rule, and SUBDIRRESET,
+	SUBDIR variables to reset (like SUBDIRC++FLAGS, SUBDIRHDRS, etc)
+	for each new SubDir.
 
 3.3   'jam' Changes (See Jam.html)
 
@@ -243,6 +192,13 @@ Release notes for Jam 2.5
 	Minor Cray porting: make hashitem()'s key value unsigned so
 	we're guaranteed no integer overflows.
 
+	Remove NT FQuote rule, as, \" is required to pass quotes on
+	the command line.
+
+	Remove temp .bat files created on NT.  They used to all have
+	the same name and get reused, but with 2.5 the names were salted
+	with the PID and they would litter $TEMP.  Now they get removed
+	after being used.
 
 ===============================================================================
 ===============================================================================
