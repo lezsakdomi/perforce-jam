@@ -61,7 +61,7 @@
 # File dest : source ;			copy file
 # Fortran obj.o : source.f ;		.f -> .o
 # GenFile source.c : program args ;	make custom file
-# Hardlink target : source ;		make link from source to target
+# HardLink target : source ;		make link from source to target
 # HdrRule source : headers ;		handle #includes
 # InstallInto dir : sources ;		install any files
 # InstallBin dir : sources ;		install binaries
@@ -83,6 +83,7 @@
 # Objects sources ;			compile sources
 # RmTemps target : sources ;		remove temp sources after target made
 # Setuid images ;			mark executables Setuid
+# SoftLink target : source ;		make symlink from source to target
 # SubDir TOP d1 d2 ... ;		start a subdirectory Jamfile
 # SubDirCcFlags flags ;			add compiler flags until next SubDir
 # SubDirC++Flags flags ;		add compiler flags until next SubDir
@@ -1070,6 +1071,14 @@ rule Shell
 	Chmod $(<) ;
 }
 
+rule SoftLink
+{
+	Depends files : $(<) ;
+	Depends $(<) : $(>) ;
+	SEARCH on $(>) = $(SEARCH_SOURCE) ;
+	Clean clean : $(<) ;
+}
+
 rule SubDir
 {
 	#
@@ -1539,6 +1548,11 @@ actions Shell
 		/^##/ { next }
 		{ print }
 	' < $(>) > $(<)
+}
+
+actions SoftLink
+{
+	$(RM) $(<) && $(LN) -s $(>) $(<)
 }
 
 actions Yacc1

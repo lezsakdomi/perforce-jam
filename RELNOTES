@@ -77,6 +77,8 @@ Release notes for Jam/MR [UNRELEASED]
 	Jambase has been compacted by applying the new E: and J:
 	expansion modifiers.
 
+	New SoftLink rule, courtesy of David Lindes.  It currently
+	assumes you can pass a -s flag to $(LN).
 
 3.3   'jam' Changes (See Jam.html)
 
