@@ -5,10 +5,18 @@
 Release notes for Jam 2.5
 (aka Jam - make(1) redux)
 
+0. Changes between 2.4rc1 and 2.4rc2:
+
+	Several uninitialized memory accesses have been corrected in
+	var_expand() and file_archscan(), thanks to Matt Armstrong.
+
+	Fix 'actions updated' broken by change 2487.  (See the
+	description to change 2612 for details.)
+
 1.  Release info:
 
 	Jam 2.5
-	December 30, 2002
+	January 20, 2002
 	VERSION 2.5
 
 2.  Compatibility

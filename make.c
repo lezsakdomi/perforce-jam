@@ -45,6 +45,7 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
+ * 01/03/03 (seiwald) - T_FATE_NEWER once again gets set with missing parent
  */
 
 # include "jam.h"
@@ -358,7 +359,7 @@ make0(
 		If temp's headers newer than parent, make temp.
 		If deliberately touched, make it.
 		If up-to-date temp file present, use it.
-		If target newer than parent, mark target newer.
+		If target newer than non-notfile parent, mark target newer.
 		Otherwise, stable!
 
 		Note this block runs from least to most stable:
@@ -403,7 +404,7 @@ make0(
 	    fate = T_FATE_ISTMP;
 	}
 	else if( t->binding == T_BIND_EXISTS && p && 
-		 p->binding == T_BIND_EXISTS && t->time > p->time )
+		 p->binding != T_BIND_UNBOUND && t->time > p->time )
 	{
 	    fate = T_FATE_NEWER;
 	}
