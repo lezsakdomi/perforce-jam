@@ -506,7 +506,7 @@ evaluate_rule(
 	{
 	    PARSE *parse = rule->procedure;
 	    parse_refer( parse );
-	    result = (*parse->func)( parse, args );
+	    result = list_append( result, (*parse->func)( parse, args ) );
 	    parse_free( parse );
 	}
 
