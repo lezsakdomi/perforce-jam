@@ -1,6 +1,22 @@
 Release notes for Jam/MR 2.4
 (aka Jam - make(1) redux)
 
+0.  Changes between 2.4rc1 and 2.4rc2:
+
+    THESE NOTES WILL BE REMOVED WITH THE FINAL 2.4 RELEASE, SINCE THEY
+    REFER EXCLUSIVELY TO ADJUSTMENTS IN BEHAVIORS NEW BETWEEN 2.3 and
+    2.4:
+
+	Make MATCH generate empty strings for () subexpressions that
+	match nothing, rather than generating nothing at all.
+	Thanks to David Abrahams.
+
+	GLOB now applies the pattern to the directory-less filename,
+	rather than the whole path. Thanks to Niklaus Giger.
+
+	Make Match rule do productized results, rather than
+	using just $(1[1]) as pattern and $(2[1]) as the string.
+
 1.  Release info:
 
 	Jam/MR 2.4
