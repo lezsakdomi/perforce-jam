@@ -41,12 +41,12 @@
 # define P0 (PARSE *)0
 # define C0 (char *)0
 
-LIST *builtin_depends( PARSE *parse, LOL *args );
-LIST *builtin_echo( PARSE *parse, LOL *args );
-LIST *builtin_exit( PARSE *parse, LOL *args );
-LIST *builtin_flags( PARSE *parse, LOL *args );
-LIST *builtin_glob( PARSE *parse, LOL *args );
-LIST *builtin_match( PARSE *parse, LOL *args );
+LIST *builtin_depends( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_echo( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_exit( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_flags( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_glob( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_match( PARSE *parse, LOL *args, int *jmp );
 
 int glob( char *s, char *c );
 
@@ -116,7 +116,8 @@ load_builtins()
 LIST *
 builtin_depends(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	LIST *targets = lol_get( args, 0 );
 	LIST *sources = lol_get( args, 1 );
@@ -142,7 +143,8 @@ builtin_depends(
 LIST *
 builtin_echo(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	list_print( lol_get( args, 0 ) );
 	printf( "\n" );
@@ -159,7 +161,8 @@ builtin_echo(
 LIST *
 builtin_exit(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	list_print( lol_get( args, 0 ) );
 	printf( "\n" );
@@ -177,7 +180,8 @@ builtin_exit(
 LIST *
 builtin_flags(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	LIST *l = lol_get( args, 0 );
 
@@ -226,7 +230,8 @@ builtin_glob_back(
 LIST *
 builtin_glob(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	LIST *l = lol_get( args, 0 );
 	LIST *r = lol_get( args, 1 );
@@ -249,7 +254,8 @@ builtin_glob(
 LIST *
 builtin_match(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	LIST *l, *r;
 	LIST *result = 0;

@@ -37,6 +37,7 @@ parse_file( char *f )
 	{
 	    LOL l;
 	    PARSE *p;
+	    int jmp = 0; /* JMP_NONE */
 
 	    /* $(<) and $(>) empty in outer scope. */
 
@@ -53,7 +54,7 @@ parse_file( char *f )
 
 	    /* Run the parse tree. */
 
-	    (*(p->func))( p, &l );
+	    list_free( (*(p->func))( p, &l, &jmp ) );
 
 	    parse_free( p );
 	}
@@ -67,7 +68,7 @@ parse_save( PARSE *p )
 
 PARSE *
 parse_make( 
-	LIST	*(*func)( PARSE *p, LOL *args ),
+	LIST	*(*func)( PARSE *p, LOL *args, int *jmp ),
 	PARSE	*left,
 	PARSE	*right,
 	PARSE	*third,

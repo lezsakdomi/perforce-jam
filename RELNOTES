@@ -45,6 +45,9 @@ Changes since Jam 2.4
 
 	The message "...using xxx..." now only shows up with -da.
 
+	The 'return' statement now actually returns, and there is
+	now break/continue statements for for/while loops.
+
 ===============================================================================
 ===============================================================================
 

@@ -33,6 +33,8 @@
  *
  *		'run' production split from 'block' production so 
  *		that empty blocks can be handled separately.
+ *
+ * 10/22/02 (seiwald) - support for break/continue/return.
  */
 
 %token ARG STRING
@@ -55,11 +57,12 @@
 
 # define YYMAXDEPTH 10000	/* for OSF and other less endowed yaccs */
 
-# define F0 (LIST *(*)(PARSE *, LOL *))0
+# define F0 (LIST *(*)(PARSE *, LOL *, int *))0
 # define P0 (PARSE *)0
 # define S0 (char *)0
 
 # define pappend( l,r )    	parse_make( compile_append,l,r,P0,S0,S0,0 )
+# define pbreak( l,f )     	parse_make( compile_break,l,P0,P0,S0,S0,f )
 # define peval( c,l,r )		parse_make( compile_eval,l,r,P0,S0,S0,c )
 # define pfor( s,l,r )    	parse_make( compile_foreach,l,r,P0,s,S0,0 )
 # define pif( l,r,t )	  	parse_make( compile_if,l,r,t,S0,S0,0 )
@@ -123,8 +126,12 @@ rule	: `{` block `}`
 		{ $$.parse = pset( $1.parse, $3.parse, $2.number ); }
 	| arg `on` list assign list `;`
 		{ $$.parse = pset1( $1.parse, $3.parse, $5.parse, $4.number ); }
+	| `break` list `;`
+		{ $$.parse = pbreak( $2.parse, JMP_BREAK ); }
+	| `continue` list `;`
+		{ $$.parse = pbreak( $2.parse, JMP_CONTINUE ); }
 	| `return` list `;`
-		{ $$.parse = $2.parse; }
+		{ $$.parse = pbreak( $2.parse, JMP_RETURN ); }
 	| `for` ARG `in` list `{` block `}`
 		{ $$.parse = pfor( $2.string, $4.parse, $6.parse ); }
 	| `switch` list `{` cases `}`
