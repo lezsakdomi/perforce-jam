@@ -59,6 +59,9 @@ Changes since Jam 2.4
 	Removed spurious search() in 'on' statement handling, thanks 
 	(again) to Ingo Weinhold.
 
+	Jambase no longer announces the compiler it is using on
+	Windows.  It doesn't announce anything else, so why?
+
 ===============================================================================
 ===============================================================================
 

@@ -173,8 +173,6 @@ if $(NT)
      
     if $(BCCROOT)
     {
-	Echo "Compiler is Borland C++" ;
-
 	AR		?= tlib /C /P64 ;
 	CC		?= bcc32 ;
 	CCFLAGS		?= -v -w- -q -DWIN -tWR -tWM -tWC ;
@@ -188,8 +186,6 @@ if $(NT)
     }
     else if $(MSVC)
     {
-	Echo "Compiler is Microsoft Visual C++ 16 bit" ;
-
 	AR		?= lib /nologo ;
 	CC		?= cl /nologo ;
 	CCFLAGS		?= /D \"WIN\" ;
@@ -213,8 +209,6 @@ if $(NT)
     }
     else if $(MSVCNT)
     {
-	Echo "Compiler is Microsoft Visual C++" ;
-
 	AR		?= lib ;
 	AS		?= masm386 ;
 	CC		?= cl /nologo ;
