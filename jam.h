@@ -39,6 +39,7 @@
  * 06/03/03 (seiwald) - OpenBSD porting from Michael Champigny.
  * 05/06/04 (seiwald) - OSPLAT amd64.
  * 06/23/04 (seiwald) - Nonstop unix porting from Kim Hae-Joo.
+ * 09/02/04 (tony)    - Zeta porting
  */
 
 /*
@@ -212,10 +213,17 @@
 # define OS_AMIGA
 # endif
 # ifdef __BEOS__
+# include <BeBuild.h>
 # define unix
+# ifdef B_ZETA_VERSION
+# define OSMINOR "OS=ZETA"
+# define OS_ZETA
+# define NO_VFORK
+# else
 # define OSMINOR "OS=BEOS"
 # define OS_BEOS
 # define NO_VFORK
+# endif
 # endif
 # ifdef __bsdi__
 # define OSMINOR "OS=BSDI"
