@@ -471,7 +471,7 @@
 
 /* Jam private definitions below. */
 
-# define DEBUG_MAX	10
+# define DEBUG_MAX	15
 
 struct globs {
 	int	noexec;
@@ -484,11 +484,8 @@ struct globs {
 
 extern struct globs globs;
 
-# define DEBUG_MAKE	( globs.debug[ 1 ] )	/* show actions when executed */
-# define DEBUG_MAKEQ	( globs.debug[ 2 ] )	/* show even quiet actions */
-# define DEBUG_EXEC	( globs.debug[ 2 ] )	/* show text of actons */
-# define DEBUG_MAKEPROG	( globs.debug[ 3 ] )	/* show progress of make0 */
-# define DEBUG_BIND	( globs.debug[ 3 ] )	/* show when files bound */
+# define DEBUG_MAKE	( globs.debug[ 1 ] )	/* -da show actions when executed */
+# define DEBUG_MAKEPROG	( globs.debug[ 3 ] )	/* -dm show progress of make0 */
 
 # define DEBUG_EXECCMD	( globs.debug[ 4 ] )	/* show execcmds()'s work */
 
@@ -505,4 +502,9 @@ extern struct globs globs;
 # define DEBUG_LISTS	( globs.debug[ 9 ] )	/* show list manipulation */
 # define DEBUG_SCAN	( globs.debug[ 9 ] )	/* show scanner tokens */
 # define DEBUG_MEM	( globs.debug[ 9 ] )	/* show memory use */
+
+# define DEBUG_MAKEQ	( globs.debug[ 11 ] )	/* -da show even quiet actions */
+# define DEBUG_EXEC	( globs.debug[ 12 ] )	/* -dx show text of actions */
+# define DEBUG_DEPENDS	( globs.debug[ 13 ] )	/* -dd show dependency graph */
+# define DEBUG_CAUSES	( globs.debug[ 14 ] )	/* -dc show dependency graph */
 

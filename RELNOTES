@@ -30,6 +30,20 @@ Changes since Jam/MR 2.4
 	Previously, headers weren't considered when deciding when to
 	reconstruct a temporary.
 
+	-d has been reworked to make it easier to display more useful
+	tracing information separate from the debugging gunk:
+
+		-da - show all actions (formerly -d2)
+		-dd - show dependencies (new output)
+		-dm - show make graph (aka -d3)
+		-dx - show executable text (formerly -d2)
+
+	-dd is new, and more display options are anticipated.
+
+	-n now implies -dax.
+
+	The message "...using xxx..." now only shows up with -da.
+
 ===============================================================================
 ===============================================================================
 

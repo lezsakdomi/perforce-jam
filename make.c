@@ -207,7 +207,7 @@ make0(
 	 * Pause for a little progress reporting 
 	 */
 
-	if( DEBUG_BIND )
+	if( DEBUG_MAKEPROG )
 	{
 	    if( strcmp( t->name, t->boundname ) )
 	    {
@@ -250,6 +250,9 @@ make0(
 	    /* Short circuit circular dependencies. */
 	    /* And only make unmade targets. */
 
+	    if( DEBUG_DEPENDS && c->target->fate == T_FATE_INIT )
+		printf( "Depends \"%s\" : \"%s\" ;\n", t->name, c->target->name );
+
 	    if( c->target->fate == T_FATE_MAKING )
 		printf( "warning: %s depends on itself\n", c->target->name );
 
@@ -284,6 +287,9 @@ make0(
 	{
 	    /* We don't care about T_FATE_MAKING. Headers seem */
 	    /* to include each other a lot these days (2002). */
+
+	    if( DEBUG_DEPENDS && c->target->fate == T_FATE_INIT )
+		printf( "Depends \"%s\" : \"%s\" ;\n", t->name, c->target->name );
 
 	    if( c->target->fate == T_FATE_INIT )
 		make0( c->target, ptime, depth + 1, counts, anyhow );

@@ -215,7 +215,7 @@ make1b( TARGET *t )
 	    break;
 
 	case T_FATE_ISTMP:
-	    if( DEBUG_MAKE )
+	    if( DEBUG_MAKEQ )
 		printf( "...using %s...\n", t->name );
 	    break;
 

@@ -131,9 +131,9 @@ struct globs globs = {
 	0,			/* quitquick */
 	0,			/* newestfirst */
 # ifdef OS_MAC
-	{ 0, 0 },		/* debug - suppress tracing output */
+	{ 0 },			/* display - suppress actions output */
 # else
-	{ 0, 1 }, 		/* debug ... */
+	{ 0, 1 }, 		/* display actions  */
 # endif
 	0			/* output commands, not run them */
 } ;
@@ -181,9 +181,10 @@ main( int argc, char **argv, char **arg_environ )
 	    printf( "\nusage: jam [ options ] targets...\n\n" );
 
             printf( "-a      Build all targets, even if they are current.\n" );
-            printf( "-dx     Set the debug level to x (0-9).\n" );
+            printf( "-dx     Display (a)actions (c)causes (d)dependencies\n" );
+	    printf( "        (m)make tree (x)commands (0-9) debug levels.\n" );
             printf( "-fx     Read x instead of Jambase.\n" );
-	    /* printf( "-g      Build from newest sources first.\n" ); */
+	    printf( "-g      Build from newest sources first.\n" );
             printf( "-jx     Run up to x shell commands concurrently.\n" );
             printf( "-n      Don't actually execute the updating actions.\n" );
             printf( "-ox     Write the updating actions to file x.\n" );
@@ -210,7 +211,7 @@ main( int argc, char **argv, char **arg_environ )
 	/* Pick up interesting options */
 
 	if( ( s = getoptval( optv, 'n', 0 ) ) )
-	    globs.noexec++, globs.debug[2] = 1;
+	    globs.noexec++, DEBUG_MAKE = DEBUG_MAKEQ = DEBUG_EXEC = 1; 
 
 	if( ( s = getoptval( optv, 'q', 0 ) ) )
 	    globs.quitquick = 1;
@@ -228,29 +229,39 @@ main( int argc, char **argv, char **arg_environ )
 
 	for( n = 0; s = getoptval( optv, 'd', n ); n++ )
 	{
-	    int i;
+	    int i = atoi( s );
 
 	    /* First -d, turn off defaults. */
 
 	    if( !n )
-		for( i = 0; i < DEBUG_MAX; i++ )
-		    globs.debug[i] = 0;
+		DEBUG_MAKE = 0;
 
-	    i = atoi( s );
+	    /* n turns on levels 1-n */
+	    /* +n turns on level n */
+	    /* c turns on named display c */
 
 	    if( i < 0 || i >= DEBUG_MAX )
 	    {
 		printf( "Invalid debug level '%s'.\n", s );
-		continue;
 	    }
-
-	    /* n turns on levels 1-n */
-	    /* +n turns on level n */
-
-	    if( *s == '+' )
+	    else if( *s == '+' )
+	    {
 		globs.debug[i] = 1;
-	    else while( i )
+	    }
+	    else if( i ) while( i )
+	    {
 		globs.debug[i--] = 1;
+	    }
+	    else while( *s ) switch( *s++ )
+	    {
+	    case 'a': DEBUG_MAKE = DEBUG_MAKEQ = 1; break;
+	    case 'c': DEBUG_CAUSES = 1; break;
+	    case 'd': DEBUG_DEPENDS = 1; break;
+	    case 'm': DEBUG_MAKEPROG = 1; break;
+	    case 'x': DEBUG_EXEC = 1; break;
+	    case '0': break;
+	    default: printf( "Invalid debug flag '%c'.\n", s[-1] );
+	    }
 	}
 
 	/* Set JAMDATE first */
