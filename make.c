@@ -46,6 +46,7 @@
  * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
  * 01/03/03 (seiwald) - T_FATE_NEWER once again gets set with missing parent
+ * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
 # include "jam.h"
@@ -253,41 +254,36 @@ make0(
 
 	/* Step 3a: recursively make0() dependents */
 
-	/* Warn about circular deps. */
-
 	for( c = t->depends; c; c = c->next )
 	{
+	    int internal = t->flags & T_FLAG_INTERNAL;
+
 	    if( DEBUG_DEPENDS )
-		printf( "Depends \"%s\" : \"%s\" ;\n", 
+		printf( "%s \"%s\" : \"%s\" ;\n", 
+		    internal ? "Includes" : "Depends",
 		    t->name, c->target->name );
 
-	    if( c->target->fate == T_FATE_MAKING )
-		printf( "warning: %s depends on itself\n", c->target->name );
-	    else if( c->target->fate == T_FATE_INIT )
-		make0( c->target, ptime, depth + 1, counts, anyhow );
-	}
-
-	/* Step 3b: recursively make0() headers */
-
-	/* Ignore circular deps: headers include themselves a lot. */
-
-	for( c = t->includes; c; c = c->next )
-	{
-	    if( DEBUG_DEPENDS )
-		printf( "Includes \"%s\" : \"%s\" ;\n",
-		    t->name, c->target->name );
+	    /* Warn about circular deps, except for includes, */
+	    /* which include each other alot. */
 
 	    if( c->target->fate == T_FATE_INIT )
-		make0( c->target, p, depth + 1, counts, anyhow );
+		make0( c->target, ptime, depth + 1, counts, anyhow );
+	    else if( c->target->fate == T_FATE_MAKING && !internal )
+		printf( "warning: %s depends on itself\n", c->target->name );
 	}
+
+	/* Step 3b: recursively make0() internal includes node */
+
+	if( t->includes )
+	    make0( t->includes, p, depth + 1, counts, anyhow );
 
 	/* Step 3c: add dependents' includes to our direct dependencies */
 
 	incs = 0;
 
 	for( c = t->depends; c; c = c->next )
-	    for( d = c->target->includes; d; d = d->next )
-		incs = targetentry( incs, bindtarget( d->target->name ) );
+	    if( c->target->includes )
+		incs = targetentry( incs, c->target->includes );
 
 	t->depends = targetchain( t->depends, incs );
 
@@ -322,15 +318,10 @@ make0(
 
 	/* 
 	 * If a header is newer than a temp source that includes it, 
-	 * the temp source will need building.   Only bother for temp
-	 * sources.
+	 * the temp source will need building.   
 	 */
 
-	hlast = 0;
-
-	if( t->binding == T_BIND_PARENTS )
-	    for( c = t->includes; c; c = c->next )
-		hlast = max( hlast, c->target->time );
+	hlast = t->includes ? t->includes->time : 0;
 
 	/* Step 4c: handle NOUPDATE oddity */
 
@@ -450,6 +441,11 @@ make0(
 	/* 
 	 * Step 6: a little harmless tabulating for tracing purposes 
 	 */
+
+	/* Don't count or report interal includes nodes. */
+
+	if( t->flags & T_FLAG_INTERNAL )
+	    return;
 
 	if( !( ++counts->targets % 1000 ) && DEBUG_MAKE )
 	    printf( "...patience...\n" );

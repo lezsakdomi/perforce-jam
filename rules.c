@@ -11,6 +11,7 @@
  *
  *    bindrule() - return pointer to RULE, creating it if necessary
  *    bindtarget() - return pointer to TARGET, creating it if necessary
+ *    copytarget() - make a new target with the old target's name
  *    touchtarget() - mark a target to simulate being new
  *    targetlist() - turn list of target names into a TARGET chain
  *    targetentry() - add a TARGET to a chain of TARGETS
@@ -29,6 +30,7 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
+ * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
 # include "jam.h"
@@ -90,6 +92,27 @@ bindtarget( const char *targetname )
 	    t->name = newstr( targetname );	/* never freed */
 	    t->boundname = t->name;		/* default for T_FLAG_NOTFILE */
 	}
+
+	return t;
+}
+
+/*
+ * copytarget() - make a new target with the old target's name
+ *
+ * Not entered into hash table -- for internal nodes.
+ */
+
+TARGET *
+copytarget( const TARGET *ot )
+{
+	TARGET *t;
+
+	t = (TARGET *)malloc( sizeof( *t ) );
+	memset( (char *)t, '\0', sizeof( *t ) );
+	t->name = copystr( ot->name );
+	t->boundname = t->name;
+
+	t->flags |= T_FLAG_NOTFILE | T_FLAG_INTERNAL;
 
 	return t;
 }

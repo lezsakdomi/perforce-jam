@@ -33,6 +33,7 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
+ * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
 typedef struct _rule RULE;
@@ -111,6 +112,7 @@ struct _target {
 # define	T_FLAG_TOUCHED	0x08	/* ALWAYS applied or -t target */
 # define	T_FLAG_LEAVES	0x10	/* LEAVES applied */
 # define	T_FLAG_NOUPDATE	0x20	/* NOUPDATE applied */
+# define	T_FLAG_INTERNAL	0x40	/* internal INCLUDES node */
 
 	char		binding;	/* how target relates to real file */
 
@@ -120,7 +122,7 @@ struct _target {
 # define 	T_BIND_EXISTS	3	/* real file, timestamp valid */
 
 	TARGETS		*depends;	/* dependencies */
-	TARGETS		*includes;	/* includes */
+	TARGET		*includes;	/* includes */
 
 	time_t		time;		/* update time */
 	time_t		leaf;		/* update time of leaf sources */
@@ -163,6 +165,7 @@ struct _target {
 
 RULE 	*bindrule( const char *rulename );
 TARGET *bindtarget( const char *targetname );
+TARGET *copytarget( const TARGET *t );
 void 	touchtarget( const char *t );
 TARGETS *targetlist( TARGETS *chain, LIST  *targets );
 TARGETS *targetentry( TARGETS *chain, TARGET *target );

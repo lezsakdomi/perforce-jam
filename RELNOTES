@@ -11,7 +11,10 @@ Release notes for Jam 2.5
 	var_expand() and file_archscan(), thanks to Matt Armstrong.
 
 	Fix 'actions updated' broken by change 2487.  (See the
-	description to change 2612 for details.)
+	description to change 2612 for details).
+
+	Fix "includes of includes not being considered", broken by 2499.
+	(See the description to change 2614 for details).
 
 1.  Release info:
 

@@ -28,6 +28,7 @@
  * 10/22/02 (seiwald) - working return/break/continue statements
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
+ * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
 # include "jam.h"
@@ -128,17 +129,24 @@ builtin_depends(
 {
 	LIST *targets = lol_get( args, 0 );
 	LIST *sources = lol_get( args, 1 );
-	int which = parse->num;
 	LIST *l;
 
 	for( l = targets; l; l = list_next( l ) )
 	{
 	    TARGET *t = bindtarget( l->string );
 
-	    if( !which )
-		t->depends = targetlist( t->depends, sources );
-	    else
-		t->includes = targetlist( t->includes, sources );
+	    /* If doing INCLUDES, switch to the TARGET's include */
+	    /* TARGET, creating it if needed.  The internal include */
+	    /* TARGET shares the name of its parent. */
+
+	    if( parse->num )
+	    {
+		if( !t->includes )
+		    t->includes = copytarget( t );
+		t = t->includes;
+	    }
+
+	    t->depends = targetlist( t->depends, sources );
 	}
 
 	return L0;
