@@ -26,6 +26,7 @@
  * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
  * 11/04/02 (seiwald) - const-ing for string literals
  * 01/23/03 (seiwald) - long long handles for NT IA64
+ * 08/18/03 (seiwald) - GHS librarian names, from Jeff Nicholson
  */
 
 # include "jam.h"
@@ -239,8 +240,12 @@ file_archscan(
 		** in ASCII decimals.
 		*/
 
-		name = string_table + atoi( ar_hdr.ar_name + 1 );
-		endname = name + strlen( name );
+		name = endname = string_table + atoi( ar_hdr.ar_name + 1 );
+
+		/* GHS librarian ends names with \n; else null */
+
+		while( *endname && *endname != '\n' )
+		    ++endname;
 	    }
 	    else
 	    {
