@@ -568,6 +568,8 @@ else if $(UNIX)
 	SHELLMODE	?= 755 ;
 	SLASH		?= / ;
 	STDHDRS		?= /usr/include ;
+	SUBDIRRULES 	?= ;
+	SUBDIRRESET 	?= ASFLAGS HDRS C++FLAGS CCFLAGS ;
 	SUFEXE		?= "" ;
 	SUFLIB		?= .a ;
 	SUFOBJ		?= .o ;
@@ -1287,6 +1289,16 @@ rule SubDir
 		$(_top) = [ FSubDirPath $(_top) ] ;
 	    }
 
+	    # Set subdir vars for the inclusion of the Jamrules,
+	    # just in case they have SubDir rules of their own.
+	    # Note that SUBDIR_DOWN is empty: it's all the way
+	    # up where the Jamrules live.  These gets overrided
+	    # just after the inclusion.
+
+	    SUBDIR_UP = $($(_top)-UP) ;
+	    SUBDIR_DOWN = ;
+	    SUBDIR_ROOT = $($(_top)-ROOT) ;
+
 	    # Include $(TOPRULES) or $(TOP)/Jamrules.
 	    # Include $(TOPRULES) if set.
 	    # Otherwise include $(TOP)/Jamrules if present.
@@ -1319,11 +1331,17 @@ rule SubDir
 	LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(SUBDIR) ;
 	SOURCE_GRIST = [ FGrist $(SUBDIR_TOKENS) ] ;
 
-	# Reset per-directory ccflags, hdrs
+	# Reset per-directory ccflags, hdrs, etc,
+	# listed in SUBDIRRESET.
+	# Note use of variable expanded assignment var
 
-	SUBDIRCCFLAGS = ;
-	SUBDIRC++FLAGS = ;
-	SUBDIRHDRS = ;
+	SUBDIR$(SUBDIRRESET) = ;
+
+	# Invoke user-specific SubDir extensions,
+	# rule names listed in SUBDIRRULES.
+	# Note use of variable expanded rule invocation
+
+	$(SUBDIRRULES) $(<) ;
 }
 
 rule FSubDirPath

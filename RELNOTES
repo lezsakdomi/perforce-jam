@@ -46,6 +46,12 @@ Release notes for Jam 2.5
 	Essentially includes the ../server/support/Jamfile, without getting
 	confused as to the current directory.
 
+0.1. Changes between 2.5rc2 and 2.5rc3:
+
+	More SubDir work after rc2: if a Jamrules invoked SubDir to 
+	establish other roots, and that Jamrules isn't in the current
+	directory, the roots it established were wrong.
+
 	Fix mysterious rebuild problem:  in an attempt to make 'jam -dc'
 	output report headers updates more accurately, internal (header
 	collection) targets were being bound as T_BIND_PARENTS so that
@@ -60,6 +66,11 @@ Release notes for Jam 2.5
 	the same name and get reused, but with 2.5 the names were salted
 	with the PID and they would litter $TEMP.  Now they get removed
 	after being used.
+
+	Undocumented support for SUBDIRRULES, user-provided rules
+	to invoke at the end of the SubDir rule, and SUBDIRRESET,
+	SUBDIR variables to reset (like SUBDIRC++FLAGS, SUBDIRHDRS, etc)
+	for each new SubDir.
 
 1.  Release info:
 
