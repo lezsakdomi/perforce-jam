@@ -45,7 +45,7 @@ struct _rule {
 	LIST	*bindlist;		/* variable to bind for actions */
 	int	flags;			/* modifiers on ACTIONS */
 
-# define	RULE_NEWSRCS	0x01	/* $(>) is updated sources only */
+# define	RULE_UPDATED	0x01	/* $(>) is updated sources only */
 # define	RULE_TOGETHER	0x02	/* combine actions on single target */
 # define	RULE_IGNORE	0x04	/* ignore return status of executes */
 # define	RULE_QUIETLY	0x08	/* don't mention it unless verbose */

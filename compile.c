@@ -642,7 +642,7 @@ compile_setexec(
 
 	rule->actions = copystr( parse->string1 );
 	rule->bindlist = bindlist;
-	rule->flags = parse->num; /* XXX translate this properly */
+	rule->flags = parse->num;
 
 	return L0;
 }

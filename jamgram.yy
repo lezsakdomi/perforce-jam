@@ -51,6 +51,7 @@
 #include "scan.h"
 #include "compile.h"
 #include "newstr.h"
+#include "rules.h"
 
 # define F0 (LIST *(*)(PARSE *, LOL *))0
 # define P0 (PARSE *)0
@@ -266,17 +267,17 @@ eflags	: /* empty */
 	;
 
 eflag	: `updated`
-		{ $$.number = EXEC_UPDATED; }
+		{ $$.number = RULE_UPDATED; }
 	| `together`
-		{ $$.number = EXEC_TOGETHER; }
+		{ $$.number = RULE_TOGETHER; }
 	| `ignore`
-		{ $$.number = EXEC_IGNORE; }
+		{ $$.number = RULE_IGNORE; }
 	| `quietly`
-		{ $$.number = EXEC_QUIETLY; }
+		{ $$.number = RULE_QUIETLY; }
 	| `piecemeal`
-		{ $$.number = EXEC_PIECEMEAL; }
+		{ $$.number = RULE_PIECEMEAL; }
 	| `existing`
-		{ $$.number = EXEC_EXISTING; }
+		{ $$.number = RULE_EXISTING; }
 	;
 
 

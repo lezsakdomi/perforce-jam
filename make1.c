@@ -398,7 +398,7 @@ make1d(
  *
  * Essentially copies a chain of ACTIONs to a chain of CMDs, 
  * grouping RULE_TOGETHER actions, splitting RULE_PIECEMEAL actions,
- * and handling RULE_NEWSRCS actions.  The result is a chain of
+ * and handling RULE_UPDATED actions.  The result is a chain of
  * CMDs which can be expanded by var_string() and executed with
  * execcmd().
  */
@@ -448,7 +448,7 @@ make1cmds( ACTIONS *a0 )
 	    /* If doing only updated (or existing) sources, but none have */
 	    /* been updated (or exist), skip this action. */
 
-	    if( !ns && ( rule->flags & ( RULE_NEWSRCS | RULE_EXISTING ) ) )
+	    if( !ns && ( rule->flags & ( RULE_UPDATED | RULE_EXISTING ) ) )
 	    {
 		list_free( nt );
 		continue;
@@ -554,7 +554,7 @@ make1list(
 	if( ( flags & RULE_EXISTING ) && t->binding != T_BIND_EXISTS )
 	    continue;
 
-	if( ( flags & RULE_NEWSRCS ) && t->fate <= T_FATE_STABLE )
+	if( ( flags & RULE_UPDATED ) && t->fate <= T_FATE_STABLE )
 	    continue;
 
 	/* Prohibit duplicates for RULE_TOGETHER */
