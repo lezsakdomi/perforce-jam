@@ -48,7 +48,7 @@ LIST *builtin_flags( PARSE *parse, LOL *args, int *jmp );
 LIST *builtin_glob( PARSE *parse, LOL *args, int *jmp );
 LIST *builtin_match( PARSE *parse, LOL *args, int *jmp );
 
-int glob( char *s, char *c );
+int glob( const char *s, const char *c );
 
 void
 load_builtins()
@@ -203,7 +203,7 @@ struct globbing {
 static void
 builtin_glob_back(
 	void	*closure,
-	char	*file,
+	const char *file,
 	int	status,
 	time_t	time )
 {

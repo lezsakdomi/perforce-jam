@@ -24,12 +24,12 @@
 typedef struct _binding BINDING;
 
 struct _binding {
-	char	*name;
-	short	flags;
+	const char	*name;
+	short		flags;
 
 # define BIND_SCANNED	0x01	/* if directory or arch, has been scanned */
 
-	short	progress;
+	short		progress;
 
 # define BIND_INIT	0	/* never seen */
 # define BIND_NOENTRY	1	/* timestamp requested but file never found */
@@ -37,13 +37,13 @@ struct _binding {
 # define BIND_MISSING	3	/* file found but can't get timestamp */
 # define BIND_FOUND	4	/* file found and time stamped */
 
-	time_t	time;		/* update time - 0 if not exist */
+	time_t		time;	/* update time - 0 if not exist */
 } ;
 
 static struct hash *bindhash = 0;
-static void time_enter( void *, char *, int , time_t  );
+static void time_enter( void *, const char *, int , time_t  );
 
-static char *time_progress[] =
+static const char *time_progress[] =
 {
 	"INIT",
 	"NOENTRY",
@@ -161,10 +161,10 @@ timestamp(
 
 static void
 time_enter( 
-	void	*closure,
-	char	*target,
-	int	found,
-	time_t	time )
+	void		*closure,
+	const char	*target,
+	int		found,
+	time_t		time )
 {
 	BINDING	binding, *b = &binding;
 	struct hash *bindhash = (struct hash *)closure;

@@ -26,7 +26,7 @@
  */
 
 struct keyword {
-	char *word;
+	const char *word;
 	int type;
 } keywords[] = {
 # include "jamgramtab.h"
@@ -34,13 +34,13 @@ struct keyword {
 } ;
 
 struct include {
-	struct include *next;	/* next serial include file */
-	char 	*string;	/* pointer into current line */
-	char	**strings;	/* for yyfparse() -- text to parse */
-	FILE 	*file;		/* for yyfparse() -- file being read */
-	char 	*fname;		/* for yyfparse() -- file name */
-	int 	line;		/* line counter for error messages */
-	char 	buf[ 512 ];	/* for yyfparse() -- line buffer */
+	struct include 	*next;		/* next serial include file */
+	const char 	*string;	/* pointer into current line */
+	char		**strings;	/* for yyfparse() -- text to parse */
+	FILE 		*file;		/* for yyfparse() -- file being read */
+	const char 	*fname;		/* for yyfparse() -- file name */
+	int 		line;		/* line counter for error messages */
+	char 		buf[ 512 ];	/* for yyfparse() -- line buffer */
 } ;
 
 static struct include *incp = 0; /* current file; head of chain */
@@ -62,7 +62,7 @@ yymode( int n )
 }
 
 void
-yyerror( char *s )
+yyerror( const char *s )
 {
 	if( incp )
 	    printf( "%s: line %d: ", incp->fname, incp->line );
@@ -79,7 +79,7 @@ yyanyerrors()
 }
 
 void
-yyfparse( char *s )
+yyfparse( const char *s )
 {
 	struct include *i = (struct include *)malloc( sizeof( *i ) );
 

@@ -65,8 +65,8 @@
  * 10/22/02 (seiwald) - support for break/continue/return.
  */
 
-static void debug_compile( int which, char *s );
-int glob( char *s, char *c );
+static void debug_compile( int which, const char *s );
+int glob( const char *s, const char *c );
 
 
 
@@ -123,8 +123,8 @@ lcmp( LIST *t, LIST *s )
 
 	while( !status && ( t || s ) )
 	{
-	    char *st = t ? t->string : "";
-	    char *ss = s ? s->string : "";
+	    const char *st = t ? t->string : "";
+	    const char *ss = s ? s->string : "";
 
 	    status = strcmp( st, ss );
 
@@ -353,7 +353,7 @@ compile_list(
 	int	*jmp )
 {
 	/* voodoo 1 means: s is a copyable string */
-	char *s = parse->string;
+	const char *s = parse->string;
 	return var_expand( L0, s, s + strlen( s ), args, 1 );
 }
 
@@ -508,7 +508,7 @@ compile_rule(
 
 LIST *
 evaluate_rule(
-	char	*rulename,
+	const char *rulename,
 	LOL	*args, 
 	LIST	*result )
 {
@@ -635,7 +635,7 @@ compile_set(
 	LIST	*ns = (*parse->right->func)( parse->right, args, jmp );
 	LIST	*l;
 	int	setflag;
-	char	*trace;
+	const char *trace;
 
 	switch( parse->num )
 	{
@@ -901,7 +901,7 @@ compile_while(
  */
 
 static void
-debug_compile( int which, char *s )
+debug_compile( int which, const char *s )
 {
 	static int level = 0;
 	static char indent[36] = ">>>>|>>>>|>>>>|>>>>|>>>>|>>>>|>>>>|";

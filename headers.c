@@ -35,7 +35,7 @@
  *		just to invoke a rule.
  */
 
-static LIST *headers1( LIST *l, char *file, int rec, regexp *re[] );
+static LIST *headers1( LIST *l, const char *file, int rec, regexp *re[] );
 
 /*
  * headers() - scan a target for include files and call HDRRULE
@@ -92,39 +92,37 @@ headers( TARGET *t )
 
 static LIST *
 headers1( 
-	LIST	*l,
-	char	*file,
+	LIST	*result,
+	const char *file,
 	int	rec,
 	regexp	*re[] )
 {
 	FILE	*f;
 	char	buf[ 1024 ];
-	int		i;
+	int	i;
 
 	if( !( f = fopen( file, "r" ) ) )
-	    return l;
+	    return result;
 
 	while( fgets( buf, sizeof( buf ), f ) )
 	{
 	    for( i = 0; i < rec; i++ )
 		if( regexec( re[i], buf ) && re[i]->startp[1] )
 	    {
-		re[i]->endp[1][0] = '\0';
+		/* Copy and terminate extracted string. */
+
+		char buf2[ MAXSYM ];
+		int l = re[i]->endp[1] - re[i]->startp[1];
+		memcpy( buf2, re[i]->startp[1], l );
+		buf2[ l ] = 0;
+		result = list_new( result, buf2, 0 );
 
 		if( DEBUG_HEADER )
-		    printf( "header found: %s\n", re[i]->startp[1] );
-
-		l = list_new( l, re[i]->startp[1], 0 );
+		    printf( "header found: %s\n", buf2 );
 	    }
 	}
 
 	fclose( f );
 
-	return l;
-}
-
-void
-regerror( char *s )
-{
-	printf( "re error %s\n", s );
+	return result;
 }

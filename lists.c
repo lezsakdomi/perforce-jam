@@ -61,7 +61,7 @@ list_append(
 LIST *
 list_new( 
 	LIST	*head,
-	char	*string,
+	const char *string,
 	int	copy )
 {
 	LIST *l;

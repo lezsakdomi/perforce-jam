@@ -16,9 +16,9 @@
  * search.c - find a target along $(SEARCH) or $(LOCATE) 
  */
 
-char *
+const char *
 search( 
-	char	*target,
+	const char *target,
 	time_t	*time )
 {
 	PATHNAME f[1];

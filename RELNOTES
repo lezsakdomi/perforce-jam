@@ -48,6 +48,9 @@ Changes since Jam 2.4
 	The 'return' statement now actually returns, and there is
 	now break/continue statements for for/while loops.
 
+	The jam code underwent a const-ing, to work with compilers
+	that don't like "" being passed as a non-const char *.
+
 ===============================================================================
 ===============================================================================
 

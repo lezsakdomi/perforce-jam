@@ -31,7 +31,7 @@
 
 typedef struct _YYSTYPE {
 	int		type;
-	char		*string;
+	const char	*string;
 	PARSE		*parse;
 	LIST		*list;
 	int		number;
@@ -40,9 +40,9 @@ typedef struct _YYSTYPE {
 extern YYSTYPE yylval;
 
 void yymode( int n );
-void yyerror( char *s );
+void yyerror( const char *s );
 int yyanyerrors();
-void yyfparse( char *s );
+void yyfparse( const char *s );
 int yyline();
 int yylex();
 int yyparse();

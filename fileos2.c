@@ -39,7 +39,7 @@
 
 void
 file_dirscan( 
-	char *dir,
+	const char *dir,
 	scanback func,
 	void	*closure )
 {
@@ -103,7 +103,7 @@ file_dirscan(
 
 int
 file_time(
-	char	*filename,
+	const char *filename,
 	time_t	*time )
 {
 	/* This is called on OS2, not NT.  */
@@ -121,7 +121,7 @@ file_time(
 
 void
 file_archscan(
-	char *archive,
+	const char *archive,
 	scanback func,
 	void	*closure )
 {

@@ -169,7 +169,7 @@ make1b( TARGET *t )
 {
 	TARGETS	*c;
 	int 	i;
-	char 	*failed = "dependents";
+	const char *failed = "dependents";
 
 	/* If any dependents are still outstanding, wait until they */
 	/* call make1b() to signal their completion. */

@@ -140,7 +140,7 @@ struct globs globs = {
 
 /* Symbols to be defined as true for use in Jambase */
 
-static char *othersyms[] = { OSMAJOR, OSMINOR, OSPLAT, JAMVERSYM, 0 } ;
+static const char *othersyms[] = { OSMAJOR, OSMINOR, OSPLAT, JAMVERSYM, 0 } ;
 
 /* Known for sure: 
  *	mac needs arg_enviro
@@ -164,9 +164,9 @@ extern char **environ;
 main( int argc, char **argv, char **arg_environ )
 {
 	int		n;
-	char		*s;
+	const char	*s;
 	struct option	optv[N_OPTS];
-	char		*all = "all";
+	const char	*all = "all";
 	int		anyhow = 0;
 	int		status;
 
@@ -267,17 +267,17 @@ main( int argc, char **argv, char **arg_environ )
 	/* Set JAMDATE first */
 
 	{
-	    char *date;
+	    char buf[ 128 ];
 	    time_t clock;
 	    time( &clock );
-	    date = newstr( ctime( &clock ) );
+	    strcpy( buf, ctime( &clock ) );
 
 	    /* Trim newline from date */
 
-	    if( strlen( date ) == 25 )
-		date[ 24 ] = 0;
+	    if( strlen( buf ) == 25 )
+		buf[ 24 ] = 0;
 
-	    var_set( "JAMDATE", list_new( L0, date, 0 ), VAR_SET );
+	    var_set( "JAMDATE", list_new( L0, buf, 0 ), VAR_SET );
 	}
 
 	/* And JAMUNAME */
@@ -306,13 +306,13 @@ main( int argc, char **argv, char **arg_environ )
 
 	/* load up environment variables */
 
-	var_defines( use_environ );
+	var_defines( (const char **)use_environ );
 
 	/* Load up variables set on command line. */
 
 	for( n = 0; s = getoptval( optv, 's', n ); n++ )
 	{
-	    char *symv[2];
+	    const char *symv[2];
 	    symv[0] = s;
 	    symv[1] = 0;
 	    var_defines( symv );
@@ -354,7 +354,7 @@ main( int argc, char **argv, char **arg_environ )
 	if( !argc )
 	    status |= make( 1, &all, anyhow );
 	else
-	    status |= make( argc, argv, anyhow );
+	    status |= make( argc, (const char **)argv, anyhow );
 
 	/* Widely scattered cleanup */
 

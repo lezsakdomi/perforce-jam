@@ -29,7 +29,7 @@ LIST *compile_settings( PARSE *parse, LOL *args, int *jmp );
 LIST *compile_switch( PARSE *parse, LOL *args, int *jmp );
 LIST *compile_while( PARSE *parse, LOL *args, int *jmp );
 
-LIST *evaluate_rule( char *rulename, LOL *args, LIST *result );
+LIST *evaluate_rule( const char *rulename, LOL *args, LIST *result );
 
 /* Flags for compile_set(), etc */
 

@@ -99,7 +99,7 @@ execcmd(
 {
 	int pid;
 	int slot;
-	char *argv[ MAXARGC + 1 ];	/* +1 for NULL */
+	const char *argv[ MAXARGC + 1 ];	/* +1 for NULL */
 
 # ifdef USE_EXECNT
 	char *p;

@@ -45,12 +45,12 @@ static struct hash *varhash = 0;
 typedef struct _variable VARIABLE ;
 
 struct _variable {
-	char	*symbol;
-	LIST	*value;
+	const char	*symbol;
+	LIST		*value;
 } ;
 
-static VARIABLE *var_enter( char *symbol );
-static void var_dump( char *symbol, LIST *value, char *what );
+static VARIABLE *var_enter( const char *symbol );
+static void var_dump( const char *symbol, LIST *value, const char *what );
 
 
 
@@ -62,11 +62,11 @@ static void var_dump( char *symbol, LIST *value, char *what );
  */
 
 void
-var_defines( char **e )
+var_defines( const char **e )
 {
 	for( ; *e; e++ )
 	{
-	    char *val;
+	    const char *val;
 
 	    /* Just say "no": windows defines this in the env, */
 	    /* but we don't want it to override our notion of OS. */
@@ -84,7 +84,7 @@ var_defines( char **e )
 # endif
 	    {
 		LIST *l = L0;
-		char *pp, *p;
+		const char *pp, *p;
 # ifdef OS_MAC
 		char split = ',';
 # else
@@ -131,7 +131,7 @@ var_defines( char **e )
 
 int
 var_string(
-	char	*in,
+	const char *in,
 	char	*out,
 	int	outsize,
 	LOL	*lol )
@@ -211,7 +211,7 @@ var_string(
  */
 
 LIST *
-var_get( char *symbol )
+var_get( const char *symbol )
 {
 	VARIABLE var, *v = &var;
 
@@ -240,7 +240,7 @@ var_get( char *symbol )
 
 void
 var_set(
-	char	*symbol,
+	const char *symbol,
 	LIST	*value,
 	int	flag )
 {
@@ -278,7 +278,7 @@ var_set(
 
 LIST *
 var_swap(
-	char	*symbol,
+	const char *symbol,
 	LIST	*value )
 {
 	VARIABLE *v = var_enter( symbol );
@@ -299,7 +299,7 @@ var_swap(
  */
 
 static VARIABLE *
-var_enter( char	*symbol )
+var_enter( const char *symbol )
 {
 	VARIABLE var, *v = &var;
 
@@ -321,9 +321,9 @@ var_enter( char	*symbol )
 
 static void
 var_dump(
-	char	*symbol,
-	LIST	*value,
-	char	*what )
+	const char	*symbol,
+	LIST		*value,
+	const char	*what )
 {
 	printf( "%s %s = ", what, symbol );
 	list_print( value );

@@ -99,7 +99,7 @@ file_cvttime(
 
 void
 file_dirscan( 
-	char *dir,
+	const char *dir,
 	scanback func,
 	void	*closure )
 {
@@ -224,7 +224,7 @@ file_dirscan(
 
 int
 file_time(
-	char	*filename,
+	const char *filename,
 	time_t	*time )
 {
 	/* This should never be called, as all files are */
@@ -281,7 +281,7 @@ file_archmember(
 
 void
 file_archscan(
-	char *archive,
+	const char *archive,
 	scanback func,
 	void	*closure )
 {

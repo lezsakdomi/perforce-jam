@@ -8,4 +8,4 @@
  * search.h - find a target along $(SEARCH) or $(LOCATE) 
  */
 
-char *search( char *target, time_t *time );
+const char *search( const char *target, time_t *time );

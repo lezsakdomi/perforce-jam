@@ -29,7 +29,7 @@
 # define CHECK_BIT( tab, bit ) ( tab[ (bit)/8 ] & (1<<( (bit)%8 )) )
 # define BITLISTSIZE 16	/* bytes used for [chars] in compiled expr */
 
-static void globchars( char *s, char *e, char *b );
+static void globchars( const char *s, const char *e, char *b );
 
 /*
  * glob() - match a string against a simple pattern
@@ -37,11 +37,11 @@ static void globchars( char *s, char *e, char *b );
 
 int
 glob(
-	register char *c,
-	register char *s )
+	const char *c,
+	const char *s )
 {
 	char bitlist[ BITLISTSIZE ];
-	char *here;
+	const char *here;
 
 	for( ;; )
 	    switch( *c++ )
@@ -118,8 +118,8 @@ glob(
 
 static void
 globchars( 
-	char *s, 
-	char *e, 
+	const char *s, 
+	const char *e, 
 	char *b )
 {
 	int neg = 0;

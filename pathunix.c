@@ -43,11 +43,11 @@
 
 void
 path_parse( 
-	char	*file,
+	const char *file,
 	PATHNAME *f )
 {
-	char *p, *q;
-	char *end;
+	const char *p, *q;
+	const char *end;
 	
 	memset( (char *)f, 0, sizeof( *f ) );
 

@@ -39,12 +39,12 @@ typedef struct _settings SETTINGS ;
 /* RULE - a generic jam rule, the product of RULE and ACTIONS */
 
 struct _rule {
-	char	*name;
-	PARSE	*procedure;		/* parse tree from RULE */
-	char	*actions;		/* command string from ACTIONS */
-	LIST	*bindlist;		/* variable to bind for actions */
-	LIST	*params;		/* bind args to local vars */
-	int	flags;			/* modifiers on ACTIONS */
+	const char	*name;
+	PARSE		*procedure;	/* parse tree from RULE */
+	const char	*actions;	/* command string from ACTIONS */
+	LIST		*bindlist;	/* variable to bind for actions */
+	LIST		*params;	/* bind args to local vars */
+	int		flags;		/* modifiers on ACTIONS */
 
 # define	RULE_UPDATED	0x01	/* $(>) is updated sources only */
 # define	RULE_TOGETHER	0x02	/* combine actions on single target */
@@ -58,46 +58,46 @@ struct _rule {
 /* ACTIONS - a chain of ACTIONs */
 
 struct _actions {
-	ACTIONS	*next;
-	ACTIONS	*tail;			/* valid only for head */
-	ACTION	*action;
+	ACTIONS		*next;
+	ACTIONS		*tail;		/* valid only for head */
+	ACTION		*action;
 } ;
 
 /* ACTION - a RULE instance with targets and sources */
 
 struct _action {
-	RULE	*rule;
-	TARGETS	*targets;
-	TARGETS	*sources;		/* aka $(>) */
-	char	running;		/* has been started */
-	char	status;			/* see TARGET status */
+	RULE		*rule;
+	TARGETS		*targets;
+	TARGETS		*sources;	/* aka $(>) */
+	char		running;	/* has been started */
+	char		status;		/* see TARGET status */
 } ;
 
 /* SETTINGS - variables to set when executing a TARGET's ACTIONS */
 
 struct _settings {
-	SETTINGS *next;
-	char	*symbol;		/* symbol name for var_set() */
-	LIST	*value;			/* symbol value for var_set() */
+	SETTINGS 	*next;
+	const char	*symbol;	/* symbol name for var_set() */
+	LIST		*value;		/* symbol value for var_set() */
 } ;
 
 /* TARGETS - a chain of TARGETs */
 
 struct _targets {
-	TARGETS	*next;
-	TARGETS	*tail;			/* valid only for head */
-	TARGET	*target;
+	TARGETS		*next;
+	TARGETS		*tail;		/* valid only for head */
+	TARGET		*target;
 } ;
 
 /* TARGET - a file or "thing" that can be built */
 
 struct _target {
-	char	*name;
-	char	*boundname;		/* if search() relocates target */
-	ACTIONS	*actions;		/* rules to execute, if any */
-	SETTINGS *settings;		/* variables to define */
+	const char	*name;
+	const char	*boundname;	/* if search() relocates target */
+	ACTIONS		*actions;	/* rules to execute, if any */
+	SETTINGS 	*settings;	/* variables to define */
 
-	char	flags;			/* status info */
+	char		flags;		/* status info */
 
 # define 	T_FLAG_TEMP 	0x01	/* TEMPORARY applied */
 # define 	T_FLAG_NOCARE 	0x02	/* NOCARE applied */
@@ -106,25 +106,25 @@ struct _target {
 # define	T_FLAG_LEAVES	0x10	/* LEAVES applied */
 # define	T_FLAG_NOUPDATE	0x20	/* NOUPDATE applied */
 
-	char	binding;		/* how target relates to real file */
+	char		binding;	/* how target relates to real file */
 
 # define 	T_BIND_UNBOUND	0	/* a disembodied name */
 # define 	T_BIND_MISSING	1	/* couldn't find real file */
 # define 	T_BIND_PARENTS	2	/* using parent's timestamp */
 # define 	T_BIND_EXISTS	3	/* real file, timestamp valid */
 
-	TARGETS	*deps[2];		/* dependencies */
+	TARGETS		*deps[2];	/* dependencies */
 
 # define	T_DEPS_DEPENDS	0	/* due to DEPENDS */
 # define	T_DEPS_INCLUDES	1	/* due to INCLUDES */
 
-	time_t	time;			/* update time */
-	time_t	leaf;			/* update time of leaf sources */
-	time_t	htime;			/* header's time */
-	time_t	hleaf;			/* update time of leaf headers */
+	time_t		time;		/* update time */
+	time_t		leaf;		/* update time of leaf sources */
+	time_t		htime;		/* header's time */
+	time_t		hleaf;		/* update time of leaf headers */
 
-	char	fate;			/* make0()'s diagnosis */
-	char	hfate;			/* collected fate for headers */
+	char		fate;		/* make0()'s diagnosis */
+	char		hfate;		/* collected fate for headers */
 
 # define 	T_FATE_INIT	0	/* nothing done to target */
 # define 	T_FATE_MAKING	1	/* make0(target) on stack */
@@ -146,7 +146,7 @@ struct _target {
 # define 	T_FATE_CANTFIND	10	/* no rules to make missing target */
 # define 	T_FATE_CANTMAKE	11	/* can't find dependents */
 
-	char	progress;		/* tracks make1() progress */
+	char		progress;	/* tracks make1() progress */
 
 # define	T_MAKE_INIT	0	/* make1(target) not yet called */
 # define	T_MAKE_ONSTACK	1	/* make1(target) on stack */
@@ -154,20 +154,20 @@ struct _target {
 # define	T_MAKE_RUNNING	3	/* make1(target) running commands */
 # define	T_MAKE_DONE	4	/* make1(target) done */
 
-	char	status;			/* execcmd() result */
+	char		status;		/* execcmd() result */
 
-	int	asynccnt;		/* child deps outstanding */
-	TARGETS	*parents;		/* used by make1() for completion */
-	char	*cmds;			/* type-punned command list */
+	int		asynccnt;	/* child deps outstanding */
+	TARGETS		*parents;	/* used by make1() for completion */
+	char		*cmds;		/* type-punned command list */
 } ;
 
-RULE 	*bindrule( char *rulename );
-TARGET *bindtarget( char *targetname );
-void 	touchtarget( char *t );
+RULE 	*bindrule( const char *rulename );
+TARGET *bindtarget( const char *targetname );
+void 	touchtarget( const char *t );
 TARGETS *targetlist( TARGETS *chain, LIST  *targets );
 TARGETS *targetentry( TARGETS *chain, TARGET *target );
 ACTIONS *actionlist( ACTIONS *chain, ACTION *action );
-SETTINGS *addsettings( SETTINGS *head, int append, char *symbol, LIST *value );
+SETTINGS *addsettings( SETTINGS *v, int append, const char *symbol, LIST *value );
 void 	pushsettings( SETTINGS *v );
 void 	popsettings( SETTINGS *v );
 void 	freesettings( SETTINGS *v );

@@ -94,7 +94,7 @@ struct ar_hdr		/* archive file member header - printable ascii */
 
 void
 file_dirscan( 
-	char *dir,
+	const char *dir,
 	scanback func,
 	void *closure )
 {
@@ -149,7 +149,7 @@ file_dirscan(
 
 int
 file_time(
-	char	*filename,
+	const char *filename,
 	time_t	*time )
 {
 	struct stat statbuf;
@@ -172,7 +172,7 @@ file_time(
 
 void
 file_archscan(
-	char *archive,
+	const char *archive,
 	scanback func,
 	void *closure )
 {
@@ -295,7 +295,7 @@ file_archscan(
 
 void
 file_archscan(
-	char *archive,
+	const char *archive,
 	scanback func,
 	void *closure )
 {

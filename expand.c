@@ -39,8 +39,8 @@ typedef struct {
 	PATHPART	join;		/* :J -- join list with char */
 } VAR_EDITS ;
 
-static void var_edit_parse( char *mods, VAR_EDITS *edits );
-static void var_edit_file( char *in, char *out, VAR_EDITS *edits );
+static void var_edit_parse( const char *mods, VAR_EDITS *edits );
+static void var_edit_file( const char *in, char *out, VAR_EDITS *edits );
 static void var_edit_shift( char *out, VAR_EDITS *edits );
 
 # define MAGIC_COLON	'\001'
@@ -61,15 +61,15 @@ static void var_edit_shift( char *out, VAR_EDITS *edits );
 
 LIST *
 var_expand( 
-	LIST	*l,
-	char	*in,
-	char	*end,
-	LOL	*lol,
-	int	cancopyin )
+	LIST		*l,
+	const char 	*in,
+	const char 	*end,
+	LOL		*lol,
+	int		cancopyin )
 {
 	char out_buf[ MAXSYM ];
 	char *out = out_buf;
-	char *inp = in;
+	const char *inp = in;
 	char *ov;		/* for temp copy of variable in outbuf */
 	int depth;
 
@@ -380,7 +380,7 @@ var_expand(
 
 static void
 var_edit_parse(
-	char		*mods,
+	const char	*mods,
 	VAR_EDITS	*edits )
 {
 	int havezeroed = 0;
@@ -463,7 +463,7 @@ var_edit_parse(
 	
 static void
 var_edit_file( 
-	char	*in,
+	const char *in,
 	char	*out,
 	VAR_EDITS *edits )
 {

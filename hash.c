@@ -23,8 +23,6 @@
  * 4/29/93 - ensure ITEM's are aligned
  */
 
-char 	*hashsccssid="@(#)hash.c	1.14  ()  6/20/88";
-
 /* Header attached to all data items entered into a hash table. */
 
 struct hashhdr {
@@ -78,7 +76,7 @@ struct hash
 		} lists[ MAX_LISTS ];
 	} items;
 
-	char *name;	/* just for hashstats() */
+	const char *name;	/* just for hashstats() */
 } ;
 
 static void hashrehash( struct hash *hp );
@@ -187,7 +185,7 @@ static void hashrehash( register struct hash *hp )
 struct hash *
 hashinit( 
 	int datalen,
-	char *name )
+	const char *name )
 {
 	struct hash *hp = (struct hash *)malloc( sizeof( *hp ) );
 

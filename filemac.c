@@ -53,7 +53,7 @@ void CopyC2PStr(const char * cstr, StringPtr pstr)
 
 void
 file_dirscan( 
-	char	*dir,
+	const char *dir,
 	scanback func,
 	void	*closure )
 {
@@ -135,7 +135,7 @@ file_dirscan(
 
 int
 file_time( 
-	char	*filename,
+	const char *filename,
 	time_t	*time )
 {
 	struct stat statbuf;
@@ -154,7 +154,7 @@ file_time(
 
 void
 file_archscan(
-	char 	*archive,
+	const char *archive,
 	scanback func,
 	void	*closure )
 {

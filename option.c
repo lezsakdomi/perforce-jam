@@ -21,7 +21,7 @@ int
 getoptions(
     int argc,
     char **argv,
-    char *opts,
+    const char *opts,
     option *optv )
 {
     int i;
@@ -44,7 +44,7 @@ getoptions(
 
 	for( arg = &argv[i][1]; *arg; arg++ )
 	{
-	    char *f;
+	    const char *f;
 
 	    for( f = opts; *f; f++ )
 		if( *f == *arg )
@@ -87,7 +87,7 @@ getoptions(
  * Name: getoptval() - find an option given its character
  */
 
-char *
+const char *
 getoptval( 
 	option *optv,
 	char opt,

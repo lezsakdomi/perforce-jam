@@ -43,7 +43,7 @@ static struct hash *targethash = 0;
  */
 
 RULE *
-bindrule( char *rulename )
+bindrule( const char *rulename )
 {
 	RULE rule, *r = &rule;
 
@@ -70,7 +70,7 @@ bindrule( char *rulename )
  */
 
 TARGET *
-bindtarget( char *targetname )
+bindtarget( const char *targetname )
 {
 	TARGET target, *t = &target;
 
@@ -94,7 +94,7 @@ bindtarget( char *targetname )
  */
 
 void
-touchtarget( char *t )
+touchtarget( const char *t )
 {
 	bindtarget( t )->flags |= T_FLAG_TOUCHED;
 }
@@ -178,7 +178,7 @@ SETTINGS *
 addsettings(
 	SETTINGS *head,
 	int	append,
-	char	*symbol,
+	const char *symbol,
 	LIST	*value )
 {
 	SETTINGS *v;

@@ -47,7 +47,7 @@
 
 void
 file_dirscan( 
-	char *dir,
+	const char *dir,
 	scanback func,
 	void	*closure )
 {
@@ -128,7 +128,7 @@ file_dirscan(
 
 int
 file_time(
-	char	*filename,
+	const char *filename,
 	time_t	*time )
 {
 	/* On NT this is called only for C:/ */
@@ -169,7 +169,7 @@ struct ar_hdr {
 
 void
 file_archscan(
-	char *archive,
+	const char *archive,
 	scanback func,
 	void	*closure )
 {

@@ -72,7 +72,7 @@ static void make0( TARGET *t, TARGET *p, int depth,
 
 static TARGETS *make0sort( TARGETS *c );
 
-static char *target_fate[] = 
+static const char *target_fate[] = 
 {
 	"init",		/* T_FATE_INIT */
 	"making", 	/* T_FATE_MAKING */
@@ -88,7 +88,7 @@ static char *target_fate[] =
 	"nomake" 	/* T_FATE_CANTMAKE */
 } ;
 
-static char *target_bind[] = 
+static const char *target_bind[] = 
 {
 	"unbound",
 	"missing",
@@ -104,9 +104,9 @@ static char *target_bind[] =
 
 int
 make( 
-	int	n_targets,
-	char	**targets,
-	int	anyhow )
+	int		n_targets,
+	const char	**targets,
+	int		anyhow )
 {
 	int i;
 	COUNTS counts[1];
@@ -161,7 +161,7 @@ make0(
 	TARGETS	*c;
 	int	fate, hfate;
 	time_t	last, leaf, hlast, hleaf;
-	char	*flag = "";
+	const char *flag = "";
 
 	/* 
 	 * Step 1: initialize

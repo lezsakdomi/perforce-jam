@@ -22,7 +22,7 @@
 static PARSE *yypsave;
 
 void
-parse_file( char *f )
+parse_file( const char *f )
 {
 	/* Suspend scan of current file */
 	/* and push this new file in the stream */
@@ -68,13 +68,13 @@ parse_save( PARSE *p )
 
 PARSE *
 parse_make( 
-	LIST	*(*func)( PARSE *p, LOL *args, int *jmp ),
-	PARSE	*left,
-	PARSE	*right,
-	PARSE	*third,
-	char	*string,
-	char	*string1,
-	int	num )
+	LIST		*(*func)( PARSE *p, LOL *args, int *jmp ),
+	PARSE		*left,
+	PARSE		*right,
+	PARSE		*third,
+	const char 	*string,
+	const char 	*string1,
+	int		num )
 {
 	PARSE	*p = (PARSE *)malloc( sizeof( PARSE ) );
 

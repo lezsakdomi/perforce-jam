@@ -37,7 +37,7 @@
 
 void
 path_parse( 
-	char	*file,
+	const char *file,
 	PATHNAME *f )
 {
 	char *p, *q;
