@@ -607,9 +607,32 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	<DD>  Using the same wildcards as for the patterns in the
         <A HREF="#switch">switch</A> statement).
         It is invoked by being used as an argument to a rule invocation
-        inside of `[ ]`. For example: "FILES = [ GLOB dir1 dir2 : *.c *.h ]"
-        will set the value of A to the list of C source and header files in
+        inside of `[ ]`. For example: "<TT>FILES = [ GLOB dir1 dir2 : *.c *.h ]</TT>"
+        sets A to the list of C source and header files in
         dir1 or dir2.
+
+	</DL></TABLE>
+
+	<P>
+
+	The MATCH rule does pattern matching.
+
+	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
+
+	<P><DT><CODE>
+	MATCH <i>regexp</I> : <I>string</I>
+	</CODE>
+
+	<DD>  Matches the regular expression <I>regexp</I> against the string
+        <I>string</I>, returning a list of matching <tt>()</tt>
+        subexpressions. For example:
+	"<TT>MATCHED = [ MATCH (d.).*(9[0-9]).*(.a) : dodge1966dart ]</TT>"
+        sets MATCHED to the three-element list "<TT>do 96 da</TT>".
+
+	<P>
+	
+	 The matching routines are Henry Spencer's Unix V8
+	compatible implementation.
 
 	</DL></TABLE>
 
