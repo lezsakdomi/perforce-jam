@@ -414,8 +414,7 @@
 # endif 
 
 # ifdef __sparc__
-# if !defined( OS_SUNOS ) && \
-     !defined( OS_SOLARIS )
+# if !defined( OS_SUNOS )
 # define OSPLAT "OSPLAT=SPARC"
 # endif
 # endif

@@ -51,6 +51,11 @@ Changes since Jam 2.4
 	The jam code underwent a const-ing, to work with compilers
 	that don't like "" being passed as a non-const char *.
 
+	Compiling on solaris w/ sparc now sets OSPLAT to "sparc".
+	Previously, it suppressed this, assuming (wrongly) that sparc
+	was the only solaris platform.  Thanks to Michael Champigny 
+	<michael.champigny@intel.com>.
+
 ===============================================================================
 ===============================================================================
 
