@@ -46,6 +46,16 @@ Release notes for Jam 2.5
 	Essentially includes the ../server/support/Jamfile, without getting
 	confused as to the current directory.
 
+	Fix mysterious rebuild problem:  in an attempt to make 'jam -dc'
+	output report headers updates more accurately, internal (header
+	collection) targets were being bound as T_BIND_PARENTS so that
+	they could carry the timestamp of the actual source file.  But
+	that caused the fate of the internal node to be marked as
+	T_FATE_NEEDTMP if anything they included was newer, and that
+	easily happens among header files (something is always newer
+	than something else).  Now internal targets carry their parents
+	time, but with T_BIND_UNBOUND, like other NOTFILE targets.
+
 1.  Release info:
 
 	Jam 2.5

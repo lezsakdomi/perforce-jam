@@ -47,6 +47,7 @@
  * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
  * 01/03/03 (seiwald) - T_FATE_NEWER once again gets set with missing parent
  * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
+ * 04/04/03 (seiwald) - fix INTERNAL node binding to avoid T_BIND_PARENTS
  */
 
 # include "jam.h"
@@ -200,12 +201,16 @@ make0(
 	    t->binding = t->time ? T_BIND_EXISTS : T_BIND_MISSING;
 	}
 
+	/* INTERNAL, NOTFILE header nodes have the time of their parents */
+
+	if( p && t->flags & T_FLAG_INTERNAL )
+	    ptime = p;
+
 	/* If temp file doesn't exist but parent does, use parent */
 
 	if( p && t->flags & T_FLAG_TEMP && 
 	    t->binding == T_BIND_MISSING && 
-	    p->binding != T_BIND_MISSING ||
-	    p && t->flags & T_FLAG_INTERNAL )
+	    p->binding != T_BIND_MISSING )
 	{
 	    t->binding = T_BIND_PARENTS;
 	    ptime = p;
