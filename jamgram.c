@@ -1,6 +1,6 @@
 #ifndef lint
 static char const 
-yyrcsid[] = "$FreeBSD: src/usr.bin/yacc/skeleton.c,v 1.28.2.1 2001/07/19 05:46:39 peter Exp $";
+yyrcsid[] = "$FreeBSD: src/usr.bin/yacc/skeleton.c,v 1.28 2000/01/17 02:04:06 bde Exp $";
 #endif
 #include <stdlib.h>
 #define YYBYACC 1
@@ -11,11 +11,7 @@ yyrcsid[] = "$FreeBSD: src/usr.bin/yacc/skeleton.c,v 1.28.2.1 2001/07/19 05:46:3
 #define yyclearin (yychar=(YYEMPTY))
 #define yyerrok (yyerrflag=0)
 #define YYRECOVERING() (yyerrflag!=0)
-#if defined(__cplusplus) || __STDC__
-static int yygrowstack(void);
-#else
 static int yygrowstack();
-#endif
 #define YYPREFIX "yy"
 #line 89 "jamgram.y"
 #include "jam.h"
@@ -54,50 +50,50 @@ static int yygrowstack();
 # define pnode( l,r )    	parse_make( F0,l,r,P0,S0,S0,0 )
 # define psnode( s,l )     	parse_make( F0,l,P0,P0,s,S0,0 )
 
-#line 58 "y.tab.c"
+#line 54 "y.tab.c"
 #define YYERRCODE 256
-#define _BANG 257
-#define _BANG_EQUALS 258
-#define _AMPER 259
-#define _AMPERAMPER 260
-#define _LPAREN 261
-#define _RPAREN 262
-#define _PLUS_EQUALS 263
-#define _COLON 264
-#define _SEMIC 265
-#define _LANGLE 266
-#define _LANGLE_EQUALS 267
-#define _EQUALS 268
-#define _RANGLE 269
-#define _RANGLE_EQUALS 270
-#define _QUESTION_EQUALS 271
-#define _LBRACKET 272
-#define _RBRACKET 273
-#define ACTIONS 274
-#define BIND 275
-#define CASE 276
-#define DEFAULT 277
-#define ELSE 278
-#define EXISTING 279
-#define FOR 280
-#define IF 281
-#define IGNORE 282
-#define IN 283
-#define INCLUDE 284
-#define LOCAL 285
-#define ON 286
-#define PIECEMEAL 287
-#define QUIETLY 288
-#define RETURN 289
-#define RULE 290
-#define SWITCH 291
-#define TOGETHER 292
-#define UPDATED 293
-#define WHILE 294
-#define _LBRACE 295
-#define _BAR 296
-#define _BARBAR 297
-#define _RBRACE 298
+#define _BANG_t 257
+#define _BANG_EQUALS_t 258
+#define _AMPER_t 259
+#define _AMPERAMPER_t 260
+#define _LPAREN_t 261
+#define _RPAREN_t 262
+#define _PLUS_EQUALS_t 263
+#define _COLON_t 264
+#define _SEMIC_t 265
+#define _LANGLE_t 266
+#define _LANGLE_EQUALS_t 267
+#define _EQUALS_t 268
+#define _RANGLE_t 269
+#define _RANGLE_EQUALS_t 270
+#define _QUESTION_EQUALS_t 271
+#define _LBRACKET_t 272
+#define _RBRACKET_t 273
+#define ACTIONS_t 274
+#define BIND_t 275
+#define CASE_t 276
+#define DEFAULT_t 277
+#define ELSE_t 278
+#define EXISTING_t 279
+#define FOR_t 280
+#define IF_t 281
+#define IGNORE_t 282
+#define IN_t 283
+#define INCLUDE_t 284
+#define LOCAL_t 285
+#define ON_t 286
+#define PIECEMEAL_t 287
+#define QUIETLY_t 288
+#define RETURN_t 289
+#define RULE_t 290
+#define SWITCH_t 291
+#define TOGETHER_t 292
+#define UPDATED_t 293
+#define WHILE_t 294
+#define _LBRACE_t 295
+#define _BAR_t 296
+#define _BARBAR_t 297
+#define _RBRACE_t 298
 #define ARG 299
 #define STRING 300
 const short yylhs[] = {                                        -1,
@@ -258,13 +254,14 @@ const char * const yyname[] = {
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"_BANG","_BANG_EQUALS","_AMPER",
-"_AMPERAMPER","_LPAREN","_RPAREN","_PLUS_EQUALS","_COLON","_SEMIC","_LANGLE",
-"_LANGLE_EQUALS","_EQUALS","_RANGLE","_RANGLE_EQUALS","_QUESTION_EQUALS",
-"_LBRACKET","_RBRACKET","ACTIONS","BIND","CASE","DEFAULT","ELSE","EXISTING",
-"FOR","IF","IGNORE","IN","INCLUDE","LOCAL","ON","PIECEMEAL","QUIETLY","RETURN",
-"RULE","SWITCH","TOGETHER","UPDATED","WHILE","_LBRACE","_BAR","_BARBAR",
-"_RBRACE","ARG","STRING",
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"_BANG_t","_BANG_EQUALS_t",
+"_AMPER_t","_AMPERAMPER_t","_LPAREN_t","_RPAREN_t","_PLUS_EQUALS_t","_COLON_t",
+"_SEMIC_t","_LANGLE_t","_LANGLE_EQUALS_t","_EQUALS_t","_RANGLE_t",
+"_RANGLE_EQUALS_t","_QUESTION_EQUALS_t","_LBRACKET_t","_RBRACKET_t","ACTIONS_t",
+"BIND_t","CASE_t","DEFAULT_t","ELSE_t","EXISTING_t","FOR_t","IF_t","IGNORE_t",
+"IN_t","INCLUDE_t","LOCAL_t","ON_t","PIECEMEAL_t","QUIETLY_t","RETURN_t",
+"RULE_t","SWITCH_t","TOGETHER_t","UPDATED_t","WHILE_t","_LBRACE_t","_BAR_t",
+"_BARBAR_t","_RBRACE_t","ARG","STRING",
 };
 const char * const yyrule[] = {
 "$accept : run",
@@ -274,66 +271,66 @@ const char * const yyrule[] = {
 "block : rules",
 "rules : rule",
 "rules : rule rules",
-"rules : LOCAL list _SEMIC block",
-"rules : LOCAL list _EQUALS list _SEMIC block",
-"rule : _LBRACE block _RBRACE",
-"rule : INCLUDE list _SEMIC",
-"rule : arg lol _SEMIC",
-"rule : arg assign list _SEMIC",
-"rule : arg ON list assign list _SEMIC",
-"rule : RETURN list _SEMIC",
-"rule : FOR ARG IN list _LBRACE block _RBRACE",
-"rule : SWITCH list _LBRACE cases _RBRACE",
-"rule : IF expr _LBRACE block _RBRACE",
-"rule : IF expr _LBRACE block _RBRACE ELSE rule",
-"rule : WHILE expr _LBRACE block _RBRACE",
-"rule : RULE ARG rule",
-"rule : ON arg rule",
+"rules : LOCAL_t list _SEMIC_t block",
+"rules : LOCAL_t list _EQUALS_t list _SEMIC_t block",
+"rule : _LBRACE_t block _RBRACE_t",
+"rule : INCLUDE_t list _SEMIC_t",
+"rule : arg lol _SEMIC_t",
+"rule : arg assign list _SEMIC_t",
+"rule : arg ON_t list assign list _SEMIC_t",
+"rule : RETURN_t list _SEMIC_t",
+"rule : FOR_t ARG IN_t list _LBRACE_t block _RBRACE_t",
+"rule : SWITCH_t list _LBRACE_t cases _RBRACE_t",
+"rule : IF_t expr _LBRACE_t block _RBRACE_t",
+"rule : IF_t expr _LBRACE_t block _RBRACE_t ELSE_t rule",
+"rule : WHILE_t expr _LBRACE_t block _RBRACE_t",
+"rule : RULE_t ARG rule",
+"rule : ON_t arg rule",
 "$$1 :",
 "$$2 :",
-"rule : ACTIONS eflags ARG bindlist _LBRACE $$1 STRING $$2 _RBRACE",
-"assign : _EQUALS",
-"assign : _PLUS_EQUALS",
-"assign : _QUESTION_EQUALS",
-"assign : DEFAULT _EQUALS",
+"rule : ACTIONS_t eflags ARG bindlist _LBRACE_t $$1 STRING $$2 _RBRACE_t",
+"assign : _EQUALS_t",
+"assign : _PLUS_EQUALS_t",
+"assign : _QUESTION_EQUALS_t",
+"assign : DEFAULT_t _EQUALS_t",
 "expr : arg",
-"expr : expr _EQUALS expr",
-"expr : expr _BANG_EQUALS expr",
-"expr : expr _LANGLE expr",
-"expr : expr _LANGLE_EQUALS expr",
-"expr : expr _RANGLE expr",
-"expr : expr _RANGLE_EQUALS expr",
-"expr : expr _AMPER expr",
-"expr : expr _AMPERAMPER expr",
-"expr : expr _BAR expr",
-"expr : expr _BARBAR expr",
-"expr : arg IN list",
-"expr : _BANG expr",
-"expr : _LPAREN expr _RPAREN",
+"expr : expr _EQUALS_t expr",
+"expr : expr _BANG_EQUALS_t expr",
+"expr : expr _LANGLE_t expr",
+"expr : expr _LANGLE_EQUALS_t expr",
+"expr : expr _RANGLE_t expr",
+"expr : expr _RANGLE_EQUALS_t expr",
+"expr : expr _AMPER_t expr",
+"expr : expr _AMPERAMPER_t expr",
+"expr : expr _BAR_t expr",
+"expr : expr _BARBAR_t expr",
+"expr : arg IN_t list",
+"expr : _BANG_t expr",
+"expr : _LPAREN_t expr _RPAREN_t",
 "cases :",
 "cases : case cases",
-"case : CASE ARG _COLON block",
+"case : CASE_t ARG _COLON_t block",
 "lol : list",
-"lol : list _COLON lol",
+"lol : list _COLON_t lol",
 "list : listp",
 "listp :",
 "listp : listp arg",
 "arg : ARG",
 "$$3 :",
-"arg : _LBRACKET $$3 func _RBRACKET",
+"arg : _LBRACKET_t $$3 func _RBRACKET_t",
 "func : arg lol",
-"func : ON arg arg lol",
-"func : ON arg RETURN list",
+"func : ON_t arg arg lol",
+"func : ON_t arg RETURN_t list",
 "eflags :",
 "eflags : eflags eflag",
-"eflag : UPDATED",
-"eflag : TOGETHER",
-"eflag : IGNORE",
-"eflag : QUIETLY",
-"eflag : PIECEMEAL",
-"eflag : EXISTING",
+"eflag : UPDATED_t",
+"eflag : TOGETHER_t",
+"eflag : IGNORE_t",
+"eflag : QUIETLY_t",
+"eflag : PIECEMEAL_t",
+"eflag : EXISTING_t",
 "bindlist :",
-"bindlist : BIND list",
+"bindlist : BIND_t list",
 };
 #endif
 #ifndef YYSTYPE
@@ -820,7 +817,7 @@ case 66:
 #line 335 "jamgram.y"
 { yyval.parse = yyvsp[0].parse; }
 break;
-#line 824 "y.tab.c"
+#line 821 "y.tab.c"
     }
     yyssp -= yym;
     yystate = *yyssp;

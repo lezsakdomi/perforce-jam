@@ -1,14 +1,11 @@
-Release notes for Jam/MR [UNRELEASED]
+Release notes for Jam/MR 2.4
 (aka Jam - make(1) redux)
 
-*** Note: These Release notes represent work in progress,
-*** not a completed release!
+1.  Release info:
 
-1.  Release info: (TENTATIVE)
-
-	Jam/MR 2.4 (TENTATIVE, IN PROGRESS!)
-	Month, dd, 2002
-	VERSION 2.4 (TENTATIVE, IN PROGRESS!)
+	Jam/MR 2.4
+	March, 21, 2002
+	VERSION 2.4
 
 2.  Compatibility
 
@@ -39,7 +36,7 @@ Release notes for Jam/MR [UNRELEASED]
 
 	New :E=value modifier provides default value if variable unset.
 
-	New :J=joinval modifier concatentates list elements into single
+	New :J=joinval modifier concatenates list elements into single
 		element, separated by joinval.
 
 	\ can now be used to escape a space (or any single whitespace
@@ -140,7 +137,7 @@ Release notes for Jam/MR [UNRELEASED]
         filename.
 
 	Four rules makeCommon, makeGrist, makeString, makeSubDir from
-	jam 2.2 missing in 2.3 have been readded, with apologies to
+	jam 2.2 missing in 2.3 have been re-added, with apologies to
 	dtb@cisco.com.
 
 	Return status more likely to be correct when using -d0, now that 
@@ -159,7 +156,7 @@ Release notes for Jam/MR [UNRELEASED]
 
 5.  Porting
 
-	[MACINTOSH] Paths are now downshifted (interally) so as to
+	[MACINTOSH] Paths are now downshifted (internally) so as to
 	handle its case insensitivity.  Thanks to Miklos Fazekas
 	<boga@mac.com>.
 
