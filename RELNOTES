@@ -147,7 +147,7 @@ Release notes for Jam/MR [UNRELEASED]
 
 	yyacc now suffixes all terminals it defines with _t, so that they
 	don't conflict with other symbols (like RULE with the typedef
-	in rules.h).  Thanks to Aichael Allard.
+	in rules.h).  Thanks to Michael Allard.
 
 5.  Porting
 
