@@ -176,13 +176,11 @@ var_string(
 
 	    if( dollar )
 	    {
-		LIST	*l;
-
-		l = var_expand( L0, lastword, out, lol, 0 );
+		LIST *l = var_expand( L0, lastword, out, lol, 0 );
 
 		out = lastword;
 
-		for( ; l; l = list_next( l ) )
+		while( l )
 		{
 		    int so = strlen( l->string );
 
@@ -191,7 +189,11 @@ var_string(
 
 		    strcpy( out, l->string );
 		    out += so;
-		    *out++ = ' ';
+
+		    /* Separate with space */
+
+		    if( l = list_next( l ) )
+			*out++ = ' ';
 		}
 
 		list_free( l );

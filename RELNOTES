@@ -100,6 +100,11 @@ Release notes for Jam 2.5
 	Previously, ?= was ignored and the variable was set anyway.
 	Thanks to Chris Antos.
 
+	Variable expansion in actions has always put an extra blank
+	space after the last list element, but the expansion is described
+	in the code as "space separated".  Now the last blank is suppressed
+	to match.  From Miklos Fazekas.
+
 5.  Porting
 
 	The Makefile now uses $(EXENAME) (./jam0 on UNIX, .\jam0.exe
