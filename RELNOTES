@@ -79,6 +79,10 @@ Changes since Jam 2.4
 
 	Jam.html was extensively updated, in an attempt at lucidity.
 
+	Jambase no longer refers to advapi32.lib on NT, as it isn't
+	needed for linking jam itself and it seems to move from release
+	to release (of MS Visual Studio).
+
 ===============================================================================
 ===============================================================================
 

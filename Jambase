@@ -194,12 +194,8 @@ if $(NT)
 	LINK		?= $(CC) ;
 	LINKFLAGS	?= $(CCFLAGS) ;
 	LINKLIBS	?= 
-				#$(MSVC)\\lib\\advapi32.lib
-				#$(MSVC)\\lib\\libcmt.lib
 				$(MSVC)\\lib\\mlibce.lib
-				#$(MSVC)\\lib\\slibce.lib
 				$(MSVC)\\lib\\oldnames.lib
-				#$(MSVC)\\lib\\kernel32.lib 
 				;
 	LINKLIBS	?= ;
 	NOARSCAN	?= true ;
@@ -217,7 +213,7 @@ if $(NT)
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= "" ;
-	LINKLIBS	?= $(MSVCNT)\\lib\\advapi32.lib
+	LINKLIBS	?= 
 				$(MSVCNT)\\lib\\libc.lib
 				$(MSVCNT)\\lib\\oldnames.lib
 				$(MSVCNT)\\lib\\kernel32.lib ;

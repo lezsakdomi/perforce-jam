@@ -53,7 +53,7 @@ const char *jambase[] = {
 "C++FLAGS	?= $(CCFLAGS) ;\n",
 "LINK		?= link /nologo ;\n",
 "LINKFLAGS	?= \"\" ;\n",
-"LINKLIBS	?= $(MSVCNT)\\\\lib\\\\advapi32.lib\n",
+"LINKLIBS	?= \n",
 "$(MSVCNT)\\\\lib\\\\libc.lib\n",
 "$(MSVCNT)\\\\lib\\\\oldnames.lib\n",
 "$(MSVCNT)\\\\lib\\\\kernel32.lib ;\n",
