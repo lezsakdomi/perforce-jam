@@ -56,6 +56,11 @@ Release notes for Jam 2.5
 	than something else).  Now internal targets carry their parents
 	time, but with T_BIND_UNBOUND, like other NOTFILE targets.
 
+	Remove temp .bat files created on NT.  They used to all have
+	the same name and get reused, but with 2.5 the names were salted
+	with the PID and they would litter $TEMP.  Now they get removed
+	after being used.
+
 1.  Release info:
 
 	Jam 2.5

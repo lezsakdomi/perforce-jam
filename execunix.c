@@ -296,6 +296,12 @@ execwait()
 	    exit( EXITBAD );
 	}
 
+# ifdef USE_EXECNT
+	/* Clear the temp file */
+
+	unlink( cmdtab[ i ].tempfile );
+# endif
+
 	/* Drive the completion */
 
 	if( !--cmdsrunning )
