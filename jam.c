@@ -148,6 +148,9 @@ extern char **environ;
 # endif
 
 # ifdef macintosh
+# ifdef MPW
+QDGlobals qd;
+# endif
 main( int argc, char **argv, char **environ )
 # else
 main( argc, argv )
@@ -277,7 +280,44 @@ char	**argv;
 
 	/* load up environment variables */
 
+# ifdef MPW
+	/*
+	 * The third parameter of main() on the mac (at least when this
+	 * is compiled with MPW tools) does not have entries of the form
+	 * "name=value", but instead "name\0value".  Since var_defines()
+	 * expects the former, we need to munge them before passing.
+	 */
+	{
+	    char **munged, **src, **dest;
+	    int envsize;
+
+	    /* First determine the size of environ */
+	    for( src = environ, envsize = 1; *src; src++, envsize++ );
+	    munged = malloc( sizeof( char* ) * envsize );
+
+	    for( src = environ, dest = munged; *src; src++, dest++ )
+	    {
+	    	/*
+		 * Can't use strlen() to find the length of the environ
+		 * entries without finding the first \0, and adding the
+		 * lengths of the "name" and "value" parts (taking into
+		 * account the terminating \0's.
+		 */
+		char *first0;
+		int lenplusterminator;
+		for( first0 = *src; *first0; first0++ );
+
+		lenplusterminator = 2 + (first0-*src) + strlen(first0+1);
+		*dest = malloc( lenplusterminator );
+		memcpy( *dest, *src, lenplusterminator);
+		*(*dest + (first0-*src)) = '=';
+	    }
+	    *dest = NULL;
+	    var_defines( munged );
+	}
+# else
 	var_defines( environ );
+# endif
 	var_defines( othersyms );
 
 	/* Load up variables set on command line. */

@@ -10,7 +10,13 @@
 # ifdef macintosh
 
 # include <sys/types.h>
+
+# ifdef MPW
+# include <sys/stat.h>
+# else
 # include <stat.h>
+# endif
+
 # include <dirent.h>
 
 /*
