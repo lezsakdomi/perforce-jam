@@ -28,6 +28,7 @@
  * 09/11/00 (seiwald) - defunct var_list() removed
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 06/11/03 (seiwald) - fix var_string mem leak found by Matt Armstrong
  */
 
 # include "jam.h"
@@ -177,6 +178,7 @@ var_string(
 	    if( dollar )
 	    {
 		LIST *l = var_expand( L0, lastword, out, lol, 0 );
+		LIST *h = l;
 
 		out = lastword;
 
@@ -196,7 +198,7 @@ var_string(
 			*out++ = ' ';
 		}
 
-		list_free( l );
+		list_free( h );
 	    }
 	}
 
