@@ -146,6 +146,9 @@ Release notes for Jam 2.5
 	The NoCare rule can be used to suppress error messages when
 	an 'include' file can't be found.
 
+	AIX "big" archives are now supported, thanks to suggestions
+	from Randy Roesler.
+
 ===============================================================================
 ===============================================================================
 

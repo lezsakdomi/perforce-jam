@@ -28,6 +28,7 @@
  * 04/03/01 (seiwald) - AIX uses SARMAG
  * 07/16/02 (seiwald) - Support BSD style long filename in archives.
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/27/02 (seiwald) - support for AIX big archives
  */
 
 # include "jam.h"
@@ -61,7 +62,7 @@
 # endif
 
 # if defined( OS_MVS ) || \
-     defined( OS_INTERIX ) || defined(OS_AIX)
+     defined( OS_INTERIX ) 
 
 #define	ARMAG	"!<arch>\n"
 #define	SARMAG	8
@@ -89,6 +90,10 @@ struct ar_hdr		/* archive file member header - printable ascii */
 # endif
 
 # ifndef HAVE_AR
+# ifdef _AIX43
+/* AIX 43 ar SUPPORTs only __AR_BIG__ */
+# define __AR_BIG__
+# endif
 # include <ar.h>
 # endif	
 
@@ -317,12 +322,28 @@ file_archscan(
 	if( ( fd = open( archive, O_RDONLY, 0 ) ) < 0 )
 	    return;
 
+# ifdef __AR_BIG__
+
+	if( read( fd, (char *)&fl_hdr, FL_HSZ ) != FL_HSZ ||
+	    strncmp( AIAMAGBIG, fl_hdr.fl_magic, SAIAMAG ) )
+	{
+	    if( strncmp( AIAMAG, fl_hdr.fl_magic, SAIAMAG ) )
+		printf( "Can't read new archive %s before AIX 4.3.\n" );
+
+	    close( fd );
+	    return;
+	}
+
+# else
+
 	if( read( fd, (char *)&fl_hdr, FL_HSZ ) != FL_HSZ ||
 	    strncmp( AIAMAG, fl_hdr.fl_magic, SAIAMAG ) )
 	{
 	    close( fd );
 	    return;
 	}
+
+# endif
 
 	sscanf( fl_hdr.fl_fstmoff, "%ld", &offset );
 
