@@ -151,6 +151,12 @@ Release notes for Jam/MR [UNRELEASED]
 	don't conflict with other symbols (like RULE with the typedef
 	in rules.h).  Thanks to Michael Allard.
 
+	InstallInto now handles multiple sources properly, rather than
+	acting as if each installed target depended on all sources to
+	be installed.  $(INSTALLGRIST) is now the default grist for
+	installed targets, rather than the hardcoded 'installed'.  Thanks
+	to Stephen Goodson.
+
 5.  Porting
 
 	[MACINTOSH] Paths are now downshifted (interally) so as to
