@@ -67,7 +67,7 @@ typedef struct {
 	int	made;
 } COUNTS ;
 
-static void make0( TARGET *t, time_t ptime, int depth, 
+static void make0( TARGET *t, TARGET *p, int depth, 
 		COUNTS *counts, int anyhow );
 
 static TARGETS *make0sort( TARGETS *c );
@@ -118,7 +118,7 @@ make(
 	{
 	    TARGET *t = bindtarget( targets[i] );
 
-	    make0( t, (time_t)0, 0, counts, anyhow );
+	    make0( t, 0, 0, counts, anyhow );
 	}
 
 	if( DEBUG_MAKE )
@@ -153,7 +153,7 @@ make(
 static void
 make0( 
 	TARGET	*t,
-	time_t	ptime,		/* parent target's timestamp */
+	TARGET  *p,		/* parent */
 	int	depth,		/* for display purposes */
 	COUNTS	*counts,	/* for reporting */
 	int	anyhow )	/* forcibly touch all (real) targets */
@@ -191,8 +191,10 @@ make0(
 
 	/* If temp file doesn't exist but parent does, use parent */
 
-	if( t->binding == T_BIND_MISSING && t->flags & T_FLAG_TEMP && ptime )
-	    t->binding = T_BIND_PARENTS;
+	if( p && t->flags & T_FLAG_TEMP && 
+	    t->binding == T_BIND_MISSING && 
+	    p->binding != T_BIND_MISSING )
+		t->binding = T_BIND_PARENTS;
 
 	/* Step 2c: If its a file, search for headers. */
 
@@ -245,13 +247,14 @@ make0(
 	{
 	    /* Pass our time or our parent's time down. */
 
-	    int time = t->binding == T_BIND_PARENTS ? ptime : t->time;
+	    TARGET *time = t->binding == T_BIND_PARENTS ? p : t; 
 
 	    /* Short circuit circular dependencies. */
 	    /* And only make unmade targets. */
 
 	    if( DEBUG_DEPENDS && c->target->fate == T_FATE_INIT )
-		printf( "Depends \"%s\" : \"%s\" ;\n", t->name, c->target->name );
+		printf( "Depends \"%s\" : \"%s\" ;\n", 
+		    t->name, c->target->name );
 
 	    if( c->target->fate == T_FATE_MAKING )
 		printf( "warning: %s depends on itself\n", c->target->name );
@@ -289,10 +292,11 @@ make0(
 	    /* to include each other a lot these days (2002). */
 
 	    if( DEBUG_DEPENDS && c->target->fate == T_FATE_INIT )
-		printf( "Depends \"%s\" : \"%s\" ;\n", t->name, c->target->name );
+		printf( "Includes \"%s\" : \"%s\" ;\n",
+		    t->name, c->target->name );
 
 	    if( c->target->fate == T_FATE_INIT )
-		make0( c->target, ptime, depth + 1, counts, anyhow );
+		make0( c->target, p, depth + 1, counts, anyhow );
 
 	    hlast = max( hlast, c->target->time );
 	    hlast = max( hlast, c->target->htime );
@@ -334,7 +338,11 @@ make0(
 		If deliberately touched, make it.
 		If up-to-date temp file present, use it.
 		If target newer than parent, mark target newer.
-		Don't propagate child's "newer" status.
+		Otherwise, stable!
+
+		Note this block runs from least to most stable:
+		as we make it further down the list, the target's
+		fate is getting stabler.
 	*/
 
 	if( fate >= T_FATE_BROKEN )
@@ -353,11 +361,11 @@ make0(
 	{
 	    fate = T_FATE_OUTDATED;
 	}
-	else if( t->binding == T_BIND_PARENTS && last > ptime )
+	else if( t->binding == T_BIND_PARENTS && last > p->time )
 	{
 	    fate = T_FATE_NEEDTMP;
 	}
-	else if( t->binding == T_BIND_PARENTS && hlast > ptime )
+	else if( t->binding == T_BIND_PARENTS && hlast > p->time )
 	{
 	    fate = T_FATE_NEEDTMP;
 	}
@@ -373,11 +381,12 @@ make0(
 	{
 	    fate = T_FATE_ISTMP;
 	}
-	else if( t->binding == T_BIND_EXISTS && t->time > ptime )
+	else if( t->binding == T_BIND_EXISTS && p && 
+		 p->binding == T_BIND_EXISTS && t->time > p->time )
 	{
 	    fate = T_FATE_NEWER;
 	}
-	else if( fate == T_FATE_NEWER )
+	else
 	{
 	    fate = T_FATE_STABLE;
 	}
@@ -442,13 +451,18 @@ make0(
 
 	if( !( t->flags & T_FLAG_NOTFILE ) && fate >= T_FATE_SPOIL )
 	    flag = "+";
-	else if( t->binding == T_BIND_EXISTS && ptime && t->time > ptime )
+	else if( t->binding == T_BIND_EXISTS && p && t->time > p->time )
 	    flag = "*";
 
 	if( DEBUG_MAKEPROG )
 	    printf( "made%s\t%s\t%s%s\n", 
 		flag, target_fate[ t->fate ], 
 		spaces( depth ), t->name );
+
+	if( DEBUG_CAUSES && 
+	    t->fate >= T_FATE_NEWER && 
+	    t->fate <= T_FATE_MISSING )
+		printf( "%s %s\n", target_fate[ t->fate ], t->name );
 }
 
 /*

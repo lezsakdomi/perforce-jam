@@ -34,6 +34,7 @@ Changes since Jam/MR 2.4
 	tracing information separate from the debugging gunk:
 
 		-da - show all actions (formerly -d2)
+		-dc - show 'causes' for rebuilding (new output)
 		-dd - show dependencies (new output)
 		-dm - show make graph (aka -d3)
 		-dx - show executable text (formerly -d2)
