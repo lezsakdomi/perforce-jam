@@ -29,6 +29,10 @@ CFLAGS =
 #Include = /NewDisk/develop/headers/posix
 #CFLAGS = -I $(Include)
 
+# BeOS - gcc
+#CC = gcc
+#LINKLIBS = -lnet
+
 SOURCES = \
 	command.c compile.c execunix.c execvms.c expand.c \
 	filent.c fileos2.c fileunix.c filevms.c glob.c hash.c \

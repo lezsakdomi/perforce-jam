@@ -1,5 +1,5 @@
 
-set CWGUSI "Macintosh HD:Perforce:mac:CWGUSI" 
+set CWGUSI "Macintosh HD:Perforce:CWGUSI" 
 set CWMAC "Macintosh HD:CW10 Gold:Metrowerks CodeWarrior:MacOS Support"
 
 newfolder  :bin.mac 
@@ -33,11 +33,11 @@ mwlinkppc  -library -o :bin.mac:libjam.lib  :bin.mac:command.o :bin.mac:compile.
 
 mwcppc  -o :bin.mac:mkjambase.o  -w off   mkjambase.c  
 
-mwlinkppc  -o :bin.mac:mkjambase  -mpwtool -warn  :bin.mac:mkjambase.o   "{CWGUSI}:Lib:GUSIMPW.Lib.PPC" "Macintosh HD:Perforce:mac:CWGUSI:Lib:GUSI.Lib.PPC" "{CWMAC}:Libraries:MacOS Common:Interfacelib" "{CWMAC}:Libraries:MacOS Common:PLStringFuncs Glue:PLStringFuncsPPC.lib" "{CWMAC}:Libraries:Runtime:Runtime PPC:MWMPWCRuntime.lib" "{CWMAC}:Libraries:ANSI PPC:MPW ANSI.C.PPC.Lib" "{CWMAC}:Libraries:MacOS PPC:PPCToolLibs.o" "{CWMAC}:Libraries:MacOS PPC:Mathlib" 
+mwlinkppc  -o :bin.mac:mkjambase  -mpwtool -warn  :bin.mac:mkjambase.o   "{CWGUSI}:Lib:GUSIMPW.Lib.PPC" "{CWGUSI}:Lib:GUSI.Lib.PPC" "{CWMAC}:Libraries:MacOS Common:Interfacelib" "{CWMAC}:Libraries:MacOS Common:PLStringFuncs Glue:PLStringFuncsPPC.lib" "{CWMAC}:Libraries:Runtime:Runtime PPC:MWMPWCRuntime.lib" "{CWMAC}:Libraries:ANSI PPC:MPW ANSI.C.PPC.Lib" "{CWMAC}:Libraries:MacOS PPC:PPCToolLibs.o" "{CWMAC}:Libraries:MacOS PPC:Mathlib" 
 
 mwcppc  -o :bin.mac:jam.o  -w off   jam.c  
 
 mwcppc  -o :bin.mac:jambase.o  -w off   jambase.c  
 
-mwlinkppc  -o :bin.mac:jam  -mpwtool -warn  :bin.mac:jam.o :bin.mac:jambase.o  :bin.mac:libjam.lib  "{CWGUSI}:Lib:GUSIMPW.Lib.PPC" "Macintosh HD:Perforce:mac:CWGUSI:Lib:GUSI.Lib.PPC" "{CWMAC}:Libraries:MacOS Common:Interfacelib" "{CWMAC}:Libraries:MacOS Common:PLStringFuncs Glue:PLStringFuncsPPC.lib" "{CWMAC}:Libraries:Runtime:Runtime PPC:MWMPWCRuntime.lib" "{CWMAC}:Libraries:ANSI PPC:MPW ANSI.C.PPC.Lib" "{CWMAC}:Libraries:MacOS PPC:PPCToolLibs.o" "{CWMAC}:Libraries:MacOS PPC:Mathlib" 
+mwlinkppc  -o :bin.mac:jam  -mpwtool -warn  :bin.mac:jam.o :bin.mac:jambase.o  :bin.mac:libjam.lib  "{CWGUSI}:Lib:GUSIMPW.Lib.PPC" "{CWGUSI}:Lib:GUSI.Lib.PPC" "{CWMAC}:Libraries:MacOS Common:Interfacelib" "{CWMAC}:Libraries:MacOS Common:PLStringFuncs Glue:PLStringFuncsPPC.lib" "{CWMAC}:Libraries:Runtime:Runtime PPC:MWMPWCRuntime.lib" "{CWMAC}:Libraries:ANSI PPC:MPW ANSI.C.PPC.Lib" "{CWMAC}:Libraries:MacOS PPC:PPCToolLibs.o" "{CWMAC}:Libraries:MacOS PPC:Mathlib" 
 

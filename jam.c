@@ -42,6 +42,12 @@
 # include <QuickDraw.h>
 # endif
 
+/* And UNIX for this */
+
+# ifdef unix
+# include <sys/utsname.h>
+# endif
+
 /*
  * jam.c - make redux
  *
@@ -244,6 +250,28 @@ char	**argv;
 
 	    var_set( "JAMDATE", list_new( L0, newstr( date ) ), VAR_SET );
 	}
+
+	/* And JAMUNAME */
+# ifdef unix
+	{
+	    struct utsname u;
+
+	    if( uname( &u ) >= 0 )
+	    {
+		var_set( "JAMUNAME", 
+			list_new( 
+			list_new(
+			list_new(
+			list_new(
+			list_new( L0, 
+				newstr( u.sysname ) ),
+				newstr( u.nodename ) ),
+				newstr( u.release ) ),
+				newstr( u.version ) ),
+				newstr( u.machine ) ), VAR_SET );
+	    }
+	}
+# endif /* unix */
 
 	/* load up environment variables */
 

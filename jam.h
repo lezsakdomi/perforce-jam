@@ -121,7 +121,7 @@ int unlink( char *f ); 	/* In filevms.c */
 
 # define OSSYMS "MAC=true","OS=MAC"
 # define SPLITPATH ','
-# define MAXLINE 1024	/* longest 'together' actions */
+# define MAXLINE 10240	/* longest 'together' actions */
 # define EXITOK 0
 # define EXITBAD 1
 
@@ -201,7 +201,11 @@ int unlink( char *f ); 	/* In filevms.c */
 # define OSSYMS "UNIX=true","OS=NCR"
 # endif
 # ifdef NeXT
+# ifdef __APPLE__
+# define OSSYMS "UNIX=true","OS=RHAPSODY"
+# else
 # define OSSYMS "UNIX=true","OS=NEXT"
+# endif
 # endif
 # ifdef __osf__
 # define OSSYMS "UNIX=true","OS=OSF"
@@ -254,7 +258,7 @@ int unlink( char *f ); 	/* In filevms.c */
 
 # define OSPLATSYM /**/
 
-# ifdef _M_PPC
+# if defined( _M_PPC ) || defined( PPC )
 # undef OSPLATSYM
 # define OSPLATSYM ,"OSPLAT=PPC"
 # endif
@@ -265,13 +269,17 @@ int unlink( char *f ); 	/* In filevms.c */
 # endif
 
 # if defined( _i386_ ) || defined( __i386__ ) || defined( _M_IX86 )
+# if !defined( __FreeBSD__ ) && !defined( __OS2__)
 # undef OSPLATSYM
 # define OSPLATSYM ,"OSPLAT=X86"
+# endif
 # endif 
 
 # ifdef __sparc__
+# ifndef sun
 # undef OSPLATSYM
 # define OSPLATSYM ,"OSPLAT=SPARC"
+# endif
 # endif
 
 /* You probably don't need to muck with these. */

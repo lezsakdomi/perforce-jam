@@ -202,7 +202,7 @@ if $(UNIX)
 	NOARSCAN	default = true ;
 	RANLIB		default = "" ;
 	}
-	else if $(OS) = BEOS 
+	else if $(OS) = BEOS && $(METROWERKS)
 	{
 	AR		default = mwld -xml -o ;
 	BINDIR		default = /boot/bin ;
@@ -216,6 +216,23 @@ if $(UNIX)
 	LINKFLAGS	default = "" ;
 	LEX		default = "" ;
 	MANDIR		default = /boot/documentation/"Shell Tools"/HTML ;
+	NOARSCAN	default = true ;
+	RANLIB		default = "" ;	
+	STDHDRS		default = /boot/develop/headers/posix ;
+	YACC		default = "" ;
+	YACCFLAGS	default = "" ;
+	YACCFILES	default = "" ;
+	}
+	else if $(OS) = BEOS 
+	{
+	BINDIR		default = /boot/bin ;
+	CC		default = gcc ;
+	C++		default = $(CC) ;
+	FORTRAN		default = "" ;
+	LIBDIR		default = /boot/develop/libraries ;
+	LINK		default = gcc ;
+	LINKLIBS	default = -lnet ;
+	LEX		default = "" ;
 	NOARSCAN	default = true ;
 	RANLIB		default = "" ;	
 	STDHDRS		default = /boot/develop/headers/posix ;
@@ -493,7 +510,7 @@ if $(NT) || $(OS2)
 JAMFILE		default = Jamfile ;
 JAMRULES	default = Jamrules ;
 
-HDRPATTERN = "^#[	 ]*include[	 ]*[<\"](.*)[\">].*$" ;
+HDRPATTERN = "^[ 	]*#[ 	]*include[ 	]*[<\"](.*)[\">].*$" ;
 
 #
 # Base dependencies - first for "bootstrap" kinds of rules
@@ -1454,7 +1471,7 @@ if $(UNIX)
 	$(AR) $(<) +-$(>) 
 	}
     }
-    else if $(OS) = BEOS
+    else if $(OS) = BEOS && $(METROWERKS)
     {
 	actions together Archive
 	{
@@ -1837,7 +1854,7 @@ else if $(MAC)
 {
     SP = " " ;
 
-    actions together piecemeal Archive 
+    actions together Archive 
     {
 	$(LINK) -library -o $(<) $(>)
     }

@@ -15,7 +15,9 @@
 # endif
 
 #ifdef NeXT
+/* need unistd for rhapsody's proper lseek */
 # include <sys/dir.h>
+# include <unistd.h>
 #else
 # include <dirent.h>
 #endif

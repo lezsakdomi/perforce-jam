@@ -1,3 +1,4 @@
+
 Release notes for Jam/MR 2.2 
 (formerly Jam - make(1) redux)
 
@@ -5,6 +6,19 @@ Release notes for Jam/MR 2.2
 
 	AmigaOS (with gcc) supported, courtesy of Alain Penders
 	(Patchlevel 2).
+
+	The HDRPATTERN variable now allows for leading blanks before
+	the #include, to keep up with ANSI (Patchlevel 3).
+
+	On NT, always create tmp .bat file for actions if JAMSHELL is set.
+	That way, if JAMSHELL is a .bat file itself, it can handle
+	single-command actions with more than 9 cmd line args.
+
+	Added: Lynx, Rhapsody. Upgraded to latest metrowerks on Beos.
+	Miscellaneous improvements to platform variant handling.
+
+	$JAMUNAME is set on UNIX.  (Patchlevel 4).
+
 
 1.  Release info:
 
