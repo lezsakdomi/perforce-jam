@@ -13,6 +13,7 @@
 # include "filesys.h"
 # include "newstr.h"
 # include "regexp.h"
+# include "pathsys.h"
 
 /*
  * builtins.c - builtin jam rules
@@ -204,9 +205,18 @@ builtin_glob_back(
 {
 	struct globbing *globbing = (struct globbing *)closure;
 	LIST		*l;
+	PATHNAME	f;
+	char		buf[ MAXJPATH ];
+
+	/* Null out directory for matching. */
+	/* We wish we had file_dirscan() pass up a PATHNAME. */
+
+	path_parse( file, &f );
+	f.f_dir.len = 0;
+	path_build( &f, buf, 0 );
 
 	for( l = globbing->patterns; l; l = l->next )
-	    if( !glob( l->string, file ) )
+	    if( !glob( l->string, buf ) )
 	{
 	    globbing->results = list_new( globbing->results, newstr( file ) );
 	    break;
