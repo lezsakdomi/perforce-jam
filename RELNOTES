@@ -145,6 +145,10 @@ Release notes for Jam/MR [UNRELEASED]
 	targets are could as being built even with no debugging output.
 	Thanks to Miklos Fazekas <boga@mac.com>.
 
+	yyacc now suffixes all terminals it defines with _t, so that they
+	don't conflict with other symbols (like RULE with the typedef
+	in rules.h).  Thanks to Aichael Allard.
+
 5.  Porting
 
 	[MACINTOSH] Paths are now downshifted (interally) so as to
