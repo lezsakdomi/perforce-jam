@@ -19,12 +19,18 @@ Release notes for Jam 2.5
 	Remove NT FQuote rule, as, \" is required to pass quotes on
 	the command line.
 
-	Porting changes allow jam to build with BorlandC 5.5
+	Porting change: allow jam to build with BorlandC 5.5
 
-	Porting changes for WinXP IA64; set MSVCNT to the root of the
+	Porting change: for WinXP IA64; set MSVCNT to the root of the
 	SDK and MSVCVer to Win64; change handle type to long long (too
 	much to include windows.h?); bury IA64 in the library path in
 	Jambase.
+
+	Porting change: Mac classic MPW Codewarrior 7 upgrades: minor
+	compiling issues, new paths in Jambase for libraries and
+	includes, and separate out GenFile1 that sets PATH for UNIX
+	only, as it does't work under MPW (or anything other than with
+	sh).
         
 
 1.  Release info:
@@ -183,6 +189,18 @@ Release notes for Jam 2.5
 	MSVCDIR now works as well as MSVCNT for the Microsoft Visual C
 	compiler directory.  It changed names in VC 6.0.  Thanks to
 	Matt Armstrong.
+
+	Allow jam to build with BorlandC 5.5
+
+	For WinXP IA64; set MSVCNT to the root of the SDK and MSVCVer
+	to Win64; change handle type to long long (too much to include
+	windows.h?); bury IA64 in the library path in Jambase.
+
+	Mac classic MPW Codewarrior 7 upgrades: minor compiling
+	issues, new paths in Jambase for libraries and includes, and
+	separate out GenFile1 that sets PATH for UNIX only, as it
+	does't work under MPW (or anything other than with sh).
+
 
 ===============================================================================
 ===============================================================================

@@ -51,8 +51,8 @@ path_parse(
 	const char *file,
 	PATHNAME *f )
 {
-	char *p, *q;
-	char *end;
+	const char *p, *q;
+	const char *end;
 	
 	memset( (char *)f, 0, sizeof( *f ) );
 
@@ -143,7 +143,7 @@ char grid[5][5] = {
 
 static int
 file_flags( 
-	char	*ptr,
+	const char	*ptr,
 	int	len )
 {
 	if( !len )

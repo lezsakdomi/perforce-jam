@@ -331,24 +331,24 @@ else if $(MAC)
 		"$(CW):MacOS Support:Universal:Libraries:StubLibraries:Mathlib" ;
 
 	MPWLIBS ?= 
-		"$(CW):MacOS Support:Libraries:Runtime:Runtime PPC:MSL MPWCRuntime.lib"
-		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL C.PPC MPW.Lib" ;
+		"$(CW):MacOS Support:Libraries:Runtime:Libs:MSL_MPWCRuntime_PPC.lib"
+		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_C_PPC_MPW.Lib" ;
 
 	MPWNLLIBS ?= 
-		"$(CW):MacOS Support:Libraries:Runtime:Runtime PPC:MSL MPWCRuntime.lib"
-		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL C.PPC MPW(NL).Lib" ;
+		"$(CW):MacOS Support:Libraries:Runtime:Libs:MSL_MPWCRuntime_PPC.lib"
+		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_C_PPC_MPW(NL).Lib" ;
 		
 	SIOUXHDRS ?= ;
 	
 	SIOUXLIBS ?= 
-		"$(CW):MacOS Support:Libraries:Runtime:Runtime PPC:MSL RuntimePPC.lib"
-		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL SIOUX.PPC.Lib" 
-		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL C.PPC.Lib" ;
+		"$(CW):MacOS Support:Libraries:Runtime:Libs:MSL_Runtime_PPC.lib"
+		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_SIOUX_PPC.Lib" 
+		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_C_PPC.Lib" ;
 
 	C++		?= mwcppc ;
-	C++FLAGS	?= -w off -nomapcr ;
+	C++FLAGS	?= -w off ;
 	CC		?= mwcppc ;
-	CCFLAGS		?= -w off -nomapcr ;
+	CCFLAGS		?= -w off ;
 	CP		?= duplicate -y ;
 	DOT		?= ":" ;
 	DOTDOT		?= "::" ;
@@ -1623,7 +1623,6 @@ actions File
 
 actions GenFile1
 {
-	PATH="$PATH:."
 	$(>[1]) $(<) $(>[2-])
 }
 
@@ -1729,6 +1728,19 @@ if $(NOARUPDATE)
 	actions Archive
 	{
 	$(AR) $(<) $(>)
+	}
+}
+
+#
+# UNIX specific actions
+#
+
+if $(UNIX)
+{
+	actions GenFile1
+	{
+	PATH="$PATH:."
+	$(>[1]) $(<) $(>[2-])
 	}
 }
 
