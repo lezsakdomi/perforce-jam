@@ -1,11 +1,12 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
 # include "jam.h"
 # include "filesys.h"
+# include "pathsys.h"
 
 # ifdef OS_OS2
 
@@ -39,9 +40,10 @@
 void
 file_dirscan( 
 	char *dir,
-	void (*func)( char *file, int status, time_t t ) )
+	scanback func,
+	void	*closure )
 {
-	FILENAME f;
+	PATHNAME f;
 	char filespec[ MAXJPATH ];
 	char filename[ MAXJPATH ];
 	long handle;
@@ -62,9 +64,9 @@ file_dirscan(
 	strcpy( filespec, dir );
 
  	if( f.f_dir.len == 1 && f.f_dir.ptr[0] == '\\' )
- 	    (*func)( dir, 0 /* not stat()'ed */, (time_t)0 );
+ 	    (*func)( closure, dir, 0 /* not stat()'ed */, (time_t)0 );
  	else if( f.f_dir.len == 3 && f.f_dir.ptr[1] == ':' )
- 	    (*func)( dir, 0 /* not stat()'ed */, (time_t)0 );
+ 	    (*func)( closure, dir, 0 /* not stat()'ed */, (time_t)0 );
 	else
 	    strcat( filespec, "/" );
 
@@ -86,9 +88,9 @@ file_dirscan(
 		f.f_base.ptr = finfo->name;
 		f.f_base.len = strlen( finfo->name );
 
-		file_build( &f, filename, 0 );
+		path_build( &f, filename, 0 );
 
-		(*func)( filename, 0 /* not stat()'ed */, (time_t)0 );
+		(*func)( closure, filename, 0 /* not stat()'ed */, (time_t)0 );
 	    }
 	    while( !_dos_findnext( finfo ) );
 	}
@@ -120,7 +122,8 @@ file_time(
 void
 file_archscan(
 	char *archive,
-	void (*func)( char *file, int status, time_t t ) )
+	scanback func,
+	void	*closure )
 {
 }
 

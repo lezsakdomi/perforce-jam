@@ -28,6 +28,22 @@ else if $(VMS) 	{ code = execvms.c filevms.c pathvms.c ; }
 else if $(MAC)	{ code = execmac.c filemac.c pathmac.c ; }
 else 		{ code = execunix.c fileunix.c pathunix.c ; }
 
+# For jam profiling/debugging.
+
+if $(PROFILE)
+{
+	CCFLAGS += -pg ;
+	LINKFLAGS += -pg ;
+	LOCATE_TARGET = $(LOCATE_TARGET)/pg ;
+}
+
+if $(DEBUG)
+{
+	CCFLAGS += -g ;
+	LINKFLAGS += -g ;
+	LOCATE_TARGET = $(LOCATE_TARGET)/g ;
+}
+
 # We have to signal jam.h for these
 
 if $(OS) = NT 			{ CCFLAGS += /DNT ; }
@@ -43,7 +59,7 @@ else            { code += jamgram.c ; }
 # easier to read/maintain.
 #
 
-if $(UNIX) && $(YACC)
+if $(YACC) && $(SUFEXE) = ""
 {
 	GenFile jamgram.y jamgramtab.h : yyacc jamgram.yy ;
 }
@@ -54,6 +70,13 @@ if $(UNIX) && $(YACC)
 
 Main		mkjambase : mkjambase.c ;
 
+if $(VMS)
+{
+	CC = cxx ;
+	LINK = cxxlink ;
+	CCFLAGS += /define=VMS ;
+}
+
 #
 # The guts of the Jamfile: how to build Jam
 #
@@ -62,11 +85,11 @@ Main 		jam : jam.c jambase.c ;
 LinkLibraries 	jam : libjam.a ;
 GenFile 	jambase.c : mkjambase Jambase ;
 
-Library         libjam.a : 
-		    command.c compile.c $(code) expand.c glob.c
-		    hash.c headers.c lists.c make.c make1.c newstr.c
-		    option.c parse.c regexp.c rules.c scan.c search.c
-		    timestamp.c variable.c ;
+Library         libjam.a :
+		    builtins.c command.c compile.c $(code) expand.c
+		    glob.c hash.c headers.c lists.c make.c make1.c
+		    newstr.c option.c parse.c regexp.c rules.c scan.c
+		    search.c timestamp.c variable.c ;
 
 
 if $(BINDIR) 	{ InstallBin $(BINDIR) : jam ; }
@@ -77,15 +100,16 @@ if $(BINDIR) 	{ InstallBin $(BINDIR) : jam ; }
 
 ALLSOURCE =
 	Build.com Build.mpw Jam.html Jambase Jambase.html Jamfile
-	Jamfile.html Makefile Porting README RELNOTES command.c command.h
-	compile.c compile.h execcmd.h execmac.c execunix.c execvms.c
-	expand.c expand.h filemac.c filent.c fileos2.c filesys.h fileunix.c
-	filevms.c glob.c hash.c hash.h headers.c headers.h jam.c jam.h
-	jambase.c jambase.h jamgram.c jamgram.h jamgram.y jamgram.yy
-	jamgramtab.h lists.c lists.h make.c make.h make1.c mkjambase.c
-	newstr.c newstr.h option.c option.h parse.c parse.h patchlevel.h
-	pathmac.c pathunix.c pathvms.c regexp.c regexp.h rules.c rules.h
-	scan.c scan.h search.c search.h timestamp.c timestamp.h variable.c
+	Jamfile.html Makefile Porting README RELNOTES builtins.c builtins.h
+	command.c command.h compile.c compile.h execcmd.h execmac.c
+	execunix.c execvms.c expand.c expand.h filemac.c filent.c
+	fileos2.c filesys.h fileunix.c filevms.c glob.c hash.c hash.h
+	headers.c headers.h jam.c jam.h jambase.c jambase.h jamgram.c
+	jamgram.h jamgram.y jamgram.yy jamgramtab.h lists.c lists.h
+	make.c make.h make1.c mkjambase.c newstr.c newstr.h option.c
+	option.h parse.c parse.h patchlevel.h pathmac.c pathsys.h
+	pathunix.c pathvms.c regexp.c regexp.h rules.c rules.h scan.c
+	scan.h search.c search.h timestamp.c timestamp.h variable.c
 	variable.h yyacc ;
 
 rule Ball
@@ -103,7 +127,7 @@ rule Ball
 	}
 }
 
-VERSION = jam-2.3.2 ;
+VERSION = jam-2.4-dev ;
 
 actions Tar
 {

@@ -1,11 +1,12 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
 # include "jam.h"
 # include "filesys.h"
+# include "pathsys.h"
 
 # ifdef USE_FILEUNIX
 
@@ -34,7 +35,7 @@
 # endif
 
 # if defined( OS_MVS ) || \
-     defined( OS_INTERIX )
+     defined( OS_INTERIX ) || defined(OS_AIX)
 
 #define	ARMAG	"!<arch>\n"
 #define	SARMAG	8
@@ -94,9 +95,10 @@ struct ar_hdr		/* archive file member header - printable ascii */
 void
 file_dirscan( 
 	char *dir,
-	void (*func)( char *file, int status, time_t t ) )
+	scanback func,
+	void *closure )
 {
-	FILENAME f;
+	PATHNAME f;
 	DIR *d;
 	STRUCT_DIRENT *dirent;
 	char filename[ MAXJPATH ];
@@ -113,7 +115,7 @@ file_dirscan(
 	/* Special case / : enter it */
 
 	if( f.f_dir.len == 1 && f.f_dir.ptr[0] == '/' )
-	    (*func)( dir, 0 /* not stat()'ed */, (time_t)0 );
+	    (*func)( closure, dir, 0 /* not stat()'ed */, (time_t)0 );
 
 	/* Now enter contents of directory */
 
@@ -133,9 +135,9 @@ file_dirscan(
 # endif
 	    f.f_base.len = strlen( f.f_base.ptr );
 
-	    file_build( &f, filename, 0 );
+	    path_build( &f, filename, 0 );
 
-	    (*func)( filename, 0 /* not stat()'ed */, (time_t)0 );
+	    (*func)( closure, filename, 0 /* not stat()'ed */, (time_t)0 );
 	}
 
 	closedir( d );
@@ -171,7 +173,8 @@ file_time(
 void
 file_archscan(
 	char *archive,
-	void (*func)( char *file, int status, time_t t ) )
+	scanback func,
+	void *closure )
 {
 # ifndef NO_AR
 	struct ar_hdr ar_hdr;
@@ -249,7 +252,7 @@ file_archscan(
 
 	    sprintf( buf, "%s(%s)", archive, lar_name );
 
-	    (*func)( buf, 1 /* time valid */, (time_t)lar_date );
+	    (*func)( closure, buf, 1 /* time valid */, (time_t)lar_date );
 
 	    offset += SARHDR + ( ( lar_size + 1 ) & ~1 );
 	    lseek( fd, offset, 0 );
@@ -269,7 +272,8 @@ file_archscan(
 void
 file_archscan(
 	char *archive,
-	void (*func)( char *file, int status, time_t t ) )
+	scanback func,
+	void *closure )
 {
 	struct fl_hdr fl_hdr;
 
@@ -315,7 +319,7 @@ file_archscan(
 
 	    sprintf( buf, "%s(%s)", archive, ar_hdr.hdr._ar_name.ar_name );
 
-	    (*func)( buf, 1 /* time valid */, (time_t)lar_date );
+	    (*func)( closure, buf, 1 /* time valid */, (time_t)lar_date );
 	}
 
 	close( fd );

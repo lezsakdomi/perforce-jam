@@ -1,11 +1,11 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
 # include "jam.h"
-# include "filesys.h"
+# include "pathsys.h"
 
 # ifdef OS_VMS
 
@@ -16,11 +16,11 @@
  *
  * External routines:
  *
- *	file_parse() - split a file name into dir/base/suffix/member
- *	file_build() - build a filename given dir/base/suffix/member
- *	file_parent() - make a FILENAME point to its parent dir
+ *	path_parse() - split a file name into dir/base/suffix/member
+ *	path_build() - build a filename given dir/base/suffix/member
+ *	path_parent() - make a PATHNAME point to its parent dir
  *
- * File_parse() and file_build() just manipuate a string and a structure;
+ * File_parse() and path_build() just manipuate a string and a structure;
  * they do not make system calls.
  *
  * WARNING!  This file contains voodoo logic, as black magic is 
@@ -32,13 +32,13 @@
  */
 
 /*
- * file_parse() - split a file name into dir/base/suffix/member
+ * path_parse() - split a file name into dir/base/suffix/member
  */
 
 void
-file_parse( 
+path_parse( 
 	char	*file,
-	FILENAME *f )
+	PATHNAME *f )
 {
 	char *p, *q;
 	char *end;
@@ -80,7 +80,7 @@ file_parse(
 	p = 0;
 	q = file;
 
-	while( q = memchr( q, '.', end - q ) )
+	while( q = (char *)memchr( q, '.', end - q ) )
 	    p = q++;
 
 	if( p )
@@ -225,12 +225,12 @@ dir_flags(
 }
 
 /*
- * file_build() - build a filename given dir/base/suffix/member
+ * path_build() - build a filename given dir/base/suffix/member
  */
 
 void
-file_build(
-	FILENAME *f,
+path_build(
+	PATHNAME *f,
 	char	*file,
 	int	binding )
 {
@@ -405,11 +405,11 @@ file_build(
 }
 
 /*
- *	file_parent() - make a FILENAME point to its parent dir
+ *	path_parent() - make a PATHNAME point to its parent dir
  */
 
 void
-file_parent( FILENAME *f )
+path_parent( PATHNAME *f )
 {
 	if( f->f_base.len )
 	{

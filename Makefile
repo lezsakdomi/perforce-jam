@@ -23,6 +23,12 @@ CFLAGS =
 #TARGET = /Fejam0
 #LINKLIBS = $(Lib)/oldnames.lib $(Lib)/kernel32.lib $(Lib)/libc.lib
 
+# NT (with Microsoft compiler)
+# People with DevStudio settings already in shell environment.
+#CC = cl /nologo
+#CFLAGS = -DNT 
+#TARGET = /Fejam0
+
 # BeOS - Metroworks CodeWarrior
 #CC = mwcc
 #Include = /NewDisk/develop/headers/posix
@@ -47,6 +53,7 @@ CFLAGS =
 #CC = gcc
 
 SOURCES = \
+	builtins.c \
 	command.c compile.c execunix.c execvms.c expand.c \
 	filent.c fileos2.c fileunix.c filevms.c glob.c hash.c \
 	headers.c jam.c jambase.c jamgram.c lists.c make.c make1.c \

@@ -1,11 +1,12 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
  
 # include "jam.h"
 # include "filesys.h"
+# include "pathsys.h"
 
 # ifdef OS_MAC
 
@@ -53,9 +54,10 @@ void CopyC2PStr(const char * cstr, StringPtr pstr)
 void
 file_dirscan( 
 	char	*dir,
-	void	(*func)( char *file, int s, time_t t ) )
+	scanback func,
+	void	*closure )
 {
-	FILENAME f;
+	PATHNAME f;
 	char filename[ MAXJPATH ];
 	unsigned char fullPath[ 512 ];
 
@@ -78,7 +80,7 @@ file_dirscan(
 	/* Special case ":" - enter it */
 
 	if( f.f_dir.len == 1 && f.f_dir.ptr[0] == ':' )
-	    (*func)( dir, 0 /* not stat()'ed */, (time_t)0 );
+	    (*func)( closure, dir, 0 /* not stat()'ed */, (time_t)0 );
 
 	/* Now enter contents of directory */
 
@@ -121,9 +123,9 @@ file_dirscan(
 	    f.f_base.ptr = (char *)fullPath + 1;
 	    f.f_base.len = *fullPath;
 	    
-	    file_build( &f, filename, 0 );
+	    path_build( &f, filename, 0 );
 
-	    (*func)( filename, 0 /* not stat()'ed */, (time_t)0 );
+	    (*func)( closure, filename, 0 /* not stat()'ed */, (time_t)0 );
 	}
 }
 
@@ -153,8 +155,8 @@ file_time(
 void
 file_archscan(
 	char 	*archive,
-	void	(*func)( char *file, int s, time_t t ) )
-
+	scanback func,
+	void	*closure )
 {
 }
 

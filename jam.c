@@ -1,6 +1,6 @@
 /*
  * /+\
- * +\	Copyright 1993, 2000 Christopher Seiwald.
+ * +\	Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
  * \+/
  *
  * This file is part of jam.
@@ -15,7 +15,7 @@
 /*
  * jam.c - make redux
  *
- * See Jam.html and Jamlang.html for usage information.
+ * See Jam.html for usage information.
  *
  * These comments document the code.
  *
@@ -30,14 +30,18 @@
  *       /   |    \              \
  *      /    |     \             |
  *  scan     |     compile      make
- *   |       |    /    \       / |  \
- *   |       |   /      \     /  |   \
- *   |       |  /        \   /   |    \
- * jambase parse         rules  search make1
- *                               |	|   \
- *                               |	|    \
- *                               |	|     \
- *                           timestamp command execute
+ *   |       |    /  | \       / |  \
+ *   |       |   /   |  \     /  |   \
+ *   |       |  /    |   \   /   |    \
+ * jambase parse     |   rules  search make1
+ *                   |           |      |   \
+ *                   |           |      |    \
+ *                   |           |      |     \
+ *               builtins    timestamp command execute
+ *                               |
+ *                               |
+ *                               |
+ *                             filesys
  *
  *
  * The support routines are called by all of the above, but themselves
@@ -47,7 +51,7 @@
  *                      /  |   |   |
  *                     /   |   |   |
  *                    /    |   |   |
- *                 lists   |   |   filesys
+ *                 lists   |   |   pathsys
  *                    \    |   |
  *                     \   |   |
  *                      \  |   |
@@ -59,13 +63,13 @@
  *
  * Roughly, the modules are:
  *
+ *	builtins.c - jam's built-in rules
  *	command.c - maintain lists of commands
  *	compile.c - compile parsed jam statements
  *	execunix.c - execute a shell script on UNIX
  *	execvms.c - execute a shell script, ala VMS
  *	expand.c - expand a buffer, given variable values
- *	fileunix.c - manipulate file names and scan directories on UNIX
- *	filevms.c - manipulate file names and scan directories on VMS
+ *	file*.c - scan directories and archives on *
  *	hash.c - simple in-memory hashing routines 
  *	headers.c - handle #includes in source files
  *	jambase.c - compilable copy of Jambase
@@ -76,6 +80,8 @@
  *	newstr.c - string manipulation routines
  *	option.c - command line option processing
  *	parse.c - make and destroy parse trees as driven by the parser
+ *	path*.c - manipulate file names on *
+ *	hash.c - simple in-memory hashing routines 
  *	regexp.c - Henry Spencer's regexp
  *	rules.c - access to RULEs, TARGETs, and ACTIONs
  *	scan.c - the jam yacc scanner
@@ -87,6 +93,7 @@
  * 02/08/95 (seiwald) - -n implies -d2.
  * 02/22/95 (seiwald) - -v for version info.
  * 09/11/00 (seiwald) - PATCHLEVEL folded into VERSION.
+ * 01/10/01 (seiwald) - pathsys.h split from filesys.h
  */
 
 # include "jam.h"
@@ -99,6 +106,7 @@
 # include "parse.h"
 # include "variable.h"
 # include "compile.h"
+# include "builtins.h"
 # include "rules.h"
 # include "newstr.h"
 # include "scan.h"
@@ -191,7 +199,7 @@ main( int argc, char **argv, char **arg_environ )
 	{
 	    printf( "Jam/MR  " );
 	    printf( "Version %s.  ", VERSION );
-	    printf( "Copyright 1993, 2000 Christopher Seiwald.  " );
+	    printf( "Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.  " );
 	    printf( "%s.\n", OSMINOR );
 
 	    return EXITOK;
@@ -295,10 +303,9 @@ main( int argc, char **argv, char **arg_environ )
 	    var_defines( symv );
 	}
 
-	/* Initialize builtins */
+	/* Initialize built-in rules */
 
-
-	compile_builtins();
+	load_builtins();
 
 	/* Parse ruleset */
 

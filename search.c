@@ -1,5 +1,5 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
@@ -8,7 +8,7 @@
 # include "lists.h"
 # include "search.h"
 # include "timestamp.h"
-# include "filesys.h"
+# include "pathsys.h"
 # include "variable.h"
 # include "newstr.h"
 
@@ -21,13 +21,13 @@ search(
 	char	*target,
 	time_t	*time )
 {
-	FILENAME f[1];
+	PATHNAME f[1];
 	LIST	*varlist;
 	char	buf[ MAXJPATH ];
 
 	/* Parse the filename */
 
-	file_parse( target, f );
+	path_parse( target, f );
 
 	f->f_grist.ptr = 0;
 	f->f_grist.len = 0;
@@ -37,7 +37,7 @@ search(
 	    f->f_root.ptr = varlist->string;
 	    f->f_root.len = strlen( varlist->string );
 
-	    file_build( f, buf, 1 );
+	    path_build( f, buf, 1 );
 
 	    if( DEBUG_SEARCH )
 		printf( "locate %s: %s\n", target, buf );
@@ -53,7 +53,7 @@ search(
 		f->f_root.ptr = varlist->string;
 		f->f_root.len = strlen( varlist->string );
 
-		file_build( f, buf, 1 );
+		path_build( f, buf, 1 );
 
 		if( DEBUG_SEARCH )
 		    printf( "search %s: %s\n", target, buf );
@@ -74,7 +74,7 @@ search(
 	f->f_root.ptr = 0;
 	f->f_root.len = 0;
 
-	file_build( f, buf, 1 );
+	path_build( f, buf, 1 );
 
 	if( DEBUG_SEARCH )
 	    printf( "search %s: %s\n", target, buf );
