@@ -150,6 +150,10 @@
 #	all - default if none given on command line
 #
 
+# for perforce use -- jambase version
+
+JAMBASEDATE = 2002.05.09 ;
+
 # Initialize variables
 #
 
@@ -923,37 +927,52 @@ rule MainFromObjects
 
 rule MakeLocate
 {
+	# MakeLocate targets : directory ;
+
+	# Sets special variable LOCATE on targets, and arranges
+	# with MkDir to create target directory.
+
+	# Note we grist the directory name with 'dir',
+	# so that directory path components and other
+	# targets don't conflict.
+
 	if $(>)
 	{
 	    LOCATE on $(<) = $(>) ;
-	    Depends $(<) : $(>[1]) ;
-	    MkDir $(>[1]) ;
+	    Depends $(<) : $(>[1]:G=dir) ;
+	    MkDir $(>[1]:G=dir) ;
 	}
 }
 
 rule MkDir
 {
-	# If dir exists, don't update it
-	# Do this even for $(DOT).
+	# MkDir directory ;
+
+	# Make a directory and all its parent directories.
+
+	# Ignore timestamps on directories: we only care if they 
+	# exist.
 
 	NoUpdate $(<) ;
 
-	if $(<) != $(DOT) && ! $($(<)-mkdir) 
-	{
-	    local s ;
+	# Don't create . or any directory already created.
 
+	if $(<:G=) != $(DOT) && ! $($(<)-mkdir) 
+	{
 	    # Cheesy gate to prevent multiple invocations on same dir
-	    # MkDir1 has the actions 
 	    # Arrange for jam dirs
+	    # MkDir1 has the actions 
 
 	    $(<)-mkdir = true ;
-	    MkDir1 $(<) ;
 	    Depends dirs : $(<) ;
+	    MkDir1 $(<) ;
 
 	    # Recursively make parent directories.
 	    # $(<:P) = $(<)'s parent, & we recurse until root
 
-	    s = $(<:P) ;
+	    local s = $(<:P) ;
+
+	    # Don't try to create A: or A:\ on windows
 
 	    if $(NT)
 	    {
@@ -964,16 +983,21 @@ rule MkDir
 		}
 	    }
 
-	    if $(s) && $(s) != $(<)
+	    if $(s) = $(<)
 	    {
+		# The parent is the same as the dir.
+		# We're at the root, which some OS's can't stat, so we mark
+		# it as NotFile.
+
+	        NotFile $(s) ;
+	    }
+	    else if $(s:G=)
+	    {
+		# There's a parent; recurse.
+
 		Depends $(<) : $(s) ;
 		MkDir $(s) ;
 	    }
-	    else if $(s)
-	    {
-	        NotFile $(s) ;
-	    }
-
 	}
 }
 
@@ -1109,53 +1133,92 @@ rule SoftLink
 rule SubDir
 {
 	#
-	# SubDir TOP d1 [ ... ]
+	# SubDir TOP d1 ... ;
 	#
-	# This introduces a Jamfile that is part of a project tree 
-	# rooted at $(TOP).  It (only once) includes the project-specific
-	# rules file $(TOP)/Jamrules and then sets search & locate stuff.
+	# Support for a project tree spanning multiple directories.
 	#
-	# If the variable $(TOPRULES) is set (where TOP is the first arg 
-	# to SubDir), that file is included instead of $(TOP)/Jamrules.
+	# SubDir introduces a Jamfile that is part of a project tree whose
+	# root is $(TOP).  TOP is a user-selected variable name for the
+	# tree; d1 ... are the directory elements that lead from the root
+	# of the tree to the directory of the Jamfile.
 	#
-	# d1 ... are the directory elements that lead to this directory 
-	# from $(TOP).  We construct the system dependent path from these
-	# directory elements in order to set search&locate stuff.
-	# 
+	# When jam reads the Jamfile in the current working directory
+	# (CWD), the first SubDir call sets $(TOP) to the back path to
+	# the project root for use by subsequent SubDir calls.  The path
+	# contains one ../ for each directory from the root.
+	#
+	# Each SubDir call sets the (fixed) variable $(SUBDIR) to the path
+	# from the CWD to the named directory.  SubDir also sets other
+	# Jambase variables (SEARCH_SOURCE, LOCATE_TARGET) to $(SUBDIR),
+	# so that file names within the Jamfile refer to $(SUBDIR).
+	#
+	# The first invocation of SubDir for TOP includes the
+	# project-specific rules files $(TOPRULES).  If $(TOPRULES) is
+	# not set SubDir looks for a Jamrules in $(TOP) and includes that
+	# if present.
+	#
+	# SubDir supports different TOPs for separate project trees; it
+	# simply uses the last value of $(SUBDIR) instead of the CWD when 
+	# computing the path to $(TOP).
+	#
+	# SubDir's public variables:
+	#
+	#	$(TOP) = path from CWD to root.
+	#	$(SUBDIR) = path from CWD to the directory SubDir names.
+	#	$(SUBDIR_TOKENS) = path from $(TOP) to $(SUBDIR) as dir names
+	#	$(SEARCH_SOURCE) = $(SUBDIR)
+	#	$(LOCATE_SOURCE) = $(ALL_LOCATE_TARGET) $(SUBDIR)
+	#	$(LOCATE_TARGET) = $(ALL_LOCATE_TARGET) $(SUBDIR)
+	#	$(SOURCE_GRIST) = $(SUBDIR_TOKENS) with !'s 
+	#
+	# SubDir's private variables:
+	#
+	#	$(SUBDIR_UP) = directories from CWD to a common point
+	#	$(SUBDIR_DOWN) = directories from common point to SUBDIR
+	#	$(TOP-UP) = directories from CWD to a common point
+	#	$(TOP-DOWN) = directories from common point to TOP
 
 	local _top = $(<[1]) ;
+	local _tokens = $(<[2-]) ;
+
+	#
+	# First time through sets up relative root and includes Jamrules.
+	#
+
+	if ! $(_top)
+	{
+	    Exit SubDir syntax error ;
+	}
 
 	if ! $($(_top))
 	{
-	    if ! $(_top)
-	    {
-		Exit SubDir syntax error ;
-	    }
+	    # Get path from SUBDIR (or CWD) to $(TOP)
 
-	    $(_top) = [ FSubDir $(<[2-]) ] ;
-	}
+	    SUBDIR_UP += $(_tokens) ;
 
-	#
-	# If $(TOP)/Jamrules hasn't been included, do so.
-	#
-
-	if ! $($(_top)-included)
-	{
-	    # Gated entry.
-
-	    $(_top)-included = TRUE ;
+	    $(_top)-UP = $(SUBDIR_UP) ;
+	    $(_top)-DOWN = $(SUBDIR_DOWN) ;
+	    $(_top) = [ FSubDirPath $(_top) ] ;
 
 	    # File is $(TOPRULES) or $(TOP)/Jamrules.
+	    # Include $(TOPRULES) if set.
+	    # Only include default $(TOP)/Jamrules if present.
 
-	    include $($(_top)RULES:E=$(JAMRULES:R=$($(_top)))) ;
+	    if $($(_top)RULES) { 
+		include $($(_top)RULES) ;
+	    } else { 
+		include [ Glob $($(_top)) : $(JAMRULES) ] ;
+	    }
 	}
 
-	# Get path to current directory from root using SubDir.
+	# Get path from $(TOP) to named directory.
 	# Save dir tokens for other potential uses.
 
-	local _s = [ FDirName $(<[2-]) ] ;
-	SUBDIR = $(_s:R=$($(_top))) ;
-        SUBDIR_TOKENS = $(<[2-]) ;
+	SUBDIR_UP = $($(_top)-UP) ;
+        SUBDIR_DOWN = $($(_top)-DOWN) $(_tokens) ;
+        SUBDIR_TOKENS = $(SUBDIR_DOWN) ;
+
+	SUBDIR = [ FSubDirPath $(<) ] ;
 
 	# Now set up SEARCH_SOURCE, LOCATE_TARGET, SOURCE_GRIST
 	# These can be reset if needed.	 For example, if the source
@@ -1165,13 +1228,23 @@ rule SubDir
 	SEARCH_SOURCE = $(SUBDIR) ;
 	LOCATE_SOURCE = $(ALL_LOCATE_TARGET) $(SUBDIR) ;
 	LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(SUBDIR) ;
-	SOURCE_GRIST = [ FGrist $(<[2-]) ] ;
+	SOURCE_GRIST = [ FGrist $(SUBDIR_TOKENS) ] ;
 
 	# Reset per-directory ccflags, hdrs
 
 	SUBDIRCCFLAGS = ;
 	SUBDIRC++FLAGS = ;
 	SUBDIRHDRS = ;
+}
+
+rule FSubDirPath
+{
+	# FSubDirPath TOP d1 ... ;
+
+	# Returns path to named directory, assuming TOP has been set by
+	# a previous call to SubDir.
+
+	return [ FRelPath $($(<[1])-UP) : $($(<[1])-DOWN) $(<[2-]) ] ;
 }
 
 rule SubDirCcFlags
@@ -1191,21 +1264,38 @@ rule SubDirHdrs
 
 rule SubInclude
 {
-	local _s ;
-
-	# That's
-	#	SubInclude TOP d1 [ d2 [ d3 [ d4 ] ] ]
+	# SubInclude TOP d1 ... ;
 	#
-	# to include a subdirectory's Jamfile.
+	# Include a subdirectory's Jamfile.
+
+	# We use SubDir to get there, in case the included Jamfile
+	# either doesn't have its own SubDir (naughty) or is a subtree
+	# with its own TOP.
 
 	if ! $($(<[1]))
 	{
-	    Exit Top level of source tree has not been set with $(<[1]) ;
+	    Exit Top level of source tree has not been set with $(_top) ;
 	}
 
-	_s = [ FDirName $(<[2-]) ] ;
-	
-	include $(JAMFILE:D=$(_s):R=$($(<[1]))) ;
+	SubDir $(<) ;
+
+	include $(JAMFILE:D=$(SUBDIR)) ;
+}
+
+rule SubRules
+{
+	# SubRules TOP d1 ... : Other-TOP ;
+	#
+	# Read another tree's Jamrules, by giving it's path according
+	# to this tree and it's own name.
+
+	if ! $($(<[1]))
+	{
+	    Exit Top level of source tree has not been set with $(_top) ;
+	}
+
+	SubDir $(<) ;
+	SubDir $(>) ;
 }
 
 rule Undefines
