@@ -7,7 +7,7 @@
 # include "jam.h"
 # include "filesys.h"
 
-# ifdef unix
+# if defined(unix) || defined(AMIGA)
 
 # if defined(_SEQUENT_) || defined(__DGUX__) || \
      defined(M_XENIX) || defined(__ISC) 
@@ -49,7 +49,7 @@ struct ar_hdr		/* archive file member header - printable ascii */
   
 
 /*
- * fileunix.c - manipulate file names and scan directories on UNIX
+ * fileunix.c - manipulate file names and scan directories on UNIX/AmigaOS
  *
  * External routines:
  *
@@ -310,5 +310,5 @@ void (*func)();
 
 # endif /* AIAMAG - RS6000 AIX */
 
-# endif /* unix */
+# endif /* unix || AMIGA */
 

@@ -212,7 +212,8 @@ if $(UNIX)
 	C++FLAGS	default = -nosyspath ;
 	FORTRAN		default = "" ;
 	LIBDIR		default = /boot/develop/libraries ;
-	LINK		default = $(CC) ;
+	LINK		default = mwld ;
+	LINKFLAGS	default = "" ;
 	LEX		default = "" ;
 	MANDIR		default = /boot/documentation/"Shell Tools"/HTML ;
 	NOARSCAN	default = true ;
@@ -221,6 +222,13 @@ if $(UNIX)
 	YACC		default = "" ;
 	YACCFLAGS	default = "" ;
 	YACCFILES	default = "" ;
+	}
+	else if $(OS) = AMIGA
+	{
+	CC				default = gcc ;
+	YACC			default = bison ;
+	YACCFLAGS	default = -d ;
+	YACCFILES	default = y.tab ;
 	}
 
 	AR		default = ar ru ;

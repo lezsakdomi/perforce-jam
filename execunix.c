@@ -9,7 +9,7 @@
 # include "lists.h"
 # include <errno.h>
 
-# if defined( unix ) || defined( NT ) || defined( __OS2__ )
+# if defined( unix ) || defined( NT ) || defined( __OS2__ ) || defined(AMIGA)
 
 # if defined( _AIX) || \
 	(defined (COHERENT) && defined (_I386)) || \
@@ -34,12 +34,12 @@ static int my_wait(int *status);
 # endif
 
 /*
- * execunix.c - execute a shell script on UNIX/WinNT/OS2
+ * execunix.c - execute a shell script on UNIX/WinNT/OS2/AmigaOS
  *
  * If $(JAMSHELL) is defined, uses that to formulate execvp()/spawnvp().
  * The default is:
  *
- *	/bin/sh -c %		[ on UNIX ]
+ *	/bin/sh -c %		[ on UNIX/AmigaOS ]
  *	cmd.exe /c %		[ on OS2/WinNT ]
  *
  * Each word must be an individual element in a jam variable value.
@@ -390,4 +390,4 @@ FAILED:
 
 # endif /* NT && !__BORLANDC__ */
 
-# endif /* unix || NT || __OS2__ */
+# endif /* unix || NT || __OS2__ || AMIGA */

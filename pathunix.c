@@ -7,16 +7,16 @@
 # include "jam.h"
 # include "filesys.h"
 
-# if defined( unix ) || defined( NT ) || defined( __OS2__ )
+# if defined( unix ) || defined( NT ) || defined( __OS2__ ) || defined(AMIGA)
 
-# ifdef unix
+# if defined(unix) || defined(AMIGA)
 # define DELIM '/'
 # else
 # define DELIM '\\'
 # endif
 
 /*
- * pathunix.c - manipulate file names on UNIX, NT, OS2
+ * pathunix.c - manipulate file names on UNIX, NT, OS2, AmigaOS
  *
  * External routines:
  *
@@ -70,11 +70,13 @@ FILENAME	*f;
 	p = strrchr( file, '/' );
 
 # ifndef UNIX
+# ifndef AMIGA
 	/* On NT, look for dir\ as well */
 	{
 	    char *p1 = strrchr( file, '\\' );
 	    p = p1 > p ? p1 : p;
 	}
+# endif
 # endif
 
 	if( p )
@@ -88,10 +90,12 @@ FILENAME	*f;
 		f->f_dir.len = 1;
 
 # ifndef UNIX
+# ifndef AMIGA
 	    /* Special case for D:/ - dirname is D:/, not "D:" */
 
 	    if( f->f_dir.len == 2 && file[1] == ':' )
 		f->f_dir.len = 3;
+# endif
 # endif
 
 	    file = p + 1;
@@ -153,7 +157,7 @@ int		binding;
 
 	/* Don't prepend root if it's . or directory is rooted */
 
-# ifdef unix
+# if defined(unix) || defined(AMIGA)
 
 	if( f->f_root.len 
 	    && !( f->f_root.len == 1 && f->f_root.ptr[0] == '.' )
@@ -190,7 +194,9 @@ int		binding;
 	    /* NT:   Special case for dir / : don't add another / */
 
 # ifndef UNIX
+# ifndef AMIGA
 	    if( !( f->f_dir.len == 3 && f->f_dir.ptr[1] == ':' ) )
+# endif
 # endif
 		if( !( f->f_dir.len == 1 && f->f_dir.ptr[0] == DELIM ) )
 		    *file++ = DELIM;
@@ -237,4 +243,4 @@ FILENAME *f;
 	f->f_member.len = 0;
 }
 
-# endif /* unix, NT, OS/2 */
+# endif /* unix, NT, OS/2, AmigaOS */

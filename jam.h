@@ -228,6 +228,9 @@ int unlink( char *f ); 	/* In filevms.c */
 # if defined(__USLC__) && !defined(M_XENIX)
 # define OSSYMS "UNIX=true","OS=UNIXWARE"
 # endif
+# ifdef AMIGA
+# define OSSYMS "UNIX=true","OS=AMIGA"
+# endif
 # ifndef OSSYMS
 # define OSSYMS "UNIX=true","OS=UNKNOWN"
 # endif

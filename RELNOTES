@@ -1,6 +1,10 @@
 Release notes for Jam/MR 2.2 
 (formerly Jam - make(1) redux)
 
+0.  Changes since 2.2
+
+	AmigaOS (with gcc) supported, courtesy of Alain Penders
+	(Patchlevel 2).
 
 1.  Release info:
 
