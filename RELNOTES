@@ -118,6 +118,9 @@ Release notes for Jam 2.5
 	jam's pid, so that multiple jams can run on the same system (with
 	the same $TEMP).  Thanks to Steve Anichini.
 
+	Several uninitialized memory accesses have been corrected in
+	var_expand() and file_archscan(), thanks to Matt Armstrong.
+
 5.  Porting
 
 	The Makefile now uses $(EXENAME) (./jam0 on UNIX, .\jam0.exe

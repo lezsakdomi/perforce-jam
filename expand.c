@@ -26,6 +26,7 @@
  * 01/25/02 (seiwald) - fixed broken $(v[1-]), by ian godin
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/30/02 (armstrong) - fix out-of-bounds access in var_expand()
  */
 
 # include "jam.h"
@@ -84,7 +85,7 @@ var_expand(
 
 	/* This gets alot of cases: $(<) and $(>) */
 
-	if( in[0] == '$' && in[1] == '(' && in[3] == ')' && !in[4] )
+	if( end - in == 4 && in[0] == '$' && in[1] == '(' && in[3] == ')' )
 	{
 	    switch( in[2] )
 	    {

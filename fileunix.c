@@ -29,6 +29,8 @@
  * 07/16/02 (seiwald) - Support BSD style long filename in archives.
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/27/02 (seiwald) - support for AIX big archives
+ * 12/30/02 (seiwald) - terminate ar_hdr for solaris sscanf()
+ * 12/30/02 (seiwald) - skip solaris' empty archive member names (/, //xxx)
  */
 
 # include "jam.h"
@@ -210,9 +212,14 @@ file_archscan(
 	while( read( fd, &ar_hdr, SARHDR ) == SARHDR &&
 	       !memcmp( ar_hdr.ar_fmag, ARFMAG, SARFMAG ) )
 	{
-	    char    lar_name[256];
 	    long    lar_date;
 	    long    lar_size;
+	    char    lar_name[256];
+	    char    *dst = lar_name;
+
+	    /* solaris sscanf() does strlen first, so terminate somewhere */
+
+	    ar_hdr.ar_fmag[0] = 0;
 
 	    /* Get date & size */
 
@@ -231,12 +238,10 @@ file_archscan(
 		*/
 
 		char *src = ar_hdr.ar_name;
-		char *dst = lar_name;
 		const char *e = src + sizeof( ar_hdr.ar_name );
 
 		while( src < e && *src && *src != ' ' && *src != '/' )
 		    *dst++ = *src++;
-		*dst = 0;
 	    }
 	    else if( ar_hdr.ar_name[1] == '/' )
 	    {
@@ -259,12 +264,14 @@ file_archscan(
 		*/
 
 		char *src = string_table + atoi( ar_hdr.ar_name + 1 );
-		char *dst = lar_name;
 
 		while( *src != '/' )
 		    *dst++ = *src++;
-		*dst = 0;
 	    }
+
+	    /* Terminate lar_name */
+
+	    *dst = 0;
 
 	    /* Modern (BSD4.4) long names: if the name is "#1/nnnn", 
 	    ** then the actual name is the nnnn bytes after the header.  
@@ -280,12 +287,17 @@ file_archscan(
 
 	    /* Build name and pass it on.  */
 
-	    if ( DEBUG_BINDSCAN )
-		printf( "archive name %s found\n", lar_name );
+	    if( lar_name[0] )
+	    {
+		if( DEBUG_BINDSCAN )
+		    printf( "archive name %s found\n", lar_name );
 
-	    sprintf( buf, "%s(%s)", archive, lar_name );
+		sprintf( buf, "%s(%s)", archive, lar_name );
 
-	    (*func)( closure, buf, 1 /* time valid */, (time_t)lar_date );
+		(*func)( closure, buf, 1 /* time valid */, (time_t)lar_date );
+	    }
+
+	    /* Position at next member */
 
 	    offset += SARHDR + ( ( lar_size + 1 ) & ~1 );
 	    lseek( fd, offset, 0 );
