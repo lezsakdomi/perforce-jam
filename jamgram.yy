@@ -184,7 +184,7 @@ expr	: arg
 		{ $$.parse = peval( EXPR_OR, $1.parse, $3.parse ); }
 	| expr `||` expr
 		{ $$.parse = peval( EXPR_OR, $1.parse, $3.parse ); }
-	| expr `in` expr
+	| arg `in` list
 		{ $$.parse = peval( EXPR_IN, $1.parse, $3.parse ); }
 	| `!` expr
 		{ $$.parse = peval( EXPR_NOT, $2.parse, pnull() ); }
