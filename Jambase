@@ -1370,12 +1370,13 @@ rule FDirName
 if $(OS2)
 {
 	rule FQuote { return \"$(<)\" ; }
-	rule FInclude { return -I$(<) ; }
+	rule FIncludes { return /I$(<) ; }
 }
 
 else if $(NT)
 {
-	rule FInclude { return -I$(<) ; }
+	rule FDefines { return /D$(<) ; }
+	rule FIncludes { return /I$(<) ; }
 }
 
 else if $(MAC)
