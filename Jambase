@@ -37,6 +37,7 @@
 # 11/21/96 (peterk) - Support for BeOS
 # 07/19/99 (sickel) - Support for Mac OS X Server (and maybe client)
 # 02/18/00 (belmonte)- Support for Cygwin.
+# 12/08/03 (seiwald) - New YaccHdr to attribute #includes to generated .c.
 
 # Special targets defined in this file:
 #
@@ -1445,6 +1446,19 @@ rule Yacc
 	# a deadly independent target
 
 	Includes $(<) : $(_h) ;
+
+	# Handle #includes in .y file
+
+	HDRRULE on $(>) = YaccHdr ;
+}
+
+rule YaccHdr
+{
+	# YaccHdr .y : hdrs ;
+	# For yacc, includes are actually on the generated
+	# .c file, not on the source .y.
+
+	HdrRule $(<:S=$(YACCGEN)) : $(>) ;
 }
 
 #
