@@ -1287,7 +1287,7 @@ rule SubInclude
 
 	if ! $($(<[1]))
 	{
-	    Exit Top level of source tree has not been set with $(_top) ;
+	    Exit SubInclude $(<[1]) without prior SubDir $(<[1]) ;
 	}
 
 	SubDir $(<) ;
@@ -1304,7 +1304,7 @@ rule SubRules
 
 	if ! $($(<[1]))
 	{
-	    Exit Top level of source tree has not been set with $(_top) ;
+	    Exit SubRules $(<[1]) without prior SubDir $(<[1]) ;
 	}
 
 	SubDir $(<) ;
