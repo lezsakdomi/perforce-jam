@@ -39,6 +39,9 @@ Release notes for Jam 2.5
 	Jamrules.  Jamrules only included if present; no error issued
 	if no Jamrules file.
 
+	$(RMDIR) has been defined for NT and defaulted to $(RM) 
+	everwhere else.  Not much tested.  For Michael Champigny.
+
 3.3   'jam' Changes (See Jam.html)
 
 	The whole /MR of Jam's name has been dropped.  It was intended

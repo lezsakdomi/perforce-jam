@@ -166,6 +166,7 @@ if $(NT)
     	MV		?= move /y ;
     	CP		?= copy ;
     	RM		?= del /f/q ;
+	RMDIR		?= rmdir /s/q ;
     	SLASH		?= \\ ;
     	SUFLIB		?= .lib ;
     	SUFOBJ		?= .obj ;
@@ -547,6 +548,7 @@ else if $(UNIX)
 	OPTIM		?= ;
 	RCP		?= rcp ;
 	RM		?= rm -f ;
+	RMDIR		?= $(RM) ;
 	RSH		?= rsh ;
 	SED		?= sed ;
 	SHELLHEADER	?= "#!/bin/sh" ;
