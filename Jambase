@@ -1813,7 +1813,7 @@ rule makeDirName { $(<) = [ FDirName $(>) ] ; }
 rule makeGrist { $(<) = [ FGrist $(>) ] ; }
 rule makeGristedName { $(<) = [ FGristSourceFiles $(>) ] ; }
 rule makeRelPath { $(<[1]) = [ FRelPath $(<[2-]) : $(>) ] ; }
-rule makeString { $(<) = [ FConcat $(>) ] ; }
+rule makeString { $(<) = $(>:J) ; }
 rule makeSubDir { $(<) = [ FSubDir $(>) ] ; }
 rule makeSuffixed { $(<[1]) = [ FAppendSuffix $(>) : $(<[2]) ] ; }
 
