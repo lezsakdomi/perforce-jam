@@ -745,19 +745,19 @@ rule InstallBin
 	local _t = [ FAppendSuffix $(>) : $(SUFEXE) ] ;
 
 	InstallInto $(<) : $(_t) ;
-	MODE on $(_t:G=installed) = $(EXEMODE) ;
+	MODE on $(_t:G=$(INSTALLGRIST)) = $(EXEMODE) ;
 }
 
 rule InstallFile
 {
 	InstallInto $(<) : $(>) ;
-	MODE on $(>:G=installed) = $(FILEMODE) ;
+	MODE on $(>:G=$(INSTALLGRIST)) = $(FILEMODE) ;
 }
 
 rule InstallLib
 {
 	InstallInto $(<) : $(>) ;
-	MODE on $(>:G=installed) = $(FILEMODE) ;
+	MODE on $(>:G=$(INSTALLGRIST)) = $(FILEMODE) ;
 }
 
 rule InstallMan
@@ -781,13 +781,13 @@ rule InstallMan
 	    InstallInto $(d:R=$(<)) : $(i) ;
 	}
 
-	MODE on $(>:G=installed) = $(FILEMODE) ;
+	MODE on $(>:G=$(INSTALLGRIST)) = $(FILEMODE) ;
 }
 
 rule InstallShell
 {
 	InstallInto $(<) : $(>) ;
-	MODE on $(>:G=installed) = $(SHELLMODE) ;
+	MODE on $(>:G=$(INSTALLGRIST)) = $(SHELLMODE) ;
 }
 
 rule Lex
