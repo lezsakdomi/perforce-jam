@@ -37,6 +37,7 @@
  * 09/19/02 (seiwald) - new -d displays
  * 11/05/02 (seiwald) - OSPLAT now set to sparc on solaris.
  * 06/03/03 (seiwald) - OpenBSD porting from Michael Champigny.
+ * 05/06/04 (seiwald) - OSPLAT amd64.
  */
 
 /*
@@ -458,6 +459,10 @@
 
 # ifdef __s390__
 # define OSPLAT "OSPLAT=390"
+# endif
+
+# ifdef __amd64__
+# define OSPLAT "OSPLAT=AMD64"
 # endif
 
 # ifndef OSPLAT
