@@ -53,6 +53,8 @@
 #include "newstr.h"
 #include "rules.h"
 
+# define YYMAXDEPTH 10000	/* for OSF and other less endowed yaccs */
+
 # define F0 (LIST *(*)(PARSE *, LOL *))0
 # define P0 (PARSE *)0
 # define S0 (char *)0

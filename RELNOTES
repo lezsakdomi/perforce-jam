@@ -85,6 +85,10 @@ Release notes for Jam/MR [UNRELEASED]
 
 3.4.  Jam internal code changes
 
+	jamgram.yy now defines YYMAXDEPTH to 10000, what it is on 
+	FreeBSD, for older yaccs that left it at 150 or so.  This is
+	needed for the right-recursion now used in the grammar.
+
 	Optimize rule compilation, with right-recursion instead of left.
 
         Split jam's built-in rules out to builtins.c from compile.c,
