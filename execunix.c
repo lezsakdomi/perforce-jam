@@ -231,7 +231,8 @@ execcmd(
 # else
 	if ((pid = vfork()) == 0) 
    	{
-	    execvp( argv[0], argv );
+	    /* hpux doesn't like const here */
+	    execvp( argv[0], (char **)argv );
 	    _exit(127);
 	}
 # endif
