@@ -286,11 +286,14 @@ TARGET	*t;
 	    if( DEBUG_EXEC )
 		printf( "%s\n", cmd->buf );
 
+	    if( globs.cmdout )
+		fprintf( globs.cmdout, "%s", cmd->buf );
+
 	    if( globs.noexec )
 	    {
 		make1d( t, EXEC_CMD_OK );
 	    } 
-	    else 
+	    else
 	    {
 		fflush( stdout );
 		execcmd( cmd->buf, make1d, t, cmd->shell );

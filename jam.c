@@ -128,10 +128,11 @@ struct globs globs = {
 	0,			/* noexec */
 	1,			/* jobs */
 # ifdef macintosh
-	{ 0, 0 }		/* debug - suppress tracing output */
+	{ 0, 0 },		/* debug - suppress tracing output */
 # else
-	{ 0, 1 } 		/* debug ... */
+	{ 0, 1 }, 		/* debug ... */
 # endif
+	0			/* output commands, not run them */
 } ;
 
 /* Symbols to be defined as true for use in Jambase */
@@ -166,7 +167,7 @@ char	**argv;
 
 	argc--, argv++;
 
-	if( ( n = getoptions( argc, argv, "d:j:f:s:t:anv", optv ) ) < 0 )
+	if( ( n = getoptions( argc, argv, "d:j:f:s:t:ano:v", optv ) ) < 0 )
 	{
 	    printf( "\nusage: jam [ options ] targets...\n\n" );
 
@@ -175,6 +176,7 @@ char	**argv;
             printf( "-fx     Read x instead of Jambase.\n" );
             printf( "-jx     Run up to x shell commands concurrently.\n" );
             printf( "-n      Don't actually execute the updating actions.\n" );
+            printf( "-ox     Write the updating actions to file x.\n" );
 	    printf( "-sx=y   Set variable x=y, overriding environment.\n" );
             printf( "-tx     Rebuild x, even if it is up-to-date.\n" );
             printf( "-v      Print the version of jam and exit.\n\n" );
@@ -307,6 +309,18 @@ char	**argv;
 	for( n = 0; s = getoptval( optv, 't', n ); n++ )
 	    touchtarget( s );
 
+	/* If an output file is specified, set globs.cmdout to that */
+
+	if( s = getoptval( optv, 'o', 0 ) )
+	{
+	    if( !( globs.cmdout = fopen( s, "w" ) ) )
+	    {
+		printf( "Failed to write to '%s'\n", s );
+		exit( EXITBAD );
+	    }
+	    globs.noexec++;
+	}
+
 	/* Now make target */
 
 	if( !argc )
@@ -320,6 +334,11 @@ char	**argv;
 	donerules();
 	donestamps();
 	donestr();
+
+	/* close cmdout */
+
+	if( globs.cmdout )
+	    fclose( globs.cmdout );
 
 	return status ? EXITBAD : EXITOK;
 }

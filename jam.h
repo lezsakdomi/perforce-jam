@@ -310,6 +310,7 @@ struct globs {
 	int	noexec;
 	int	jobs;
 	char	debug[DEBUG_MAX];
+	FILE	*cmdout;		/* print cmds, not run them */
 } ;
 
 extern struct globs globs;

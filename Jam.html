@@ -23,7 +23,7 @@ USAGE
 <PRE>
 	jam [ -a ] [ -n ] [ -v ] [ -d <I>debug</I> ] [ -f <I>rulesfile</I> ... ] 
 	    [ -j <I>jobs</I> ] [ -s <I>var</I>=<I>value</I> ... ] [ -t <I>target</I> ... ] 
-	    [  <I>target</I> ... ]
+	    [  <I>target</I> ... ] [ -o <I>actionsfile</I> ]
 </PRE>
 
 <H2>
@@ -90,7 +90,10 @@ OPTIONS
 
        -n     Don't actually execute the updating actions, but do
               everything else.  This changes the debug level default 
-	      to -d2.
+	            to -d2.
+
+       -o     Write the updating actions to the specified file instead
+              of running them (or outputting them, as on the Mac).
 
        -s&lt;var&gt;=&lt;value&gt;
               Set  the variable &lt;var&gt; to &lt;value&gt;, overriding both
@@ -99,7 +102,7 @@ OPTIONS
 
        -t&lt;target&gt;
               Rebuild &lt;target&gt;, even if it is up-to-date, and/or build 
-	      dependencies of &lt;target&gt; as if &lt;target&gt; were newer.
+              dependencies of &lt;target&gt; as if &lt;target&gt; were newer.
 
        -v     Print the version of <B>jam</B> and exit.
 </PRE>
