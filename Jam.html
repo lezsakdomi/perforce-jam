@@ -390,6 +390,39 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	target names.  See <A HREF="#binding"> Binding</A> above.
 
 	<P>
+	
+	Rule invokation may be indirected through a variable:
+
+	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
+
+	    <P> <DT> <CODE>
+	    $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I> 
+	    : <I>fieldN</I> ;
+	    </CODE>
+
+	    <P> <DT> <CODE>
+	    on <I>target</I> $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I> 
+	    : <I>fieldN</I> ;
+	    </CODE>
+
+	    <P> <DT> <CODE>
+	    [ $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I>
+	
+            : <I>fieldN</I> ] <br>
+	    [  on <I>target</I> $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I>
+            : <I>fieldN</I> ] <br>
+
+	    </CODE>
+
+	</DL></TABLE>
+
+ 	The variable's value names the rule (or rules) to be invoked.
+	A rule is invoked for each element in the list of
+	<TT>$(<I>var</I>)</TT>'s values. The fields
+	<I>field1</I> : <I>field2</I> : <I>...</I> are passed as
+	arguments for each invokation. For the <TT> [ ... ] </TT> forms,
+	the return value is the concatenation of the return values for
+	all of the invokations.
 
 	<A NAME="actionmods">
 	<P> <H4> Action Modifiers </H4>
