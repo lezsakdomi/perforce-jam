@@ -1619,6 +1619,7 @@ actions File
 
 actions GenFile1
 {
+	PATH="$PATH:."
 	$(>[1]) $(<) $(>[2-])
 }
 

@@ -42,6 +42,12 @@ Release notes for Jam 2.5
 	$(RMDIR) has been defined for NT and defaulted to $(RM) 
 	everwhere else.  Not much tested.  For Michael Champigny.
 
+	GenFile actions (on UNIX) now put . in the PATH for the execution
+	of the command, so that (at least) when jam builds itself . does 
+	not need to be in the global path.  It is the rare case where a
+	target bound in the current directory can't be used directly,
+	so we fudge it by setting PATH.
+
 3.3   'jam' Changes (See Jam.html)
 
 	The whole /MR of Jam's name has been dropped.  It was intended
