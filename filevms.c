@@ -138,7 +138,7 @@ file_dirscan(
     xfab.fab$l_dna = DEFAULT_FILE_SPECIFICATION;
     xfab.fab$b_dns = sizeof( DEFAULT_FILE_SPECIFICATION ) - 1;
     xfab.fab$l_fop = FAB$M_NAM;
-    xfab.fab$l_fna = dir;			/* address of file name	    */
+    xfab.fab$l_fna = (char *)dir;		/* address of file name	    */
     xfab.fab$b_fns = strlen( dir );		/* length of file name	    */
     xfab.fab$l_nam = &xnam;			/* address of NAB block	    */
     xfab.fab$l_xab = (char *)&xab;       /* address of XAB block     */
@@ -297,7 +297,7 @@ file_archscan(
 
     register int status;
 
-    VMS_archive = archive;
+    VMS_archive = (char *)archive;
     VMS_func = func;
     VMS_closure = closure;
 
@@ -305,7 +305,7 @@ file_archscan(
     if ( !( status & 1 ) )
 	return;
 
-    library.dsc$a_pointer = archive;
+    library.dsc$a_pointer = (char *)archive;
     library.dsc$w_length = strlen( archive );
 
     status = lbr$open( &context, &library, NULL, NULL, NULL, NULL, NULL );
