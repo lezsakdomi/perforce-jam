@@ -62,6 +62,13 @@ Changes since Jam 2.4
 	Jambase no longer announces the compiler it is using on
 	Windows.  It doesn't announce anything else, so why?
 
+	Fix 'includes' support so that included files aren't treated as
+	direct dependencies during the command execution phase.  If an
+	included file failed to build, make1() would bypass the including
+	file.  Now make0() appends each child's 'includes' onto its own
+	'depends' list, eliminating 'includes'-specific code in make0()
+	and make1().
+
 ===============================================================================
 ===============================================================================
 

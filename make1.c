@@ -46,6 +46,7 @@
  * 09/23/02 (seiwald) - "...using temp..." only displayed on -da now.
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  */
 
 # include "jam.h"
@@ -124,7 +125,6 @@ make1a(
 	TARGET	*parent )
 {
 	TARGETS	*c;
-	int i;
 
 	/* If the parent is the first to try to build this target */
 	/* or this target is in the make1c() quagmire, arrange for the */
@@ -156,9 +156,8 @@ make1a(
 
 	t->progress = T_MAKE_ONSTACK;
 
-	for( i = T_DEPS_DEPENDS; i <= T_DEPS_INCLUDES; i++ )
-	    for( c = t->deps[i]; c && !intr; c = c->next )
-		make1a( c->target, t );
+	for( c = t->depends; c && !intr; c = c->next )
+	    make1a( c->target, t );
 
 	t->progress = T_MAKE_ACTIVE;
 
@@ -176,7 +175,6 @@ static void
 make1b( TARGET *t )
 {
 	TARGETS	*c;
-	int 	i;
 	const char *failed = "dependents";
 
 	/* If any dependents are still outstanding, wait until they */
@@ -189,9 +187,8 @@ make1b( TARGET *t )
 
 	/* Collect status from dependents */
 
-	for( i = T_DEPS_DEPENDS; i <= T_DEPS_INCLUDES; i++ )
-	    for( c = t->deps[i]; c; c = c->next )
-		if( c->target->status > t->status )
+	for( c = t->depends; c; c = c->next )
+	    if( c->target->status > t->status )
 	{
 	    failed = c->target->name;
 	    t->status = c->target->status;

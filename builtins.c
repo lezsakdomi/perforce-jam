@@ -27,6 +27,7 @@
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
  * 10/22/02 (seiwald) - working return/break/continue statements
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  */
 
 # include "jam.h"
@@ -65,7 +66,7 @@ load_builtins()
 
     bindrule( "Depends" )->procedure = 
     bindrule( "DEPENDS" )->procedure = 
-	parse_make( builtin_depends, P0, P0, P0, C0, C0, T_DEPS_DEPENDS );
+	parse_make( builtin_depends, P0, P0, P0, C0, C0, 0 );
 
     bindrule( "echo" )->procedure = 
     bindrule( "Echo" )->procedure = 
@@ -83,7 +84,7 @@ load_builtins()
 
     bindrule( "Includes" )->procedure = 
     bindrule( "INCLUDES" )->procedure = 
-	parse_make( builtin_depends, P0, P0, P0, C0, C0, T_DEPS_INCLUDES );
+	parse_make( builtin_depends, P0, P0, P0, C0, C0, 1 );
 
     bindrule( "Leaves" )->procedure = 
     bindrule( "LEAVES" )->procedure = 
@@ -133,7 +134,11 @@ builtin_depends(
 	for( l = targets; l; l = list_next( l ) )
 	{
 	    TARGET *t = bindtarget( l->string );
-	    t->deps[ which ] = targetlist( t->deps[ which ], sources );
+
+	    if( !which )
+		t->depends = targetlist( t->depends, sources );
+	    else
+		t->includes = targetlist( t->includes, sources );
 	}
 
 	return L0;

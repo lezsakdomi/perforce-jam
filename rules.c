@@ -14,6 +14,7 @@
  *    touchtarget() - mark a target to simulate being new
  *    targetlist() - turn list of target names into a TARGET chain
  *    targetentry() - add a TARGET to a chain of TARGETS
+ *    targetchain() - append two TARGET chains
  *    actionlist() - append to an ACTION chain
  *    addsettings() - add a deferred "set" command to a target
  *    usesettings() - set all target specific variables
@@ -26,6 +27,7 @@
  * 08/23/94 (seiwald) - Support for '+=' (append to variable)
  * 06/21/02 (seiwald) - support for named parameters
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  */
 
 # include "jam.h"
@@ -142,6 +144,32 @@ targetentry(
 	else chain->tail->next = c;
 	chain->tail = c;
 	c->next = 0;
+
+	return chain;
+}
+
+/*
+ * targetchain() - append two TARGET chains
+ *
+ * Inputs:
+ *	chain	exisitng TARGETS to append to
+ *	target	new target to append
+ */
+
+TARGETS *
+targetchain( 
+	TARGETS	*chain,
+	TARGETS	*targets )
+{
+	TARGETS *c;
+
+	if( !targets )
+	    return chain;
+	else if( !chain )
+	    return targets;
+
+	chain->tail->next = targets;
+	chain->tail = targets->tail;
 
 	return chain;
 }

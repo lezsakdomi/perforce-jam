@@ -31,6 +31,7 @@
  * 06/21/02 (seiwald) - support for named parameters
  * 07/17/02 (seiwald) - TEMPORARY sources for headers now get built
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  */
 
 typedef struct _rule RULE;
@@ -117,18 +118,12 @@ struct _target {
 # define 	T_BIND_PARENTS	2	/* using parent's timestamp */
 # define 	T_BIND_EXISTS	3	/* real file, timestamp valid */
 
-	TARGETS		*deps[2];	/* dependencies */
-
-# define	T_DEPS_DEPENDS	0	/* due to DEPENDS */
-# define	T_DEPS_INCLUDES	1	/* due to INCLUDES */
+	TARGETS		*depends;	/* dependencies */
+	TARGETS		*includes;	/* includes */
 
 	time_t		time;		/* update time */
 	time_t		leaf;		/* update time of leaf sources */
-	time_t		htime;		/* header's time */
-	time_t		hleaf;		/* update time of leaf headers */
-
 	char		fate;		/* make0()'s diagnosis */
-	char		hfate;		/* collected fate for headers */
 
 # define 	T_FATE_INIT	0	/* nothing done to target */
 # define 	T_FATE_MAKING	1	/* make0(target) on stack */
@@ -170,6 +165,7 @@ TARGET *bindtarget( const char *targetname );
 void 	touchtarget( const char *t );
 TARGETS *targetlist( TARGETS *chain, LIST  *targets );
 TARGETS *targetentry( TARGETS *chain, TARGET *target );
+TARGETS *targetchain( TARGETS *chain, TARGETS *targets );
 ACTIONS *actionlist( ACTIONS *chain, ACTION *action );
 SETTINGS *addsettings( SETTINGS *v, int append, const char *symbol, LIST *value );
 void 	pushsettings( SETTINGS *v );

@@ -43,6 +43,7 @@
  * 09/23/02 (seiwald) - suppress "...using temp..." in default output
  * 09/28/02 (seiwald) - make0() takes parent pointer; new -dc display
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  */
 
 # include "jam.h"
@@ -162,9 +163,10 @@ make0(
 	COUNTS	*counts,	/* for reporting */
 	int	anyhow )	/* forcibly touch all (real) targets */
 {
-	TARGETS	*c;
-	int	fate, hfate;
-	time_t	last, leaf, hlast, hleaf;
+	TARGETS	*c, *d, *incs;
+	TARGET 	*ptime = t;
+	time_t	last, leaf;
+	int	fate;
 	const char *flag = "";
 
 	/* 
@@ -198,7 +200,10 @@ make0(
 	if( p && t->flags & T_FLAG_TEMP && 
 	    t->binding == T_BIND_MISSING && 
 	    p->binding != T_BIND_MISSING )
-		t->binding = T_BIND_PARENTS;
+	{
+	    t->binding = T_BIND_PARENTS;
+	    ptime = p;
+	}
 
 	/* Step 2c: If its a file, search for headers. */
 
@@ -243,34 +248,60 @@ make0(
 
 	/* Step 3a: recursively make0() dependents */
 
-	last = 0;
-	leaf = 0;
-	fate = T_FATE_STABLE;
+	/* Warn about circular deps. */
 
-	for( c = t->deps[ T_DEPS_DEPENDS ]; c; c = c->next )
+	for( c = t->depends; c; c = c->next )
 	{
-	    /* Pass our time or our parent's time down. */
-
-	    TARGET *time = t->binding == T_BIND_PARENTS ? p : t; 
-
-	    /* Short circuit circular dependencies. */
-	    /* And only make unmade targets. */
-
-	    if( DEBUG_DEPENDS && c->target->fate == T_FATE_INIT )
+	    if( DEBUG_DEPENDS )
 		printf( "Depends \"%s\" : \"%s\" ;\n", 
 		    t->name, c->target->name );
 
 	    if( c->target->fate == T_FATE_MAKING )
 		printf( "warning: %s depends on itself\n", c->target->name );
-
 	    else if( c->target->fate == T_FATE_INIT )
-		make0( c->target, time, depth + 1, counts, anyhow );
+		make0( c->target, ptime, depth + 1, counts, anyhow );
+	}
 
+	/* Step 3b: recursively make0() headers */
+
+	/* Ignore circular deps: headers include themselves a lot. */
+
+	for( c = t->includes; c; c = c->next )
+	{
+	    if( DEBUG_DEPENDS )
+		printf( "Includes \"%s\" : \"%s\" ;\n",
+		    t->name, c->target->name );
+
+	    if( c->target->fate == T_FATE_INIT )
+		make0( c->target, p, depth + 1, counts, anyhow );
+	}
+
+	/* Step 3c: add dependents' includes to our direct dependencies */
+
+	incs = 0;
+
+	for( c = t->depends; c; c = c->next )
+	    for( d = c->target->includes; d; d = d->next )
+		incs = targetentry( incs, bindtarget( d->target->name ) );
+
+	t->depends = targetchain( t->depends, incs );
+
+	/*
+	 * Step 4: compute time & fate 
+	 */
+
+	/* Step 4a: pick up dependents' time and fate */
+
+	last = 0;
+	leaf = 0;
+	fate = T_FATE_STABLE;
+
+	for( c = t->depends; c; c = c->next )
+	{
 	    /* If LEAVES has been applied, we only heed the timestamps of */
 	    /* the leaf source nodes. */
 
 	    leaf = max( leaf, c->target->leaf );
-	    leaf = max( leaf, c->target->hleaf );
 
 	    if( t->flags & T_FLAG_LEAVES )
 	    {
@@ -279,42 +310,10 @@ make0(
 	    }
 
 	    last = max( last, c->target->time );
-	    last = max( last, c->target->htime );
 	    fate = max( fate, c->target->fate );
-	    fate = max( fate, c->target->hfate );
 	}
 
-	/* Step 3b: recursively make0() headers */
-
-	hlast = 0;
-	hleaf = 0;
-	hfate = T_FATE_STABLE;
-
-	for( c = t->deps[ T_DEPS_INCLUDES ]; c; c = c->next )
-	{
-	    /* We don't care about T_FATE_MAKING. Headers seem */
-	    /* to include each other a lot these days (2002). */
-
-	    if( DEBUG_DEPENDS && c->target->fate == T_FATE_INIT )
-		printf( "Includes \"%s\" : \"%s\" ;\n",
-		    t->name, c->target->name );
-
-	    if( c->target->fate == T_FATE_INIT )
-		make0( c->target, p, depth + 1, counts, anyhow );
-
-	    hlast = max( hlast, c->target->time );
-	    hlast = max( hlast, c->target->htime );
-	    hleaf = max( hleaf, c->target->leaf );
-	    hleaf = max( hleaf, c->target->hleaf );
-	    hfate = max( hfate, c->target->fate );
-	    hfate = max( hfate, c->target->hfate );
-	}
-
-	/*
-	 * Step 4: propagate time & fate 
-	 */
-
-	/* Step 4a: handle NOUPDATE oddity */
+	/* Step 4b: handle NOUPDATE oddity */
 
 	/*
 	 * If a NOUPDATE file exists, make dependents eternally old.
@@ -329,7 +328,7 @@ make0(
 	    fate = T_FATE_STABLE;
 	}
 
-	/* Step 4b: determine fate: rebuild target or what? */
+	/* Step 4c: determine fate: rebuild target or what? */
 
 	/* 
 	    In English:
@@ -369,10 +368,6 @@ make0(
 	{
 	    fate = T_FATE_NEEDTMP;
 	}
-	else if( t->binding == T_BIND_PARENTS && hlast > p->time )
-	{
-	    fate = T_FATE_NEEDTMP;
-	}
 	else if( t->flags & T_FLAG_TOUCHED )
 	{
 	    fate = T_FATE_TOUCHED;
@@ -395,15 +390,13 @@ make0(
 	    fate = T_FATE_STABLE;
 	}
 
-	/* Step 4c: handle missing files */
+	/* Step 4d: handle missing files */
 	/* If it's missing and there are no actions to create it, boom. */
 	/* If we can't make a target we don't care about, 'sokay */
 	/* We could insist that there are updating actions for all missing */
 	/* files, but if they have dependents we just pretend it's NOTFILE. */
 
-	if( fate == T_FATE_MISSING && 
-		!t->actions && 
-		!t->deps[ T_DEPS_DEPENDS ] )
+	if( fate == T_FATE_MISSING && !t->actions && !t->depends )
 	{
 	    if( t->flags & T_FLAG_NOCARE )
 	    {
@@ -417,25 +410,19 @@ make0(
 	    }
 	}
 
-	/* Step 4d: propagate dependents' time & fate. */
+	/* Step 4e: propagate dependents' time & fate. */
 	/* Set leaf time to be our time only if this is a leaf. */
 
 	t->time = max( t->time, last );
 	t->leaf = leaf ? leaf : t->time ;
 	t->fate = fate;
 
-	/* Step 4e: propagate headers' time & fate. */
-
-	t->htime = hlast;
-	t->hleaf = hleaf ? hleaf : t->htime;
-	t->hfate = hfate;
-
 	/* 
 	 * Step 5: sort dependents by their update time. 
 	 */
 
 	if( globs.newestfirst )
-	    t->deps[ T_DEPS_DEPENDS ] = make0sort( t->deps[ T_DEPS_DEPENDS ] );
+	    t->depends = make0sort( t->depends );
 
 	/* 
 	 * Step 6: a little harmless tabulating for tracing purposes 
