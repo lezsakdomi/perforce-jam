@@ -38,6 +38,7 @@
  * 03/02/01 (seiwald) - reverse NOCARE change.
  * 03/14/02 (seiwald) - TEMPORARY targets no longer take on parents age
  * 03/16/02 (seiwald) - support for -g (reorder builds by source time)
+ * xx/xx/02 (seiwald) - TEMPORARY sources for headers now get built
  */
 
 # include "jam.h"
@@ -80,6 +81,7 @@ static char *target_fate[] =
 	"temp", 	/* T_FATE_ISTMP */
 	"touched", 	/* T_FATE_TOUCHED */
 	"missing", 	/* T_FATE_MISSING */
+	"needtmp", 	/* T_FATE_NEEDTMP */
 	"old", 		/* T_FATE_OUTDATED */
 	"update", 	/* T_FATE_UPDATE */
 	"nofind", 	/* T_FATE_CANTFIND */
@@ -161,25 +163,12 @@ make0(
 	time_t	last, leaf, hlast, hleaf;
 	char	*flag = "";
 
-	if( DEBUG_MAKEPROG )
-	    printf( "make\t--\t%s%s\n", spaces( depth ), t->name );
-
 	/* 
-	 * Step 1: don't remake if already trying or tried 
+	 * Step 1: initialize
 	 */
 
-	switch( t->fate )
-	{
-	case T_FATE_MAKING:
-	    printf( "warning: %s depends on itself\n", t->name );
-	    return;
-
-	default:
-	    return;
-
-	case T_FATE_INIT:
-	    break;
-	}
+	if( DEBUG_MAKEPROG )
+	    printf( "make\t--\t%s%s\n", spaces( depth ), t->name );
 
 	t->fate = T_FATE_MAKING;
 
@@ -243,8 +232,10 @@ make0(
 	}
 
 	/* 
-	 * Step 3: recursively make0() dependents 
+	 * Step 3: recursively make0() dependents & headers
 	 */
+
+	/* Step 3a: recursively make0() dependents */
 
 	last = 0;
 	leaf = 0;
@@ -256,12 +247,20 @@ make0(
 
 	    int time = t->binding == T_BIND_PARENTS ? ptime : t->time;
 
-	    make0( c->target, time, depth + 1, counts, anyhow );
-	    leaf = max( leaf, c->target->leaf );
-	    leaf = max( leaf, c->target->hleaf );
+	    /* Short circuit circular dependencies. */
+	    /* And only make unmade targets. */
+
+	    if( c->target->fate == T_FATE_MAKING )
+		printf( "warning: %s depends on itself\n", c->target->name );
+
+	    else if( c->target->fate == T_FATE_INIT )
+		make0( c->target, time, depth + 1, counts, anyhow );
 
 	    /* If LEAVES has been applied, we only heed the timestamps of */
 	    /* the leaf source nodes. */
+
+	    leaf = max( leaf, c->target->leaf );
+	    leaf = max( leaf, c->target->hleaf );
 
 	    if( t->flags & T_FLAG_LEAVES )
 	    {
@@ -275,22 +274,48 @@ make0(
 	    fate = max( fate, c->target->hfate );
 	}
 
-	/* If a NOUPDATE file exists, make dependents eternally old. */
+	/* Step 3b: recursively make0() headers */
+
+	hlast = 0;
+	hleaf = 0;
+	hfate = T_FATE_STABLE;
+
+	for( c = t->deps[ T_DEPS_INCLUDES ]; c; c = c->next )
+	{
+	    /* We don't care about T_FATE_MAKING. Headers seem */
+	    /* to include each other a lot these days (2002). */
+
+	    if( c->target->fate == T_FATE_INIT )
+		make0( c->target, ptime, depth + 1, counts, anyhow );
+
+	    hlast = max( hlast, c->target->time );
+	    hlast = max( hlast, c->target->htime );
+	    hleaf = max( hleaf, c->target->leaf );
+	    hleaf = max( hleaf, c->target->hleaf );
+	    hfate = max( hfate, c->target->fate );
+	    hfate = max( hfate, c->target->hfate );
+	}
+
+	/*
+	 * Step 4: propagate time & fate 
+	 */
+
+	/* Step 4a: handle NOUPDATE oddity */
+
+	/*
+	 * If a NOUPDATE file exists, make dependents eternally old.
+	 * Don't inherit our fate from our dependents.  Decide fate
+	 * based only upon other flags and our binding (done later).
+	 */
 
 	if( t->flags & T_FLAG_NOUPDATE )
 	{
 	    last = 0;
 	    t->time = 0;
-
-	    /*
-	     * Don't inherit our fate from our dependents.  Decide fate
-	     * based only upon other flags and our binding (done later).
-	     */
-
 	    fate = T_FATE_STABLE;
 	}
 
-	/* Step 3b: determine fate: rebuild target or what? */
+	/* Step 4b: determine fate: rebuild target or what? */
 
 	/* 
 	    In English:
@@ -299,6 +324,7 @@ make0(
 		If target missing, make it.
 		If children newer, make target.
 		If temp's children newer than parent, make temp.
+		If temp's headers newer than parent, make temp.
 		If deliberately touched, make it.
 		If up-to-date temp file present, use it.
 		If target newer than parent, mark target newer.
@@ -323,7 +349,11 @@ make0(
 	}
 	else if( t->binding == T_BIND_PARENTS && last > ptime )
 	{
-	    fate = T_FATE_OUTDATED;
+	    fate = T_FATE_NEEDTMP;
+	}
+	else if( t->binding == T_BIND_PARENTS && hlast > ptime )
+	{
+	    fate = T_FATE_NEEDTMP;
 	}
 	else if( t->flags & T_FLAG_TOUCHED )
 	{
@@ -346,7 +376,7 @@ make0(
 	    fate = T_FATE_STABLE;
 	}
 
-	/* Step 3c: handle missing files */
+	/* Step 4c: handle missing files */
 	/* If it's missing and there are no actions to create it, boom. */
 	/* If we can't make a target we don't care about, 'sokay */
 	/* We could insist that there are updating actions for all missing */
@@ -368,47 +398,28 @@ make0(
 	    }
 	}
 
-	/* Step 3d: propagate dependents' time & fate. */
+	/* Step 4d: propagate dependents' time & fate. */
 	/* Set leaf time to be our time only if this is a leaf. */
 
 	t->time = max( t->time, last );
 	t->leaf = leaf ? leaf : t->time ;
 	t->fate = fate;
 
-	/* Step 3e: sort dependents by their update time. */
-
-	if( globs.newestfirst )
-	    t->deps[ T_DEPS_DEPENDS ] = make0sort( t->deps[ T_DEPS_DEPENDS ] );
-
-	/*
-	 * Step 4: Recursively make0() headers.
-	 */
-
-	/* Step 4a: recursively make0() headers */
-
-	hlast = 0;
-	hleaf = 0;
-	hfate = T_FATE_STABLE;
-
-	for( c = t->deps[ T_DEPS_INCLUDES ]; c; c = c->next )
-	{
-	    make0( c->target, ptime, depth + 1, counts, anyhow );
-	    hlast = max( hlast, c->target->time );
-	    hlast = max( hlast, c->target->htime );
-	    hleaf = max( hleaf, c->target->leaf );
-	    hleaf = max( hleaf, c->target->hleaf );
-	    hfate = max( hfate, c->target->fate );
-	    hfate = max( hfate, c->target->hfate );
-	}
-
-	/* Step 4b: propagate dependents' time & fate. */
+	/* Step 4e: propagate headers' time & fate. */
 
 	t->htime = hlast;
 	t->hleaf = hleaf ? hleaf : t->htime;
 	t->hfate = hfate;
 
 	/* 
-	 * Step 5: a little harmless tabulating for tracing purposes 
+	 * Step 5: sort dependents by their update time. 
+	 */
+
+	if( globs.newestfirst )
+	    t->deps[ T_DEPS_DEPENDS ] = make0sort( t->deps[ T_DEPS_DEPENDS ] );
+
+	/* 
+	 * Step 6: a little harmless tabulating for tracing purposes 
 	 */
 
 	if( !( ++counts->targets % 1000 ) && DEBUG_MAKE )

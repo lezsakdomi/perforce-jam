@@ -138,12 +138,13 @@ struct _target {
 # define	T_FATE_BUILD	5	/* >= BUILD rebuilds target */
 # define	T_FATE_TOUCHED	5	/* manually touched with -t */
 # define	T_FATE_MISSING	6	/* is missing, needs updating */
-# define 	T_FATE_OUTDATED	7	/* is out of date, needs updating */
-# define 	T_FATE_UPDATE	8	/* deps updated, needs updating */
+# define	T_FATE_NEEDTMP	7	/* missing temp that must be rebuild */
+# define 	T_FATE_OUTDATED	8	/* is out of date, needs updating */
+# define 	T_FATE_UPDATE	9	/* deps updated, needs updating */
 
-# define 	T_FATE_BROKEN	9	/* >= BROKEN ruins parents */
-# define 	T_FATE_CANTFIND	9	/* no rules to make missing target */
-# define 	T_FATE_CANTMAKE	10	/* can't find dependents */
+# define 	T_FATE_BROKEN	10	/* >= BROKEN ruins parents */
+# define 	T_FATE_CANTFIND	10	/* no rules to make missing target */
+# define 	T_FATE_CANTMAKE	11	/* can't find dependents */
 
 	char	progress;		/* tracks make1() progress */
 

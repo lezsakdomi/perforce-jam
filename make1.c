@@ -221,6 +221,7 @@ make1b( TARGET *t )
 
 	case T_FATE_TOUCHED:
 	case T_FATE_MISSING:
+	case T_FATE_NEEDTMP:
 	case T_FATE_OUTDATED:
 	case T_FATE_UPDATE:
 	    /* Set "on target" vars, build actions, unset vars */

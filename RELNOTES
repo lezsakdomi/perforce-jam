@@ -22,6 +22,11 @@ Changes since Jam/MR 2.4
 	where the real entry name follows the header and nnnn is
 	the length of the name.
 
+	If header dependencies cause an object to be recompiled and the
+	source file is a temporary, the temporary is now reconstructed.
+	Previously, headers weren't considered when deciding when to
+	reconstruct a temporary.
+
 ===============================================================================
 ===============================================================================
 
