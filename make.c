@@ -34,6 +34,7 @@
  * 02/14/95 (seiwald) - NOUPDATE rule means don't update existing target.
  * 08/22/95 (seiwald) - NOUPDATE targets immune to anyhow (-a) flag.
  * 09/06/00 (seiwald) - NOCARE affects targets with sources/actions.
+ * 03/02/01 (seiwald) - reverse NOCARE change.
  */
 
 # include "jam.h"
@@ -346,18 +347,20 @@ make0(
 	}
 
 	/* Step 3c: handle missing files */
-	/* If we can't make a target we don't care about, 'sokay */
 	/* If it's missing and there are no actions to create it, boom. */
+	/* If we can't make a target we don't care about, 'sokay */
 	/* We could insist that there are updating actions for all missing */
 	/* files, but if they have dependents we just pretend it's NOTFILE. */
 
-	if( fate == T_FATE_MISSING )
+	if( fate == T_FATE_MISSING && 
+		!t->actions && 
+		!t->deps[ T_DEPS_DEPENDS ] )
 	{
 	    if( t->flags & T_FLAG_NOCARE )
 	    {
 		fate = T_FATE_STABLE;
 	    }
-	    else if( !t->actions && !t->deps[ T_DEPS_DEPENDS ] )
+	    else
 	    {
 		printf( "don't know how to make %s\n", t->name );
 

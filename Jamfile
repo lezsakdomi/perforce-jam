@@ -103,7 +103,7 @@ rule Ball
 	}
 }
 
-VERSION = jam-2.3 ;
+VERSION = jam-2.3.2 ;
 
 actions Tar
 {

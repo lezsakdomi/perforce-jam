@@ -1,6 +1,16 @@
 Release notes for Jam/MR 2.3
 (aka Jam - make(1) redux)
 
+0.  Bugs fixed since 2.3.1
+
+	PATCHLEVEL 2 - 3/12/2001
+
+	NOCARE changed back: it once again does not applies to targets
+	with sources and/or actions.  In 2.3 it was changed to apply to
+	such targets, but that broke header file builds: files that are
+	#included get marked with NOCARE, but if they have source or
+	actions, they still should get built.
+
 1.  Release info:
 
 	Jam/MR 2.3
