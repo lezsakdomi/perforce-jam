@@ -44,6 +44,7 @@
  * 09/28/02 (seiwald) - make0() takes parent pointer; new -dc display
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
+ * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
  */
 
 # include "jam.h"
@@ -168,6 +169,7 @@ make0(
 	time_t	last, leaf, hlast;
 	int	fate;
 	const char *flag = "";
+	SETTINGS *s;
 
 	/* 
 	 * Step 1: initialize
@@ -185,7 +187,8 @@ make0(
 
 	/* Step 2a: set "on target" variables. */
 
-	pushsettings( t->settings );
+	s = copysettings( t->settings );
+	pushsettings( s );
 
 	/* Step 2b: find and timestamp the target file (if it's a file). */
 
@@ -212,7 +215,8 @@ make0(
 
 	/* Step 2d: reset "on target" variables */
 
-	popsettings( t->settings );
+	popsettings( s );
+	freesettings( s );
 
 	/* 
 	 * Pause for a little progress reporting 

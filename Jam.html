@@ -538,13 +538,16 @@ jam [ -a ] [ -g ] [ -n ] [ -q ] [ -v ]
 
 	    <P> <DT> <CODE>
 	    
-		on <I>target</I> <I>rulename field1</I> : <I>field2</I> 
-		: <I>...</I> : <I>fieldN</I> ;
+		on <I>target</I> <I>statement</I> ;
 
 	    </CODE>
 
-	    <P><DD> Invoke a rule under the influence of <I>target</I>'s
-	    target-specific variables.
+	    <P><DD> Run <I>statement</I> under the influence of
+	    <I>target</I>'s target-specific variables.  These variables
+	    become local copies during <I>statement</I>'s run, but they
+	    may be updated as target-specific variables using the usual
+	    "<I>variable</I> on <I>targets</I> =" syntax.
+
 
 	    <P><DT> <CODE>
 
@@ -627,7 +630,8 @@ jam [ -a ] [ -g ] [ -n ] [ -q ] [ -v ]
 
 	Variables are either global or target-specific.  In the latter
 	case, the variable takes on the given value only during the
-	updating of the specific target.
+	target's binding, header file scanning, and updating; and during
+	the "on <I>target</I> <I>statement</I>" statement.
 
 	<P>
 
@@ -1067,6 +1071,8 @@ jam [ -a ] [ -g ] [ -n ] [ -q ] [ -v ]
 	uses $(HDRPATTERN) as the pattern for $(HDRSCAN).  $(HDRRULE)
 	is the name of a rule to invoke with the results of the scan:
 	the scanned file is the target, the found files are the sources.
+	$(HDRRULE) is run under the influence of the scanned file's
+	target-specific variables.
 
 	<P>
 

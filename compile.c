@@ -65,6 +65,7 @@
  * 10/22/02 (seiwald) - working return/break/continue statements
  * 11/04/02 (seiwald) - const-ing for string literals
  * 11/18/02 (seiwald) - remove bogus search() in 'on' statement.
+ * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
  */
 
 # include "jam.h"
@@ -340,6 +341,7 @@ compile_include(
 	    /* Bind the include file under the influence of */
 	    /* "on-target" variables.  Though they are targets, */
 	    /* include files are not built with make(). */
+	    /* Needn't copysettings(), as search sets no vars. */
 
 	    pushsettings( t->settings );
 	    t->boundname = search( t->name, &t->time );
@@ -413,7 +415,6 @@ compile_local(
 	pushsettings( s );
 	result = (*parse->third->func)( parse->third, args, jmp );
 	popsettings( s );
-
 	freesettings( s );
 
 	return result;
@@ -455,13 +456,20 @@ compile_on(
 	    printf( "\n" );
 	}
 
+	/* 
+	 * Copy settings, so that 'on target var on target = val' 
+	 * doesn't set var globally.
+	 */
+
 	if( nt )
 	{
 	    TARGET *t = bindtarget( nt->string );
+	    SETTINGS *s = copysettings( t->settings );
 
-	    pushsettings( t->settings );
+	    pushsettings( s );
 	    result = (*parse->right->func)( parse->right, args, jmp );
-	    popsettings( t->settings );
+	    popsettings( s );
+	    freesettings( s );
 	}
 
 	list_free( nt );
@@ -578,12 +586,14 @@ evaluate_rule(
 	    /* Bring in local params. */
 	    /* refer/free to ensure rule not freed during use. */
 
-	    pushsettings( s );
 	    parse_refer( parse );
+
+	    pushsettings( s );
 	    result = list_append( result, (*parse->func)( parse, args, &jmp ) );
-	    parse_free( parse );
 	    popsettings( s );
 	    freesettings( s );
+
+	    parse_free( parse );
 	}
 
 	if( DEBUG_COMPILE )

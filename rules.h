@@ -32,6 +32,7 @@
  * 07/17/02 (seiwald) - TEMPORARY sources for headers now get built
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
+ * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
  */
 
 typedef struct _rule RULE;
@@ -167,7 +168,8 @@ TARGETS *targetlist( TARGETS *chain, LIST  *targets );
 TARGETS *targetentry( TARGETS *chain, TARGET *target );
 TARGETS *targetchain( TARGETS *chain, TARGETS *targets );
 ACTIONS *actionlist( ACTIONS *chain, ACTION *action );
-SETTINGS *addsettings( SETTINGS *v, int append, const char *symbol, LIST *value );
+SETTINGS *addsettings( SETTINGS *v, int append, const char *sym, LIST *val );
+SETTINGS *copysettings( SETTINGS *v );
 void 	pushsettings( SETTINGS *v );
 void 	popsettings( SETTINGS *v );
 void 	freesettings( SETTINGS *v );

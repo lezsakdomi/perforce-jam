@@ -88,6 +88,13 @@ Release notes for Jam 2.5
 
 	Fixed the description of the :E modifier in Jam.html.
 
+	Setting target-specific variables while under the influence of
+	the target's target-specific variables caused the _global_ values
+	to be modified.  This happened both during header file scanning
+	(HdrRule is called when target-specific variables are in effect)
+	and with the "on target statement" syntax.  Now setting
+	target-specific variables works again.  Thanks to Matt Armstrong.
+
 5.  Porting
 
 	The Makefile now uses $(EXENAME) (./jam0 on UNIX, .\jam0.exe

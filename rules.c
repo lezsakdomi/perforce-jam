@@ -17,7 +17,7 @@
  *    targetchain() - append two TARGET chains
  *    actionlist() - append to an ACTION chain
  *    addsettings() - add a deferred "set" command to a target
- *    usesettings() - set all target specific variables
+ *    copysettings() - copy a settings list for temp use
  *    pushsettings() - set all target specific variables
  *    popsettings() - reset target specific variables to their pre-push values
  *    freesettings() - delete a settings list
@@ -28,6 +28,7 @@
  * 06/21/02 (seiwald) - support for named parameters
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
+ * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
  */
 
 # include "jam.h"
@@ -242,6 +243,38 @@ addsettings(
 	} 
 
 	/* Return (new) head of list. */
+
+	return head;
+}
+
+/*
+ * copysettings() - copy a settings list for temp use
+ *
+ * When target-specific variables are pushed into place with pushsettings(),
+ * any global variables with the same name are swapped onto the target's
+ * SETTINGS chain.  If that chain gets modified (by using the "on target"
+ * syntax), popsettings() would wrongly swap those modified values back 
+ * as the new global values.  
+ *
+ * copysettings() protects the target's SETTINGS chain by providing a
+ * copy of the chain to pass to pushsettings() and popsettings(), so that
+ * the target's original SETTINGS chain can be modified using the usual
+ * "on target" syntax.
+ */
+
+SETTINGS *
+copysettings( SETTINGS *from )
+{
+	SETTINGS *head = 0, *v;
+
+	for( ; from; from = from->next )
+	{
+	    SETTINGS *v = (SETTINGS *)malloc( sizeof( *v ) );
+	    v->symbol = copystr( from->symbol );
+	    v->value = list_copy( 0, from->value );
+	    v->next = head;
+	    head = v;
+	}
 
 	return head;
 }
