@@ -29,6 +29,7 @@
 %token IN_t
 %token INCLUDE_t
 %token LOCAL_t
+%token MAXLINE_t
 %token ON_t
 %token PIECEMEAL_t
 %token QUIETLY_t
@@ -336,6 +337,8 @@ eflag	: UPDATED_t
 		{ $$.number = RULE_PIECEMEAL; }
 	| EXISTING_t
 		{ $$.number = RULE_EXISTING; }
+	| MAXLINE_t ARG
+		{ $$.number = atoi( $2.string ) * RULE_MAXLINE; }
 	;
 
 

@@ -292,6 +292,8 @@ eflag	: `updated`
 		{ $$.number = RULE_PIECEMEAL; }
 	| `existing`
 		{ $$.number = RULE_EXISTING; }
+	| `maxline` ARG
+		{ $$.number = atoi( $2.string ) * RULE_MAXLINE; }
 	;
 
 

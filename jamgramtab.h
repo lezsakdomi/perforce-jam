@@ -29,6 +29,7 @@
 	{ "in", IN_t },
 	{ "include", INCLUDE_t },
 	{ "local", LOCAL_t },
+	{ "maxline", MAXLINE_t },
 	{ "on", ON_t },
 	{ "piecemeal", PIECEMEAL_t },
 	{ "quietly", QUIETLY_t },

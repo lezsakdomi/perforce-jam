@@ -59,6 +59,7 @@ struct _rule {
 # define	RULE_QUIETLY	0x08	/* don't mention it unless verbose */
 # define	RULE_PIECEMEAL	0x10	/* split exec so each $(>) is small */
 # define	RULE_EXISTING	0x20	/* $(>) is pre-exisitng sources only */
+# define	RULE_MAXLINE	0x40	/* cmd specific maxline (last) */
 
 } ;
 

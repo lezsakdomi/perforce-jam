@@ -29,7 +29,8 @@ cmd_new(
 	RULE	*rule,
 	LIST	*targets,
 	LIST	*sources,
-	LIST	*shell )
+	LIST	*shell,
+	int	maxline )
 {
 	CMD *cmd = (CMD *)malloc( sizeof( CMD ) );
 
@@ -41,10 +42,10 @@ cmd_new(
 	lol_add( &cmd->args, targets );
 	lol_add( &cmd->args, sources );
 
-	/* Bail if the result won't fit in MAXLINE */
+	/* Bail if the result won't fit in maxline */
 	/* We don't free targets/sources/shell if bailing. */
 
-	if( var_string( rule->actions, cmd->buf, MAXLINE, &cmd->args ) < 0 )
+	if( var_string( rule->actions, cmd->buf, maxline, &cmd->args ) < 0 )
 	{
 	    cmd_free( cmd );
 	    return 0;

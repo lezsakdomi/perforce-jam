@@ -427,7 +427,7 @@ make1cmds( ACTIONS *a0 )
 	    LIST    *nt, *ns;
 	    ACTIONS *a1;
 	    CMD	    *cmd;
-	    int	    start, chunk, length;
+	    int	    start, chunk, length, maxline;
 
 	    /* Only do rules with commands to execute. */
 	    /* If this action has already been executed, use saved status */
@@ -481,10 +481,15 @@ make1cmds( ACTIONS *a0 )
 	     * is likely to be much more compute intensive!
 	     *
 	     * Note we loop through at least once, for sourceless actions.
+	     *
+	     * Max line length is the action specific maxline or, if not 
+	     * given or bigger than MAXLINE, MAXLINE.
 	     */
 
 	    start = 0;
 	    chunk = length = list_length( ns );
+	    maxline = rule->flags / RULE_MAXLINE;
+	    maxline = maxline && maxline < MAXLINE ? maxline : MAXLINE;
 
 	    do
 	    {
@@ -493,7 +498,8 @@ make1cmds( ACTIONS *a0 )
 		CMD *cmd = cmd_new( rule, 
 			list_copy( L0, nt ), 
 			list_sublist( ns, start, chunk ),
-			list_copy( L0, shell ) );
+			list_copy( L0, shell ),
+			maxline );
 
 		if( cmd )
 		{
@@ -515,7 +521,7 @@ make1cmds( ACTIONS *a0 )
 		    /* Too long and not splittable. */
 
 		    printf( "%s actions too long (max %d)!\n", 
-			rule->name, MAXLINE );
+			rule->name, maxline );
 		    exit( EXITBAD );
 		}
 	    }
