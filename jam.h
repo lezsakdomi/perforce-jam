@@ -364,6 +364,10 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 
+# ifdef OS_HPUX
+# include <unistd.h>
+# endif
+
 # ifndef OS_MPEIX
 # include <sys/file.h>
 # endif
