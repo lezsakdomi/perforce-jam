@@ -21,6 +21,12 @@ Release notes for Jam 2.5
 
 	Porting changes allow jam to build with BorlandC 5.5
 
+	Porting changes for WinXP IA64; set MSVCNT to the root of the
+	SDK and MSVCVer to Win64; change handle type to long long (too
+	much to include windows.h?); bury IA64 in the library path in
+	Jambase.
+        
+
 1.  Release info:
 
 	Jam 2.5

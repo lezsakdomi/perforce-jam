@@ -206,9 +206,13 @@ if $(NT)
     }
     else if $(MSVCNT) || $(MSVCDIR)
     {
-			# Visual C++ 6.0 uses MSVCDIR
+	# Visual C++ 6.0 uses MSVCDIR
 
 	MSVCNT		?= $(MSVCDIR) ;	
+
+	# bury IA64 in the path for the SDK
+
+	local I ; if $(OSPLAT) = IA64 { I = ia64\\ ; } else { I = "" ; }
 
 	AR		?= lib ;
 	AS		?= masm386 ;
@@ -219,9 +223,9 @@ if $(NT)
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= "" ;
 	LINKLIBS	?= 
-				$(MSVCNT)\\lib\\libc.lib
-				$(MSVCNT)\\lib\\oldnames.lib
-				$(MSVCNT)\\lib\\kernel32.lib ;
+				$(MSVCNT)\\lib\\$(I)libc.lib
+				$(MSVCNT)\\lib\\$(I)oldnames.lib
+				$(MSVCNT)\\lib\\$(I)kernel32.lib ;
 	OPTIM		?= "" ;
 	STDHDRS		?= $(MSVCNT)\\include ;
 	UNDEFFLAG	?= "/u _" ;

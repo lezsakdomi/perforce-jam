@@ -25,6 +25,7 @@
  * 10/03/00 (anton) - Porting for Borland C++ 5.5
  * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 01/23/03 (seiwald) - long long handles for NT IA64
  */
 
 # include "jam.h"
@@ -49,6 +50,12 @@
  * file_dirscan() - scan a directory for files
  */
 
+# ifdef _M_IA64
+# define FINDTYPE long long
+# else
+# define FINDTYPE long
+# endif
+
 void
 file_dirscan( 
 	const char *dir,
@@ -58,7 +65,7 @@ file_dirscan(
 	PATHNAME f;
 	char filespec[ MAXJPATH ];
 	char filename[ MAXJPATH ];
-	long handle;
+	FINDTYPE handle;
 	int ret;
 	struct _finddata_t finfo[1];
 
@@ -106,7 +113,7 @@ file_dirscan(
 # else
 	handle = _findfirst( filespec, finfo );
 
-	if( ret = ( handle < 0L ) )
+	if( ret = ( handle == (FINDTYPE)(-1) ) )
 	    return;
 
 	while( !ret )
