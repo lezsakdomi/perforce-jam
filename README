@@ -4,7 +4,7 @@ Jam - make(1) redux
     +\	Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
     \+/
 
-    This is Release 2.4 of Jam, a make-like program.
+    This is Release 2.5 of Jam, a make-like program.
 
     License is hereby granted to use this software and distribute it
     freely, as long as this copyright notice is retained and modifications 
@@ -142,6 +142,7 @@ February, 1996 - release 2.1
 November, 1997 - release 2.2
 December, 2000 - release 2.3
 March, 2002 - release 2.4
+December, 2002 - release 2.5
 
 
 Christopher Seiwald

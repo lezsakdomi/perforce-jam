@@ -17,12 +17,7 @@ Release notes for Jam 2.5
 
 	The Jam 2.5 language is a superset of the 2.4 language;
 	Jamfiles, Jambase, and other rulesets used in 2.4 can be used
-	with the 2.5 language support, with the the following
-	exception: Jam's "return" statement previously served to set
-	an action's return value, but did not actually cause a return
-	to happen.  In Jam 2.5, "return" actually causes a return from
-	the action as soon as it's executed. Scripts that relied upon
-	this behavior will be affected.
+	with the 2.5 language support.
 
 3.  Changes since 2.4.
 

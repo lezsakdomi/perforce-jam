@@ -7,7 +7,7 @@
 #
 
 #
-# JAMBASE - jam 2.3 ruleset providing make(1)-like functionality
+# JAMBASE - jam 2.5 ruleset providing make(1)-like functionality
 #
 # Supports UNIX, NT, and VMS.
 #
@@ -138,7 +138,7 @@
 #	$(>) - sources of a rule (to the right of the :)
 #	$(xxx) - true on xxx (UNIX, VMS, NT, OS2, MAC)
 #	$(OS) - name of OS - varies wildly
-#	$(JAMVERSION) - version number (2.3)
+#	$(JAMVERSION) - version number (2.5)
 #
 # Special variables used by jam:
 #	SEARCH - where to find something (used during binding and actions)
