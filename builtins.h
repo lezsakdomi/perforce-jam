@@ -10,9 +10,3 @@
 
 void load_builtins();
 
-LIST *builtin_depends( PARSE *parse, LOL *args );
-LIST *builtin_echo( PARSE *parse, LOL *args );
-LIST *builtin_exit( PARSE *parse, LOL *args );
-LIST *builtin_flags( PARSE *parse, LOL *args );
-LIST *builtin_glob( PARSE *parse, LOL *args );
-

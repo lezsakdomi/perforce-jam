@@ -12,6 +12,7 @@
 # include "rules.h"
 # include "filesys.h"
 # include "newstr.h"
+# include "regexp.h"
 
 /*
  * builtins.c - builtin jam rules
@@ -27,6 +28,7 @@
  *	builtin_exit() - EXIT rule
  *	builtin_flags() - NOCARE, NOTFILE, TEMPORARY rule
  *	builtin_glob() - GLOB rule
+ *	builtin_match() - MATCH rule
  *
  * 01/10/01 (seiwald) - split from compile.c
  */
@@ -37,6 +39,13 @@
 
 # define P0 (PARSE *)0
 # define C0 (char *)0
+
+LIST *builtin_depends( PARSE *parse, LOL *args );
+LIST *builtin_echo( PARSE *parse, LOL *args );
+LIST *builtin_exit( PARSE *parse, LOL *args );
+LIST *builtin_flags( PARSE *parse, LOL *args );
+LIST *builtin_glob( PARSE *parse, LOL *args );
+LIST *builtin_match( PARSE *parse, LOL *args );
 
 int glob( char *s, char *c );
 
@@ -72,6 +81,10 @@ load_builtins()
     bindrule( "Leaves" )->procedure = 
     bindrule( "LEAVES" )->procedure = 
 	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_LEAVES );
+
+    bindrule( "Match" )->procedure = 
+    bindrule( "MATCH" )->procedure = 
+	parse_make( builtin_match, P0, P0, P0, C0, C0, 0 );
 
     bindrule( "NoCare" )->procedure = 
     bindrule( "NOCARE" )->procedure = 
@@ -217,4 +230,55 @@ builtin_glob(
 	    file_dirscan( l->string, builtin_glob_back, &globbing );
 
 	return globbing.results;
+}
+
+/*
+ * builtin_match() - MATCH rule, regexp matching
+ */
+
+LIST *
+builtin_match(
+	PARSE	*parse,
+	LOL	*args )
+{
+	LIST *l = lol_get( args, 0 );
+	LIST *r = lol_get( args, 1 );
+	LIST *result = 0;
+	regexp *re;
+
+	/* No pattern or string?  No results. */
+
+	if( !l || !r )
+	    return L0;
+
+	/* Just use first arg of each list. */
+
+	re = regcomp( l->string );
+
+	if( regexec( re, r->string ) )
+	{
+	    int i, top;
+
+	    /* Find highest parameter */
+
+	    for( top = NSUBEXP; top-- > 1; )
+		if( re->startp[top] != re->endp[top] )
+		    break;
+
+	    /* And add all parameters up to highest onto list. */
+	    /* Must have parameters to have results! */
+
+	    for( i = 1; i <= top; i++ )
+	    {
+		char buf[ MAXSYM ];
+		int l = re->endp[i] - re->startp[i];
+		memcpy( buf, re->startp[i], l );
+		buf[ l ] = 0;
+		result = list_new( result, newstr( buf ) );
+	    }
+	}
+
+	free( (char *)re );
+
+	return result;
 }
