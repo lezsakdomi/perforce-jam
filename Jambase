@@ -101,6 +101,8 @@
 # FGrist d1 d2 ... ;			return d1!d2!...
 # FGristFiles value ;			return $(value:G=$(SOURCE_GRIST))
 # FGristSourceFiles value ;		return $(value:G=$(SOURCE_GRIST))
+# FStripCommon v1 : v2 ; 		strip common initial parts of v1 v2
+# FReverse a1 a2 ... ;			return ... a2 a1 
 # FRelPath d1 : d2 ;			return rel path from d1 to d2
 # FSubDir d1 d2 ... ;			return path to root
 #
@@ -1146,33 +1148,30 @@ rule SoftLink
 rule SubDir
 {
 	#
-	# SubDir TOP d1 ... ;
+	# SubDir TOP d1 d2 ... ;
 	#
 	# Support for a project tree spanning multiple directories.
 	#
-	# SubDir introduces a Jamfile that is part of a project tree whose
-	# root is $(TOP).  TOP is a user-selected variable name for the
-	# tree; d1 ... are the directory elements that lead from the root
+	# SubDir declares a Jamfile's location in a project tree, setting
+	# Jambase variables (SEARCH_SOURCE, LOCATE_TARGET) so that source
+	# files can be found.
+	#
+	# TOP is a user-select variable name for root of the tree, and
+	# d1 d2 ...  are the directory elements that lead from the root
 	# of the tree to the directory of the Jamfile.
 	#
-	# When jam reads the Jamfile in the current working directory
-	# (CWD), the first SubDir call sets $(TOP) to the back path to
-	# the project root for use by subsequent SubDir calls.  The path
-	# contains one ../ for each directory from the root.
+	# TOP can be set externally, but normally the first SubDir call
+	# computes TOP as the path up from the current directory; the
+	# path contains one ../ for each of d1 d2 ...
 	#
-	# Each SubDir call sets the (fixed) variable $(SUBDIR) to the path
-	# from the CWD to the named directory.  SubDir also sets other
-	# Jambase variables (SEARCH_SOURCE, LOCATE_TARGET) to $(SUBDIR),
-	# so that file names within the Jamfile refer to $(SUBDIR).
+	# SubDir reads once the project-specific rules file Jamrules 
+	# in the TOP directory, if present.  This can be overridden
+	# with the variable TOPRULES.
 	#
-	# The first invocation of SubDir for TOP includes the
-	# project-specific rules files $(TOPRULES).  If $(TOPRULES) is
-	# not set SubDir looks for a Jamrules in $(TOP) and includes that
-	# if present.
-	#
-	# SubDir supports different TOPs for separate project trees; it
-	# simply uses the last value of $(SUBDIR) instead of the CWD when 
-	# computing the path to $(TOP).
+	# SubDir supports multiple, overlaid project trees:  SubDir
+	# invocations with different TOPs can appear in the same Jamfile.
+	# The location established by the first SubDir call is used set
+	# the TOPs for the subsequent SubDir calls.
 	#
 	# SubDir's public variables:
 	#
@@ -1184,12 +1183,6 @@ rule SubDir
 	#	$(LOCATE_TARGET) = $(ALL_LOCATE_TARGET) $(SUBDIR)
 	#	$(SOURCE_GRIST) = $(SUBDIR_TOKENS) with !'s 
 	#
-	# SubDir's private variables:
-	#
-	#	$(SUBDIR_UP) = directories from CWD to a common point
-	#	$(SUBDIR_DOWN) = directories from common point to SUBDIR
-	#	$(TOP-UP) = directories from CWD to a common point
-	#	$(TOP-DOWN) = directories from common point to TOP
 
 	local _top = $(<[1]) ;
 	local _tokens = $(<[2-]) ;
@@ -1203,19 +1196,97 @@ rule SubDir
 	    Exit SubDir syntax error ;
 	}
 
-	if ! $($(_top))
+	if ! $($(_top)-SET)
 	{
-	    # Get path from SUBDIR (or CWD) to $(TOP)
+	    $(_top)-SET = true ;
 
-	    SUBDIR_UP += $(_tokens) ;
+	    # First time we've seen this TOP.
+	    # We'll initialize a number of internal variables:
+	    #
+	    #	$(TOP-UP) = directories from ROOT to a common point
+	    #	$(TOP-DOWN) = directories from common point to TOP
+	    #	$(TOP-ROOT) = root directory for UP/DOWN -- normally CWD
+	    #	$(SUBDIR_UP) = current value of $(TOP-UP)
+	    #	$(SUBDIR_DOWN) = current value of $(TOP-DOWN)
+	    #	$(SUBDIR_ROOT) = current value of $(TOP-ROOT)
+	    #
 
-	    $(_top)-UP = $(SUBDIR_UP) ;
-	    $(_top)-DOWN = $(SUBDIR_DOWN) ;
-	    $(_top) = [ FSubDirPath $(_top) ] ;
+	    if $($(_top))
+	    {
+		# TOP externally set.
+		# We'll ignore the relative (UP/DOWN) path that
+		# got us here, and instead remember the hard ROOT.
 
-	    # File is $(TOPRULES) or $(TOP)/Jamrules.
+		$(_top)-UP = ;
+		$(_top)-DOWN = ;
+		$(_top)-ROOT = $($(_top)) ;
+	    }
+	    else
+	    {
+		# TOP not preset.
+
+		# Establishing a new TOP.  In the simplest case,
+		# (SUBDIR_UP/SUBDIR_DOWN/SUBDIR_ROOT unset), it's
+		# merely a certain number of directories down from
+		# the current directory, and FSubDirPath will set
+		# TOP to a path consisting of ../ for each of the
+		# elements of _tokens, because that represents how 
+		# far below TOP the current directory sits.
+		#
+		# In the more complicated case, the starting directory
+		# isn't the directory of jam's invocation but an 
+		# location established by previous SubDir call.  The
+		# starting directory is SUBDIR_UP directories up from
+		# SUBDIR_ROOT, and then SUBDIR_DOWN directories down
+		# from that.   If SUBDIR_ROOT is not set, that means
+		# SUBDIR_DOWN and SUBDIR_UP represent the path from
+		# the directory of jam's invocation.
+		#
+		# In the most complicated case, the _tokens also 
+		# represents directories down, because TOP is being
+		# estalished in a directory other than TOP's root.
+		# Hopefully, _tokens and SUBDIR_DOWN represent the
+		# same final directory, relative to the new TOP and
+		# the previous SubDIr's TOP.  To find the new TOP,
+		# we have to chop off any common directories from
+		# then ends of _tokens and SUBDIR_DOWN.  To do so,
+		# we reverse each of them, call FStripCommon to
+		# remove the initial common elements, and then
+		# reverse them again.  After this process, if
+		# both _tokens and SUBDIR_DOWN have elements, it
+		# means the directory names estalished by the two
+		# SubDir calls don't match, and a warning is issued.
+		# All hell will likely break loose at this point,
+		# since the whole SubDir scheme relies on the SubDir
+		# calls accurately naming the current directory.
+
+		# Strip common trailing elements of _tokens and SUBDIR_DOWN.
+
+		_tokens = [ FReverse $(_tokens) ] ;
+		SUBDIR_DOWN = [ FReverse $(SUBDIR_DOWN) ] ;
+		FStripCommon _tokens : SUBDIR_DOWN ;
+		SUBDIR_DOWN = [ FReverse $(SUBDIR_DOWN) ] ;
+		_tokens = [ FReverse $(_tokens) ] ;
+
+		if $(SUBDIR_DOWN) && $(_tokens) 
+		{ 
+		    Echo Warning: SubDir $(<) misplaced! ; 
+		}
+
+		# We'll remember the relative (UP/DOWN) path that
+		# got us here, plus any hard ROOT starting point
+		# for the UP/DOWN.  If TOP is never set externally,
+		# ROOT will always be "" (directory of jam's invocation).
+
+		$(_top)-UP = $(SUBDIR_UP) $(_tokens) ;
+		$(_top)-DOWN = $(SUBDIR_DOWN) ;
+		$(_top)-ROOT = $(SUBDIR_ROOT:E="") ;
+		$(_top) = [ FSubDirPath $(_top) ] ;
+	    }
+
+	    # Include $(TOPRULES) or $(TOP)/Jamrules.
 	    # Include $(TOPRULES) if set.
-	    # Only include default $(TOP)/Jamrules if present.
+	    # Otherwise include $(TOP)/Jamrules if present.
 
 	    if $($(_top)RULES) { 
 		include $($(_top)RULES) ;
@@ -1230,6 +1301,7 @@ rule SubDir
 
 	SUBDIR_UP = $($(_top)-UP) ;
         SUBDIR_DOWN = $($(_top)-DOWN) $(_tokens) ;
+	SUBDIR_ROOT = $($(_top)-ROOT) ;
         SUBDIR_TOKENS = $(SUBDIR_DOWN) ;
 
 	SUBDIR = [ FSubDirPath $(<) ] ;
@@ -1255,10 +1327,18 @@ rule FSubDirPath
 {
 	# FSubDirPath TOP d1 ... ;
 
-	# Returns path to named directory, assuming TOP has been set by
-	# a previous call to SubDir.
+	# Returns path to named directory.
 
-	return [ FRelPath $($(<[1])-UP) : $($(<[1])-DOWN) $(<[2-]) ] ;
+	# If jam is invoked in a subdirectory of the TOP, then we
+	# need to prepend a ../ for every level we must climb up
+	# (TOP-UP), and then append the directory names we must 
+	# climb down (TOP-DOWN), plus the named directories d1 ...
+	# If TOP was set externally, or computed from another TOP 
+	# that was, we'll have to reroot the whole thing at TOP-ROOT.
+
+	local _r = [ FRelPath $($(<[1])-UP) : $($(<[1])-DOWN) $(<[2-]) ] ;
+
+	return $(_r:R=$($(<[1])-ROOT)) ;
 }
 
 rule SubDirCcFlags
@@ -1390,6 +1470,14 @@ rule FGristSourceFiles
 	}
 }
 
+rule FReverse 
+{
+	# FReverse a1 a2 a3 ... ;
+	# return ... a3 a2 a1 ;
+
+	if $(1) { return [ FReverse $(1[2-]) ] $(1[1]) ; }
+}
+
 rule FSubDir
 {
 	# If $(>) is the path to the current directory, compute the
@@ -1415,15 +1503,18 @@ rule FSubDir
 	}
 }
 
-rule _makeCommon
+rule FStripCommon
 {
-	# strip common initial elements
+	# FStripCommon v1 : v2 ;
+
+	# Strip common initial elements of variables v1 and v2.
+	# Modifies the variable values themselves.
 
 	if $($(<)[1]) && $($(<)[1]) = $($(>)[1])
 	{
 	    $(<) = $($(<)[2-]) ;
 	    $(>) = $($(>)[2-]) ;
-	    _makeCommon $(<) : $(>) ;
+	    FStripCommon $(<) : $(>) ;
 	}
 }
 
@@ -1436,7 +1527,7 @@ rule FRelPath
 	_l = $(<) ;
 	_r = $(>) ;
 
-	_makeCommon _l : _r ;
+	FStripCommon _l : _r ;
 
 	# now make path to root and path down
 
@@ -1967,7 +2058,8 @@ rule INSTALLMAN { InstallMan $(MANDIR) : $(<) ; }
 # Compatibility with jam 2.2.
 
 rule addDirName { $(<) += [ FDirName $(>) ] ; }
-rule makeCommon { _makeCommon $(<) : $(>) ; }
+rule makeCommon { FStripCommon $(<) : $(>) ; }
+rule _makeCommon { FStripCommon $(<) : $(>) ; }
 rule makeDirName { $(<) = [ FDirName $(>) ] ; }
 rule makeGrist { $(<) = [ FGrist $(>) ] ; }
 rule makeGristedName { $(<) = [ FGristSourceFiles $(>) ] ; }

@@ -35,6 +35,17 @@ Release notes for Jam 2.5
 	Porting change: Minor Cray porting: make hashitem()'s key
 	value unsigned so we're guaranteed no integer overflows.
 
+	SubDir's support for an externally set TOP variable was broken
+	in 2.5rc1.  It now works as it did in 2.4.  Further, using SubDir
+	to include a subpart of an SubDir tree now works.  Previously,
+	you could only include the root of another SubDir tree.  For example,
+
+		SubDir ALL src builds ;
+		SubInclude ALL src server support ;
+
+	Essentially includes the ../server/support/Jamfile, without getting
+	confused as to the current directory.
+
 1.  Release info:
 
 	Jam 2.5
