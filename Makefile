@@ -45,6 +45,10 @@ CFLAGS =
 #CC = gcc
 #CFLAGS = -D__cygwin__
 
+# MingW32
+#CC = gcc
+#CFLAGS = -DMINGW
+
 # MPEIX
 #CC = gcc
 #CFLAGS = -I/usr/include -D_POSIX_SOURCE

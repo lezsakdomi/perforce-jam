@@ -103,6 +103,34 @@
 # endif
 
 /*
+ * Windows MingW32
+ */
+
+# ifdef MINGW
+
+# include <fcntl.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include <ctype.h>
+# include <malloc.h>
+# include <memory.h>
+# include <signal.h>
+# include <string.h>
+# include <time.h>
+
+# define OSMAJOR "MINGW=true"
+# define OSMINOR "OS=MINGW"
+# define OS_NT
+# define SPLITPATH ';'
+# define MAXLINE 996	/* longest 'together' actions */
+# define USE_EXECUNIX
+# define USE_PATHUNIX
+# define PATH_DELIM '\\'
+# define DOWNSHIFT_PATHS
+
+# endif
+
+/*
  * OS2
  */
 

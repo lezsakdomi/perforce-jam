@@ -234,6 +234,16 @@ if $(NT)
     }
 
 }
+else if $(MINGW)
+{
+	Echo		"MingW32" ;
+
+	CC		?= gcc ;
+	C++		?= g++ ;
+	CCFLAGS 	+= -DMINGW ;
+	RANLIB		?= "ranlib" ;
+	SUFEXE		?= .exe ;
+}
 else if $(OS2)
 {
 	WATCOM		?= $(watcom) ;
