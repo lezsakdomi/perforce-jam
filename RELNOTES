@@ -32,8 +32,8 @@ Release notes for Jam/MR [UNRELEASED]
         Add "[ on targ rule ... ]" to call a rule returning a value,
         under the influence of a target's specific variables.
 
-	New 'Glob' builtin that returns a list of files in a list of
-	directories, given a list of patterns.
+	New 'Glob' builtin that returns a list of files, given a list
+	of directories, and a list of filename patterns.
 
 	New 'while expr { block }' construct.
 
