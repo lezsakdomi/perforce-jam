@@ -372,9 +372,10 @@ make1d(
 	}
 
 	/* If the command was interrupted or failed and the target */
-	/* is not "precious", remove the targets */
+	/* is not "precious", remove the targets. */
+	/* Precious == 'actions updated' -- the target maintains state. */
 
-	if( status != EXEC_CMD_OK && !( cmd->rule->flags & RULE_TOGETHER ) )
+	if( status != EXEC_CMD_OK && !( cmd->rule->flags & RULE_UPDATED ) )
 	{
 	    LIST *targets = lol_get( &cmd->args, 0 );
 
