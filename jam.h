@@ -138,7 +138,7 @@ int unlink( char *f ); 	/* In filevms.c */
 # include <ctype.h>
 # if !defined(__bsdi__)&&!defined(__FreeBSD__)
 # if !defined(NeXT)&&!defined(__MACHTEN__)
-# if !defined(MVS)
+# if !defined(__MVS__)
 # include <malloc.h>
 # endif
 # endif
@@ -177,6 +177,10 @@ int unlink( char *f ); 	/* In filevms.c */
 # ifdef __hpux
 # define OSSYMS "UNIX=true","OS=HPUX"
 # endif
+# ifdef __OPENNT
+# define unix
+# define OSSYMS "UNIX=true","OS=INTERIX"
+# endif
 # ifdef __sgi
 # define OSSYMS "UNIX=true","OS=IRIX"
 # endif
@@ -193,7 +197,7 @@ int unlink( char *f ); 	/* In filevms.c */
 # ifdef __MACHTEN__
 # define OSSYMS "UNIX=true","OS=MACHTEN"
 # endif
-# ifdef MVS
+# ifdef __MVS__
 # define unix
 # define OSSYMS "UNIX=true","OS=MVS"
 # endif
@@ -217,6 +221,7 @@ int unlink( char *f ); 	/* In filevms.c */
 # define OSSYMS "UNIX=true","OS=SCO"
 # endif
 # ifdef sinix
+# define unix
 # define OSSYMS "UNIX=true","OS=SINIX"
 # endif
 # ifdef sun

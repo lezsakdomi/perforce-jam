@@ -33,6 +33,9 @@ CFLAGS =
 #CC = gcc
 #LINKLIBS = -lnet
 
+# Interix - gcc
+#CC = gcc
+
 SOURCES = \
 	command.c compile.c execunix.c execvms.c expand.c \
 	filent.c fileos2.c fileunix.c filevms.c glob.c hash.c \

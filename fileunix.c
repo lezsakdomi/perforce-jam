@@ -25,7 +25,7 @@
 # if defined (COHERENT) && defined (_I386)
 # include <arcoff.h>
 # else
-# if defined( MVS )
+# if defined( __MVS__ ) || defined( __OPENNT )
 
 #define	ARMAG	"!<arch>\n"
 #define	SARMAG	8
@@ -213,7 +213,7 @@ void (*func)();
 		    if (read(fd, string_table, lar_size) != lar_size)
 			printf("error reading string table\n");
 		}
-		else if (ar_hdr.ar_name[1] != ' ')
+		else if (string_table && ar_hdr.ar_name[1] != ' ')
 		{
 		    /* Long filenames are recognized by "/nnnn" where nnnn is
 		    ** the offset of the string in the string table represented

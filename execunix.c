@@ -18,7 +18,8 @@
 	defined(M_XENIX) || \
 	defined(__QNX__) || \
 	defined(__BEOS__) || \
-	defined(__ISC)
+	defined(__ISC) || \
+	defined(__OPENNT )
 # define vfork() fork()
 # endif
 

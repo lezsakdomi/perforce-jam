@@ -165,9 +165,12 @@ case AIX :	LINKLIBS default = -lbsd ;
 case DGUX :	RANLIB default = "" ; RELOCATE = true ;
 case HPUX :	RANLIB default = "" ;
 		INSTALL default = "" ;
+case INTERIX :	RANLIB default = "" ;
+		JAMSHELL default = "sh -c" ;
+		CC default = gcc ;
 case IRIX :	RANLIB default = "" ;
 		INSTALL default = "" ;
-case MVS :	RANLIB default = "" ; RELOCATE = true ;
+case MVS :	RANLIB default = "" ; 
 case NEXT :	AR default = libtool -o ;
 		RANLIB default = "" ;
 case NCR :	RANLIB default = "" ;
@@ -176,7 +179,7 @@ case PTX :	RANLIB default = "" ;
 case QNX :	INSTALL default = "" ;
 case SCO :	RANLIB default = "" ;
 		INSTALL default = "" ; RELOCATE = true ;
-case SINIX :	RANLIB default = "" ; RELOCATE = true ;
+case SINIX :	RANLIB default = "" ;
 case SOLARIS :	RANLIB default = "" ;
 		INSTALL default = "install" ;
 		AR default = "/usr/ccs/bin/ar ru" ;
@@ -455,32 +458,35 @@ else if $(VMS)
 }
 else if $(MAC)
 {
+	CW		default = "{CW}" ;
+	CWMAC		default = "$(CW):MacOS Support" ;
+	CWMSL		default = "$(CW):Metrowerks Standard Library" ;
 	CWGUSI		default = "{CWGUSI}" ;
-	CWMAC		default = "{CWMAC}" ;
 
-	CWGUSIHDR	default = $(CWGUSI):include ;
-	CWGUSILIB	default = $(CWGUSI):Lib ;
-	CWMACLIB	default = $(CWMAC):Libraries ;
-	CWMACHDR	default = $(CWMAC):Headers ;
-	
 	CC		default = mwcppc ;
-	CCFLAGS		default = -w off ;
+	CCFLAGS		default = -eol -w off ;
+	C++		default = mwcppc ;
+	C++FLAGS	default = -eol -w off ;
 	CP		default = copy ;
 	DOT		default = ":" ;
 	DOTDOT		default = "::" ;
-	HDRS		default = $(CWGUSIHDR) 
-				  $(CWMACHDR):"ANSI Headers" 
-				  $(CWMACHDR):"Universal Headers" ;
+	HDRS		default = "$(CWGUSI):include"
+				  "$(CWMAC):Headers:Universal Headers"
+				  "$(CWMAC):Headers:System Extras Headers:MPW Extras"
+				  "$(CWMSL):MSL C:MSL Common:Public Includes"
+				  "$(CWMSL):MSL C:MSL Mac:Public Includes" ;
+				  
 	LINK		default = mwlinkppc ;
 	LINKFLAGS	default = -mpwtool -warn ;
-	LINKLIBS	default = "$(CWGUSILIB):GUSIMPW.Lib.PPC" 
-				  "$(CWGUSILIB):GUSI.Lib.PPC" 
-				  "$(CWMACLIB):MacOS Common:Interfacelib" 
-				  "$(CWMACLIB):MacOS Common:PLStringFuncs Glue:PLStringFuncsPPC.lib" 
-				  "$(CWMACLIB):Runtime:Runtime PPC:MWMPWCRuntime.lib" 
-				  "$(CWMACLIB):ANSI PPC:MPW ANSI.C.PPC.Lib" 
-				  "$(CWMACLIB):MacOS PPC:PPCToolLibs.o" 
-				  "$(CWMACLIB):MacOS PPC:Mathlib" ;
+	LINKLIBS	default = "$(CWGUSI):Lib:GUSIMPW.Lib.PPC"
+				  "$(CWGUSI):Lib:MSLGUSI.Lib.PPC"
+				  "$(CWMAC):Libraries:MacOS Common:Interfacelib"
+				  "$(CWMAC):Libraries:MacOS PPC:PPCToolLibs.o"
+				  "$(CWMAC):Libraries:MacOS Common:PLStringFuncs Glue:PLStringFuncsPPC.lib"
+				  "$(CWMAC):Libraries:Runtime:Runtime PPC:MSL MPWCRuntime.lib"
+				  "$(CWMSL):MSL C:Bin:MSL C.PPC MPW(NL).Lib"
+				  "$(CWMAC):Libraries:MacOS Common:Mathlib" ;
+				
 	MKDIR		default = newfolder ;
 	MV		default = rename ;
 	NOARSCAN	default = true ;
@@ -1491,15 +1497,7 @@ if $(UNIX)
 	$(AS) $(ASFLAGS) -I$(HDRS) -o $(<) $(>)
     }
 
-    if $(OS) = SINIX
-    {
-	actions C++
-	{
-	[ $(>:S) != .C ] && $(CP) $(>) $(>:S=.C) && trap "rm -f $(>:S=.C)" 0
-	$(C++) -c $(C++FLAGS) $(OPTIM) -I$(HDRS) $(>:S=.C)
-	}
-    } 
-    else if $(RELOCATE)
+    if $(RELOCATE)
     {
 	actions C++
 	{

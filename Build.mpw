@@ -1,43 +1,42 @@
+# These two lines must be set manually to the CodeWarrior Pro 3 installation
+# and the CWGUSI 1.8 tree.  Good luck!
 
-set CWGUSI "Macintosh HD:Perforce:CWGUSI" 
-set CWMAC "Macintosh HD:CW10 Gold:Metrowerks CodeWarrior:MacOS Support"
+set CW "PowerUser HD:Metrowerks:Metrowerks CodeWarrior"
+set CWGUSI "PowerUser HD:Perforce:CWGUSI" 
 
-newfolder  :bin.mac 
+set MWCincludes "{CWGUSI}:include,{CW}:MacOS Support:Headers:Universal Headers,{CW}:Metrowerks Standard Library:MSL C:MSL Common:Public Includes,{CW}:Metrowerks Standard Library:MSL C:MSL Mac:Public Includes" 
 
-set MWCincludes "{CWGUSI}:include,{CWMAC}:Headers:ANSI Headers,{CWMAC}:Headers:Universal Headers" 
-
-mwcppc  -o :bin.mac:command.o  -w off   command.c  
-mwcppc  -o :bin.mac:compile.o  -w off   compile.c  
-mwcppc  -o :bin.mac:execmac.o  -w off   execmac.c  
-mwcppc  -o :bin.mac:filemac.o  -w off   filemac.c  
-mwcppc  -o :bin.mac:pathmac.o  -w off   pathmac.c  
-mwcppc  -o :bin.mac:jamgram.o  -w off   jamgram.c  
-mwcppc  -o :bin.mac:expand.o  -w off   expand.c  
-mwcppc  -o :bin.mac:glob.o  -w off   glob.c  
-mwcppc  -o :bin.mac:hash.o  -w off   hash.c  
-mwcppc  -o :bin.mac:headers.o  -w off   headers.c  
-mwcppc  -o :bin.mac:lists.o  -w off   lists.c  
-mwcppc  -o :bin.mac:make.o  -w off   make.c  
-mwcppc  -o :bin.mac:make1.o  -w off   make1.c  
-mwcppc  -o :bin.mac:newstr.o  -w off   newstr.c  
-mwcppc  -o :bin.mac:option.o  -w off   option.c  
-mwcppc  -o :bin.mac:parse.o  -w off   parse.c  
-mwcppc  -o :bin.mac:regexp.o  -w off   regexp.c  
-mwcppc  -o :bin.mac:rules.o  -w off   rules.c  
-mwcppc  -o :bin.mac:scan.o  -w off   scan.c  
-mwcppc  -o :bin.mac:search.o  -w off   search.c  
-mwcppc  -o :bin.mac:timestamp.o  -w off   timestamp.c  
-mwcppc  -o :bin.mac:variable.o  -w off   variable.c  
+mwcppc  -o :bin.mac:command.o  -eol -w off   command.c  
+mwcppc  -o :bin.mac:compile.o  -eol -w off   compile.c  
+mwcppc  -o :bin.mac:execmac.o  -eol -w off   execmac.c  
+mwcppc  -o :bin.mac:filemac.o  -eol -w off   filemac.c  
+mwcppc  -o :bin.mac:pathmac.o  -eol -w off   pathmac.c  
+mwcppc  -o :bin.mac:jamgram.o  -eol -w off   jamgram.c  
+mwcppc  -o :bin.mac:expand.o  -eol -w off   expand.c  
+mwcppc  -o :bin.mac:glob.o  -eol -w off   glob.c  
+mwcppc  -o :bin.mac:hash.o  -eol -w off   hash.c  
+mwcppc  -o :bin.mac:headers.o  -eol -w off   headers.c  
+mwcppc  -o :bin.mac:lists.o  -eol -w off   lists.c  
+mwcppc  -o :bin.mac:make.o  -eol -w off   make.c  
+mwcppc  -o :bin.mac:make1.o  -eol -w off   make1.c  
+mwcppc  -o :bin.mac:newstr.o  -eol -w off   newstr.c  
+mwcppc  -o :bin.mac:option.o  -eol -w off   option.c  
+mwcppc  -o :bin.mac:parse.o  -eol -w off   parse.c  
+mwcppc  -o :bin.mac:regexp.o  -eol -w off   regexp.c  
+mwcppc  -o :bin.mac:rules.o  -eol -w off   rules.c  
+mwcppc  -o :bin.mac:scan.o  -eol -w off   scan.c  
+mwcppc  -o :bin.mac:search.o  -eol -w off   search.c  
+mwcppc  -o :bin.mac:timestamp.o  -eol -w off   timestamp.c  
+mwcppc  -o :bin.mac:variable.o  -eol -w off   variable.c  
 
 mwlinkppc  -library -o :bin.mac:libjam.lib  :bin.mac:command.o :bin.mac:compile.o :bin.mac:execmac.o :bin.mac:filemac.o :bin.mac:pathmac.o :bin.mac:jamgram.o :bin.mac:expand.o :bin.mac:glob.o :bin.mac:hash.o :bin.mac:headers.o :bin.mac:lists.o :bin.mac:make.o :bin.mac:make1.o :bin.mac:newstr.o :bin.mac:option.o :bin.mac:parse.o :bin.mac:regexp.o :bin.mac:rules.o :bin.mac:scan.o :bin.mac:search.o :bin.mac:timestamp.o :bin.mac:variable.o 
+mwcppc  -o :bin.mac:mkjambase.o  -eol -w off   mkjambase.c  
 
-mwcppc  -o :bin.mac:mkjambase.o  -w off   mkjambase.c  
+mwlinkppc  -o :bin.mac:mkjambase  -mpwtool -warn  :bin.mac:mkjambase.o   "{CWGUSI}:Lib:GUSIMPW.Lib.PPC" "{CWGUSI}:Lib:MSLGUSI.Lib.PPC" "{CW}:MacOS Support:Libraries:MacOS Common:Interfacelib" "{CW}:MacOS Support:Libraries:MacOS PPC:PPCToolLibs.o" "{CW}:MacOS Support:Libraries:MacOS Common:PLStringFuncs Glue:PLStringFuncsPPC.lib" "{CW}:MacOS Support:Libraries:Runtime:Runtime PPC:MSL MPWCRuntime.lib" "{CW}:Metrowerks Standard Library:MSL C:Bin:MSL C.PPC MPW(NL).Lib" "{CW}:MacOS Support:Libraries:MacOS Common:Mathlib" 
+mwcppc  -o :bin.mac:jam.o  -eol -w off   jam.c  
 
-mwlinkppc  -o :bin.mac:mkjambase  -mpwtool -warn  :bin.mac:mkjambase.o   "{CWGUSI}:Lib:GUSIMPW.Lib.PPC" "{CWGUSI}:Lib:GUSI.Lib.PPC" "{CWMAC}:Libraries:MacOS Common:Interfacelib" "{CWMAC}:Libraries:MacOS Common:PLStringFuncs Glue:PLStringFuncsPPC.lib" "{CWMAC}:Libraries:Runtime:Runtime PPC:MWMPWCRuntime.lib" "{CWMAC}:Libraries:ANSI PPC:MPW ANSI.C.PPC.Lib" "{CWMAC}:Libraries:MacOS PPC:PPCToolLibs.o" "{CWMAC}:Libraries:MacOS PPC:Mathlib" 
+:bin.mac:mkjambase  jambase.c  Jambase 
 
-mwcppc  -o :bin.mac:jam.o  -w off   jam.c  
+mwcppc  -o :bin.mac:jambase.o  -eol -w off   jambase.c  
 
-mwcppc  -o :bin.mac:jambase.o  -w off   jambase.c  
-
-mwlinkppc  -o :bin.mac:jam  -mpwtool -warn  :bin.mac:jam.o :bin.mac:jambase.o  :bin.mac:libjam.lib  "{CWGUSI}:Lib:GUSIMPW.Lib.PPC" "{CWGUSI}:Lib:GUSI.Lib.PPC" "{CWMAC}:Libraries:MacOS Common:Interfacelib" "{CWMAC}:Libraries:MacOS Common:PLStringFuncs Glue:PLStringFuncsPPC.lib" "{CWMAC}:Libraries:Runtime:Runtime PPC:MWMPWCRuntime.lib" "{CWMAC}:Libraries:ANSI PPC:MPW ANSI.C.PPC.Lib" "{CWMAC}:Libraries:MacOS PPC:PPCToolLibs.o" "{CWMAC}:Libraries:MacOS PPC:Mathlib" 
-
+mwlinkppc  -o :bin.mac:jam  -mpwtool -warn  :bin.mac:jam.o :bin.mac:jambase.o  :bin.mac:libjam.lib  "{CWGUSI}:Lib:GUSIMPW.Lib.PPC" "{CWGUSI}:Lib:MSLGUSI.Lib.PPC" "{CW}:MacOS Support:Libraries:MacOS Common:Interfacelib" "{CW}:MacOS Support:Libraries:MacOS PPC:PPCToolLibs.o" "{CW}:MacOS Support:Libraries:MacOS Common:PLStringFuncs Glue:PLStringFuncsPPC.lib" "{CW}:MacOS Support:Libraries:Runtime:Runtime PPC:MSL MPWCRuntime.lib" "{CW}:Metrowerks Standard Library:MSL C:Bin:MSL C.PPC MPW(NL).Lib" "{CW}:MacOS Support:Libraries:MacOS Common:Mathlib" 
