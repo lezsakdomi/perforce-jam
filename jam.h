@@ -286,10 +286,8 @@ int unlink( char *f ); 	/* In filevms.c */
 # endif 
 
 # ifdef __sparc__
-# ifndef sun
 # undef OSPLATSYM
 # define OSPLATSYM ,"OSPLAT=SPARC"
-# endif
 # endif
 
 /* You probably don't need to muck with these. */
