@@ -56,6 +56,9 @@ Changes since Jam 2.4
 	was the only solaris platform.  Thanks to Michael Champigny 
 	<michael.champigny@intel.com>.
 
+	Removed spurious search() in 'on' statement handling, thanks 
+	(again) to Ingo Weinhold.
+
 ===============================================================================
 ===============================================================================
 

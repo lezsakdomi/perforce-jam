@@ -64,6 +64,7 @@
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
  * 10/22/02 (seiwald) - working return/break/continue statements
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 11/18/02 (seiwald) - remove bogus search() in 'on' statement.
  */
 
 # include "jam.h"
@@ -462,9 +463,7 @@ compile_on(
 
 	    pushsettings( t->settings );
 	    result = (*parse->right->func)( parse->right, args, jmp );
-	    t->boundname = search( t->name, &t->time );
 	    popsettings( t->settings );
-
 	}
 
 	list_free( nt );
