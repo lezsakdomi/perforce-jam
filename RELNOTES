@@ -149,6 +149,10 @@ Release notes for Jam 2.5
 	AIX "big" archives are now supported, thanks to suggestions
 	from Randy Roesler.
 
+	MSVCDIR now works as well as MSVCNT for the Microsoft Visual C
+	compiler directory.  It changed names in VC 6.0.  Thanks to
+	Matt Armstrong.
+
 ===============================================================================
 ===============================================================================
 

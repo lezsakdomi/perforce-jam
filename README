@@ -110,10 +110,12 @@ INSTALLING
 	depends on which compiler you are using:
 
 	    BCCROOT:	The Borland C compiler
+	    MSVCDIR:	The Microsoft Compiler 6.0 (for NT)
 	    MSVCNT:	The Microsoft Compiler 5.0 (for NT)
 	    MSVC:	The Microsoft Compiler 1.5 (for Windows)
 
-	Only MSVCNT has really been tested and is known to work.
+	Only MSVCNT and MSVCDIR have really been tested and are known
+	to work.
 
     Macintosh
 

@@ -204,8 +204,12 @@ if $(NT)
 	STDHDRS		?= $(MSVC)\\include ;
 	UNDEFFLAG	?= "/u _" ;
     }
-    else if $(MSVCNT)
+    else if $(MSVCNT) || $(MSVCDIR)
     {
+			# Visual C++ 6.0 uses MSVCDIR
+
+	MSVCNT		?= $(MSVCDIR) ;	
+
 	AR		?= lib ;
 	AS		?= masm386 ;
 	CC		?= cl /nologo ;
@@ -224,8 +228,8 @@ if $(NT)
     }
     else
     {
-	Exit On NT, set BCCROOT, MSVCNT, or MSVC to the root of the
-		Borland or Microsoft directories. ;
+	EXIT On NT, set BCCROOT, MSVCDIR, MSVCNT, or MSVC to the root
+		of the Borland or Microsoft directories. ;
     }
 
 }
