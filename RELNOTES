@@ -69,7 +69,12 @@ Release notes for Jam/MR [UNRELEASED]
 	expansion modifiers.
 
 
-3.3.  Jam internal code changes
+3.3   'jam' Changes (See Jam.html)
+
+	Added '-q' (quit quick) option; jam will exit promptly (as if it
+	received an interrupt), as soon as any target fails.
+
+3.4.  Jam internal code changes
 
 	Optimize rule compilation, with right-recursion instead of left.
 

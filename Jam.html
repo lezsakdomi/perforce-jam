@@ -16,8 +16,10 @@
 
 <DT> <P> <H2> USAGE </H2> <DD>
 
+-q      Quit Quickly as soon as a target fails.
+
 <PRE>
-jam [ -a ] [ -n ] [ -v ] 
+jam [ -a ] [ -n ] [ -v ] [ -q ]
     [ -d <I>debug</I> ] 
     [ -f <I>jambase</I> ] 
     [ -j <I>jobs</I> ] 
@@ -104,6 +106,10 @@ jam [ -a ] [ -n ] [ -v ]
 	    <TR><TD VALIGN=TOP><CODE> -o <I>file</I></CODE>
 	    <TD> Write the updating actions to the specified file instead
 	    of running them (or outputting them, as on the Mac).
+
+	    <TR><TD VALIGN=TOP><CODE> -q </CODE>
+	    <TD> Quit quickly (as if an interrupt was received)
+	    as soon as any target fails.
 
 	    <TR><TD VALIGN=TOP><CODE> -s <I>var</I>=<I>value</I></CODE>
 	    <TD> Set the variable <I>var</I> to <I>value</I>, overriding
