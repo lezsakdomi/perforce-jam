@@ -69,6 +69,16 @@ Changes since Jam 2.4
 	'depends' list, eliminating 'includes'-specific code in make0()
 	and make1().
 
+	Rewrite of the past: updated all jam's source with comments to
+	reflect changes since about 2.3, very early 2001.
+
+	The whole /MR of Jam's name has been dropped.  It was intended
+	to avoid trademark infringement of JYACC's JAM, but as far as
+	we can tell (a) it wasn't enough to avoid infringement and (b)
+	the trademark has lapsed anyhow.
+
+	Jam.html was extensively updated, in an attempt at lucidity.
+
 ===============================================================================
 ===============================================================================
 
