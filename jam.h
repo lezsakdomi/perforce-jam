@@ -448,6 +448,7 @@ struct globs {
 	int	noexec;
 	int	jobs;
 	int	quitquick;
+	int	newestfirst;		/* build newest sources first */
 	char	debug[DEBUG_MAX];
 	FILE	*cmdout;		/* print cmds, not run them */
 } ;

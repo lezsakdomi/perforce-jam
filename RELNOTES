@@ -83,6 +83,12 @@ Release notes for Jam/MR [UNRELEASED]
 	Added '-q' (quit quick) option; jam will exit promptly (as if it
 	received an interrupt), as soon as any target fails.
 
+	Added experimental '-g' (build newest sources first) option:
+	all things being equal, normally targets are simply built in
+	the order they appear in the Jamfiles.  With this flag, targets
+	with the newest sources are built first.   From an idea by Arnt
+	Gulbrandsen.  Undocumented (outside this note).
+
 3.4.  Jam internal code changes
 
 	jamgram.yy now defines YYMAXDEPTH to 10000, what it is on 

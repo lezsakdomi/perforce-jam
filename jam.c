@@ -129,6 +129,7 @@ struct globs globs = {
 	0,			/* noexec */
 	1,			/* jobs */
 	0,			/* quitquick */
+	0,			/* newestfirst */
 # ifdef OS_MAC
 	{ 0, 0 },		/* debug - suppress tracing output */
 # else
@@ -175,13 +176,14 @@ main( int argc, char **argv, char **arg_environ )
 
 	argc--, argv++;
 
-	if( ( n = getoptions( argc, argv, "d:j:f:s:t:ano:qv", optv ) ) < 0 )
+	if( ( n = getoptions( argc, argv, "d:j:f:gs:t:ano:qv", optv ) ) < 0 )
 	{
 	    printf( "\nusage: jam [ options ] targets...\n\n" );
 
             printf( "-a      Build all targets, even if they are current.\n" );
             printf( "-dx     Set the debug level to x (0-9).\n" );
             printf( "-fx     Read x instead of Jambase.\n" );
+	    /* printf( "-g      Build from newest sources first.\n" ); */
             printf( "-jx     Run up to x shell commands concurrently.\n" );
             printf( "-n      Don't actually execute the updating actions.\n" );
             printf( "-ox     Write the updating actions to file x.\n" );
@@ -220,6 +222,9 @@ main( int argc, char **argv, char **arg_environ )
 
 	if( ( s = getoptval( optv, 'j', 0 ) ) )
 	    globs.jobs = atoi( s );
+
+	if( ( s = getoptval( optv, 'g', 0 ) ) )
+	    globs.newestfirst = 1;
 
 	/* Turn on/off debugging */
 
