@@ -24,6 +24,13 @@
  * 11/21/96 (peterk)  - added BeOS with MW CW mwcc
  * 12/21/96 (seiwald) - OSPLAT now defined for NT.
  * 07/19/99 (sickel)  - Mac OS X Server and Client support added
+ * 02/18/00 (belmonte)- Support for Cygwin.
+ * 09/12/00 (seiwald) - OSSYMS split to OSMAJOR/OSMINOR/OSPLAT
+ * 12/29/00 (seiwald) - OSVER dropped.
+ */
+
+/*
+ * VMS, OPENVMS
  */
 
 # ifdef VMS
@@ -41,18 +48,25 @@ int unlink( char *f ); 	/* In filevms.c */
 # include <time.h>
 # include <unixlib.h>
 
-# ifdef __DECC
-# define OSSYMS "VMS=true","OS=OPENVMS"
-# else
-# define OSSYMS "VMS=true","OS=VMS"
-# endif 
-
+# define OSMINOR "OS=VMS"
+# define OSMAJOR "VMS=true"
+# define OS_VMS
 # define MAXLINE 1024 /* longest 'together' actions */
 # define SPLITPATH ','
 # define EXITOK 1
 # define EXITBAD 0
+# define DOWNSHIFT_PATHS
 
-# else
+/* This may be inaccurate */
+# ifndef __DECC
+# define OSPLAT "OSPLAT=VAX"
+# endif 
+
+# endif
+
+/*
+ * Windows NT
+ */
 
 # ifdef NT
 
@@ -66,13 +80,31 @@ int unlink( char *f ); 	/* In filevms.c */
 # include <string.h>
 # include <time.h>
 
-# define OSSYMS "NT=true","OS=NT"
+# define OSMAJOR "NT=true"
+# define OSMINOR "OS=NT"
+# define OS_NT
 # define SPLITPATH ';'
 # define MAXLINE 996	/* longest 'together' actions */
-# define EXITOK 0
-# define EXITBAD 1
+# define USE_EXECUNIX
+# define USE_PATHUNIX
+# define PATH_DELIM '\\'
+# define DOWNSHIFT_PATHS
 
-# else
+/* AS400 cross-compile from NT */
+
+# ifdef AS400
+# undef OSMINOR
+# undef OSMAJOR
+# define OSMAJOR "AS400=true"
+# define OSMINOR "OS=AS400"
+# define OS_AS400
+# endif
+
+# endif
+
+/*
+ * OS2
+ */
 
 # ifdef __OS2__
 
@@ -85,209 +117,316 @@ int unlink( char *f ); 	/* In filevms.c */
 # include <string.h>
 # include <time.h>
 
-# define OSSYMS "OS2=true","OS=OS2"
+# define OSMAJOR "OS2=true"
+# define OSMINOR "OS=OS2"
+# define OS_OS2
 # define SPLITPATH ';'
 # define MAXLINE 996	/* longest 'together' actions */
-# define EXITOK 0
-# define EXITBAD 1
+# define USE_EXECUNIX
+# define USE_PATHUNIX
+# define PATH_DELIM '\\'
+# define DOWNSHIFT_PATHS
 
-# else
+# endif
 
-# ifdef __QNX__
-
-# define unix
-
-# include <fcntl.h>
-# include <stdlib.h>
-# include <stdio.h>
-# include <ctype.h>
-# include <malloc.h>
-# include <signal.h>
-# include <string.h>
-# include <time.h>
-
-# define OSSYMS "UNIX=true","OS=QNX"
-# define SPLITPATH ':'
-# define MAXLINE 996	/* longest 'together' actions */
-# define EXITOK 0
-# define EXITBAD 1
-
-# else /* QNX */
+/*
+ * Macintosh MPW
+ */
 
 # ifdef macintosh
+
 # include <time.h>
 # include <stdlib.h>
 # include <string.h>
 # include <stdio.h>
 
-# define OSSYMS "MAC=true","OS=MAC"
+# define OSMAJOR "MAC=true"
+# define OSMINOR "OS=MAC"
+# define OS_MAC
 # define SPLITPATH ','
-# define MAXLINE 10240	/* longest 'together' actions */
-# define EXITOK 0
-# define EXITBAD 1
 
-# else /* not MAC */
+# endif
 
-# include <sys/types.h>
-# include <sys/file.h>
-# include <sys/stat.h>
-# include <fcntl.h>
-# ifndef ultrix
-# include <stdlib.h>
-# endif
-# include <stdio.h>
-# include <ctype.h>
-# if !defined(__bsdi__)&&!defined(__FreeBSD__)
-# if !defined(NeXT)&&!defined(__MACHTEN__)&&!defined(__APPLE__)
-# if !defined(MVS)
-# include <malloc.h>
-# endif
-# endif
-# endif
-# include <memory.h>
-# include <signal.h>
-# include <string.h>
-# include <time.h>
+/*
+ * God fearing UNIX
+ */
+
+# ifndef OSMINOR
+
+# define OSMAJOR "UNIX=true"
+# define USE_EXECUNIX
+# define USE_FILEUNIX
+# define USE_PATHUNIX
+# define PATH_DELIM '/'
 
 # ifdef _AIX
 # define unix
-# ifdef _AIX41
-# define OSSYMS "UNIX=true","OS=AIX","OSVER=41"
-# else
-# define OSSYMS "UNIX=true","OS=AIX","OSVER=32"
+# define OSMINOR "OS=AIX"
+# define OS_AIX
+# define NO_VFORK
 # endif
+# ifdef AMIGA
+# define OSMINOR "OS=AMIGA"
+# define OS_AMIGA
 # endif
-
 # ifdef __BEOS__
-# define OSSYMS "UNIX=true","OS=BEOS"
 # define unix
+# define OSMINOR "OS=BEOS"
+# define OS_BEOS
+# define NO_VFORK
 # endif
-
 # ifdef __bsdi__
-# define OSSYMS "UNIX=true","OS=BSDI"
+# define OSMINOR "OS=BSDI"
+# define OS_BSDI
 # endif
 # if defined (COHERENT) && defined (_I386)
-# define OSSYMS "UNIX=true","OS=COHERENT"
+# define OSMINOR "OS=COHERENT"
+# define OS_COHERENT
+# define NO_VFORK
+# endif
+# ifdef __cygwin__
+# define OSMINOR "OS=CYGWIN"
+# define OS_CYGWIN
 # endif
 # ifdef __FreeBSD__
-# define OSSYMS "UNIX=true","OS=FREEBSD"
+# define OSMINOR "OS=FREEBSD"
+# define OS_FREEBSD
 # endif
 # ifdef __DGUX__
-# define OSSYMS "UNIX=true","OS=DGUX"
+# define OSMINOR "OS=DGUX"
+# define OS_DGUX
 # endif
 # ifdef __hpux
-# define OSSYMS "UNIX=true","OS=HPUX"
+# define OSMINOR "OS=HPUX"
+# define OS_HPUX
 # endif
 # ifdef __OPENNT
 # define unix
-# define OSSYMS "UNIX=true","OS=INTERIX"
+# define OSMINOR "OS=INTERIX"
+# define OS_INTERIX
+# define NO_VFORK
 # endif
 # ifdef __sgi
-# define OSSYMS "UNIX=true","OS=IRIX"
+# define OSMINOR "OS=IRIX"
+# define OS_IRIX
+# define NO_VFORK
 # endif
 # ifdef __ISC
-# define OSSYMS "UNIX=true","OS=ISC"
+# define OSMINOR "OS=ISC"
+# define OS_ISC
+# define NO_VFORK
 # endif
 # ifdef linux
-# define OSSYMS "UNIX=true","OS=LINUX"
+# define OSMINOR "OS=LINUX"
+# define OS_LINUX
 # endif
 # ifdef __Lynx__
-# define OSSYMS "UNIX=true","OS=LYNX"
+# define OSMINOR "OS=LYNX"
+# define OS_LYNX
+# define NO_VFORK
 # define unix
 # endif
 # ifdef __MACHTEN__
-# define OSSYMS "UNIX=true","OS=MACHTEN"
+# define OSMINOR "OS=MACHTEN"
+# define OS_MACHTEN
+# endif
+# ifdef mpeix
+# define unix
+# define OSMINOR "OS=MPEIX"
+# define OS_MPEIX
+# define NO_VFORK
 # endif
 # ifdef __MVS__
 # define unix
-# define OSSYMS "UNIX=true","OS=MVS"
+# define OSMINOR "OS=MVS"
+# define OS_MVS
 # endif
 # ifdef _ATT4
-# define OSSYMS "UNIX=true","OS=NCR"
+# define OSMINOR "OS=NCR"
+# define OS_NCR
+# endif
+# ifdef __NetBSD__
+# define unix
+# define OSMINOR "OS=NETBSD"
+# define OS_NETBSD
+# define NO_VFORK
+# endif
+# ifdef __QNX__
+# ifdef __QNXNTO__
+# define OSMINOR "OS=QNXNTO"
+# define OS_QNXNTO
+# else
+# define unix
+# define OSMINOR "OS=QNX"
+# define OS_QNX
+# define NO_VFORK
+# define MAXLINE 996
+# endif
 # endif
 # ifdef NeXT
 # ifdef __APPLE__
-# define OSSYMS "UNIX=true","OS=RHAPSODY"
+# define OSMINOR "OS=RHAPSODY"
+# define OS_RHAPSODY
 # else
-# define OSSYMS "UNIX=true","OS=NEXT"
+# define OSMINOR "OS=NEXT"
+# define OS_NEXT
 # endif
 # endif
 # ifdef __APPLE__
 # define unix
-# define OSSYMS "UNIX=true","OS=MACOSX"
+# define OSMINOR "OS=MACOSX"
+# define OS_MACOSX
 # endif
 # ifdef __osf__
-# define OSSYMS "UNIX=true","OS=OSF"
+# define OSMINOR "OS=OSF"
+# define OS_OSF
 # endif
 # ifdef _SEQUENT_
-# define OSSYMS "UNIX=true","OS=PTX"
+# define OSMINOR "OS=PTX"
+# define OS_PTX
 # endif
 # ifdef M_XENIX
-# define OSSYMS "UNIX=true","OS=SCO"
+# define OSMINOR "OS=SCO"
+# define OS_SCO
+# define NO_VFORK
 # endif
 # ifdef sinix
 # define unix
-# define OSSYMS "UNIX=true","OS=SINIX"
+# define OSMINOR "OS=SINIX"
+# define OS_SINIX
 # endif
 # ifdef sun
 # if defined(__svr4__) || defined(__SVR4)
-# define OSSYMS "UNIX=true","OS=SOLARIS"
+# define OSMINOR "OS=SOLARIS"
+# define OS_SOLARIS
 # else
-# define OSSYMS "UNIX=true","OS=SUNOS"
+# define OSMINOR "OS=SUNOS"
+# define OS_SUNOS
 # endif
 # endif
 # ifdef ultrix
-# define OSSYMS "UNIX=true","OS=ULTRIX"
+# define OSMINOR "OS=ULTRIX"
+# define OS_ULTRIX
+# endif
+# ifdef _UNICOS
+# define OSMINOR "OS=UNICOS"
+# define OS_UNICOS
 # endif
 # if defined(__USLC__) && !defined(M_XENIX)
-# define OSSYMS "UNIX=true","OS=UNIXWARE"
+# define OSMINOR "OS=UNIXWARE"
+# define OS_UNIXWARE
 # endif
-# ifdef AMIGA
-# define OSSYMS "UNIX=true","OS=AMIGA"
-# endif
-# ifndef OSSYMS
-# define OSSYMS "UNIX=true","OS=UNKNOWN"
+# ifndef OSMINOR
+# define OSMINOR "OS=UNKNOWN"
 # endif
 
-# define MAXLINE 10240	/* longest 'together' actions' */
-# define SPLITPATH ':'
-# define EXITOK 0
-# define EXITBAD 1
+/* All the UNIX includes */
 
-# endif /* mac */
+# include <sys/types.h>
+# include <sys/stat.h>
 
-# endif /* QNX */
-
-# endif /* OS/2 */
-
-# endif /* NT */
-
-# endif /* UNIX */
-
-/* OSPLAT definitions - note the leading , */
-
-# define OSPLATSYM /**/
-
-# if defined( _M_PPC ) || defined( PPC ) || defined( ppc )
-# undef OSPLATSYM
-# define OSPLATSYM ,"OSPLAT=PPC"
+# ifndef OS_MPEIX
+# include <sys/file.h>
 # endif
 
-# if defined( _ALPHA_ ) || defined( __alpha__ )
-# undef OSPLATSYM
-# define OSPLATSYM ,"OSPLAT=AXP"
+# include <fcntl.h>
+# include <stdio.h>
+# include <ctype.h>
+# include <signal.h>
+# include <string.h>
+# include <time.h>
+
+# ifndef OS_QNX
+# include <memory.h>
 # endif
 
-# if defined( _i386_ ) || defined( __i386__ ) || defined( _M_IX86 )
-# if !defined( __FreeBSD__ ) && !defined( __OS2__)
-# undef OSPLATSYM
-# define OSPLATSYM ,"OSPLAT=X86"
+# ifndef OS_ULTRIX
+# include <stdlib.h>
+# endif
+
+# if !defined(OS_BSDI) && \
+     !defined(OS_FREEBSD) && \
+     !defined(OS_NEXT) && \
+     !defined(OS_MACHTEN) && \
+     !defined(OS_MACOSX) && \
+     !defined(OS_RHAPSODY) && \
+     !defined(OS_MVS)
+# include <malloc.h>
+# endif
+
+# endif 
+
+/* 
+ * OSPLAT definitions - suppressed when it's a one-of-a-kind
+ */
+
+# if defined( _M_PPC ) || \
+     defined( PPC ) || \
+     defined( ppc ) || \
+     defined( __powerpc__ ) || \
+     defined( __ppc__ )
+# define OSPLAT "OSPLAT=PPC"
+# endif
+
+# if defined( _ALPHA_ ) || \
+     defined( __alpha__ )
+# define OSPLAT "OSPLAT=AXP"
+# endif
+
+# if defined( _i386_ ) || \
+     defined( __i386__ ) || \
+     defined( _M_IX86 )
+# if !defined( OS_FREEBSD ) && \
+     !defined( OS_OS2 ) && \
+     !defined( OS_AS400 )
+# define OSPLAT "OSPLAT=X86"
 # endif
 # endif 
 
 # ifdef __sparc__
-# undef OSPLATSYM
-# define OSPLATSYM ,"OSPLAT=SPARC"
+# if !defined( OS_SUNOS ) && \
+     !defined( OS_SOLARIS )
+# define OSPLAT "OSPLAT=SPARC"
+# endif
+# endif
+
+# ifdef __mips__
+# if !defined( OS_SGI )
+# define OSPLAT "OSPLAT=MIPS"
+# endif
+# endif
+
+# ifdef __arm__
+# define OSPLAT "OSPLAT=ARM"
+# endif
+
+# if defined( __ia64__ ) || defined( __IA64__ )
+# define OSPLAT "OSPLAT=IA64"
+# endif
+
+# ifdef __s390__
+# define OSPLAT "OSPLAT=390"
+# endif
+
+# ifndef OSPLAT
+# define OSPLAT ""
+# endif
+
+/*
+ * Jam implementation misc.
+ */
+
+# ifndef MAXLINE
+# define MAXLINE 10240	/* longest 'together' actions' */
+# endif
+
+# ifndef EXITOK
+# define EXITOK 0
+# define EXITBAD 1
+# endif
+
+# ifndef SPLITPATH
+# define SPLITPATH ':'
 # endif
 
 /* You probably don't need to muck with these. */
@@ -297,8 +436,6 @@ int unlink( char *f ); 	/* In filevms.c */
 
 # define MAXJOBS 64	/* silently enforce -j limit */
 # define MAXARGC 32	/* words in $(JAMSHELL) */
-
-# define CMDBUF 10240	/* size of command blocks */
 
 /* Jam private definitions below. */
 

@@ -1,46 +1,186 @@
-
-Release notes for Jam/MR 2.2 
-(formerly Jam - make(1) redux)
-
-0.  Changes since 2.2
-
-	AmigaOS (with gcc) supported, courtesy of Alain Penders
-	(Patchlevel 2).
-
-	The HDRPATTERN variable now allows for leading blanks before
-	the #include, to keep up with ANSI (Patchlevel 3).
-
-	On NT, always create tmp .bat file for actions if JAMSHELL is set.
-	That way, if JAMSHELL is a .bat file itself, it can handle
-	single-command actions with more than 9 cmd line args.
-
-	Added: Lynx, Rhapsody. Upgraded to latest metrowerks on Beos.
-	Miscellaneous improvements to platform variant handling.
-
-	$JAMUNAME is set on UNIX.  (Patchlevel 4).
-
-	Mac OS X Server support from Jeff_Sickel@sickel.com (Jeff Sickel)
-	(Patchlevel 5).
+Release notes for Jam/MR 2.3
+(aka Jam - make(1) redux)
 
 1.  Release info:
 
-	Jam/MR 2.2
+	Jam/MR 2.3
+	November 16, 2000
+	VERSION 2.3
+	PATCHLEVEL 1
+
+2.  Compatibility
+
+	Jam 2.3 is upward compatible with Jam 2.2.
+
+	The Jam 2.3 language is a superset of the 2.2 language;
+	Jamfiles, Jambase, and other rulesets used in 2.2 can be used
+	with the 2.3 language support.
+
+3.  Changes since 2.2
+
+3.1.  Changes to Jam Language
+
+	Rules now can have values, which can expanded into a list with
+	the new "[ rule args ... ]" syntax.  A rule's value is the value
+	of its last statement, though only the following statements have
+	values: if (value of the leg chosen), switch (ditto), set (value
+	of the resulting variable), return (its arguments).  Note that
+	'return' doesn't actually return.  This support is EXPERIEMENTAL
+	and otherwise undocumented.  (2.3.1)
+
+	Because of the new way lists are processed, if a rule has no
+	targets a warning message is no longer issued.
+
+	NOCARE now applies to targets with sources and/or actions,
+	rather than just those without.
+
+3.2.  Jambase Changes
+
+	The HDRPATTERN variable now allows for leading blanks before
+	the #include, to keep up with ANSI.  By john@nanaon-sha.co.jp
+	(John Belmonte) (2.2.3).
+
+	HDRPATTERN has been adjusted to avoid mistaking cases like:
+
+		# include <time.h> /* could be <sys/time.h> */
+
+	MkDir now NOUPDATE's $(DOT), so that there are no dependencies
+	on the current directory's timestamp.  By john@nanaon-sha.co.jp
+	(John Belmonte).
+
+	The old mock functions like makeDirName, which assigned their
+	results to the variable named as their first argument, have
+	been replaced with real functions using the new [] synxtax.
+	E.g. "makeDirName foo : bar ola" is now "foo = [ fDirName bar ]"
+
+	Install now always does a cp/chmod/etc, rather than using
+	the system's install(1), which invariably seems broken.
+
+3.3.  Jam internal code changes
+
+	$JAMUNAME is set on UNIX.  (2.2.4).
+
+	Jam ANSI-fied (2.3.0).
+
+	jam.h now defines a bunch of symbols used by the other source
+	files, so as minimize compiler- and platform-specific ifdefs.
+
+	OSVER is no longer set by jam.h (it was only set for AIX).
+	Jam does not depend on this variable at all, except to set
+	$(OSFULL), which is used to determine jam's build directory.
+	If the user needs to distinguish between various revs of 
+	OSs, he must set OSVER in the environment.
+
+4.  Fixed bugs
+
+	Redefining a rule while it was executing could cause jam to
+	crash.  Reference counts are now used to prevent that, thanks
+	to Matt Armstrong.
+
+	Logic for computing chunk size when executing PIECEMEAL rules
+	has been reworked to be a little more accurate, without danger
+	of overflow, at the cost of being a little more compute intensive.
+	Instead of computing an estimate chunksize in the (now gone)
+	make1chunk(), make1cmds() now just goes full bore and tries to
+	use all args.  When that fails, it backs off by 10% of the source
+	args until the command fits.  It takes a little bit more compute
+	time compared to the old logic, but when you're executing actions
+	to build all of Shinola it's still pretty small in the scheme
+	of things.
+
+	The NT handle leak in execunix.c has been fixed, thanks to
+	Gurusamy Sarathy.  (2.2.1).
+
+5.  Porting
+
+	Platforms newly supported or updated:
+
+	    AmigaOS (with gcc), courtesy of Alain Penders (2.2.2).
+
+	    Beos
+
+	    CYGWIN 1.1.4, courtesy of John Belmonte <john@nanaon-sha.co.jp>.
+
+	    IBM AS400 via Visual Age on NT (primitive)
+
+	    IBM OS/390 Unix System Services
+
+	    Linux SuSE on OS390
+
+	    Linux Mips, ARM
+
+	    Lynx
+
+	    HPUX 11, IA64
+
+	    Mac OS X Server, courtesy of Jeff_Sickel@sickel.com (2.2.5).
+
+	    Mac Rhapsody
+
+	    MPE IX 6.0
+
+	    NetBSD
+
+	    QNX RTP (QNX 6.0)
+
+	    Siemens Sinix
+
+	    UNICOS
+
+	    VMS 6.2, 7.1
+
+	    Windows NT IA64
+
+5.1.  NT Porting Notes
+
+	Always create tmp .bat file for actions if JAMSHELL is set.
+	That way, if JAMSHELL is a .bat file itself, it can handle
+	single-command actions with more than 9 cmd line args.
+
+	COMSPEC is no longer examined: cmd.exe is always used
+	instead.  Only cmd.exe can execute the Jambase rules anyhow.
+
+	Jam can be built with Borland C++ 5.5.
+
+	OS2 fixes: InstallBin now works.  Filenames are now downshifted,
+	so mixed case works better there, too.  file_dirscan() can now scan 
+	the root ("c:\" or "\") directory, which it couldn't handle before.
+
+	var_defines now ignores OS=Windows_NT, because it conflicts
+	with Jam's setting of OS (to NT).
+
+5.2. Mac OS 8/9 Notes
+
+	The support for Mac is curious at best.  It runs under MPW.
+
+	It requires CodeWarrior Pro 5, but no longer requires GUSI.
+
+	Use Build.mpw to bootstrap the build.
+
+	The Mac specific definitions in the Jambase are not intended
+	to be of general purpose, but are sufficient to have Jam build
+	itself.
+
+===============================================================================
+===============================================================================
+
+
+Release Notes for Jam 2.2
+
+1.  Release info:
+
+	Jam 2.2
 	October 22, 1997
 	VERSION 2.2
 	PATCHLEVEL 1
 
-1.1 Bug fixes since 2.2 patchlevel 0
-
-	The NT handle leak in execunix.c has been fixed, thanks to
-	Gurusamy Sarathy.  (Patchlevel 1).
-
 2. Compatibility
 
-	Jam/MR 2.2 is a roll-up of 'Jam - make(1) redux' release 2.1+.
+	Jam 2.2 is a roll-up of 'Jam - make(1) redux' release 2.1+.
 	Most of the changes described below were available before this,
 	in the jam.2.1.plus.tar ball.
 
-	The Jam/MR 2.2 language is a superset of the 2.1 language;
+	The Jam 2.2 language is a superset of the 2.1 language;
 	Jamfiles, Jambase, and other rulesets used in 2.1 can be used
 	with the 2.2 language support.
 
@@ -50,12 +190,12 @@ Release notes for Jam/MR 2.2
 
 3. Changes Since 2.1
 
-	New product name: Jam/MR. (Executable program is still named 'jam'.)
+	New product name: Jam. (Executable program is still named 'jam'.)
 
 	Documentation rewritten; HTML versions supplied.
 
 
-3.1 Changes to Jam/MR Language (See Jamlang.html)
+3.1 Changes to Jam Language (See Jamlang.html)
 
 	Rules may now have more fields than just $(<) and $(>).
 
@@ -202,7 +342,7 @@ Release notes for Jam/MR 2.2
 	Concurrent process support is fully enabled for NT.
 	(Gurusamy Sarathy <gsar@engin.umich.edu>)
 	
-	Path handling: Jam/MR now knows that the directory component of "D:\"
+	Path handling: Jam now knows that the directory component of "D:\"
 	is "D:\", just as on unix it knows that the directory component of
 	"/" is "/".  It also now successfully gets the timestamp for "D:\"
 	or just plain "\".
@@ -220,6 +360,9 @@ Release notes for Jam/MR 2.2
 	call rather than separate ones for each line, so that actions can
 	be DCL scripts.
 
+===============================================================================
+===============================================================================
+
 
 Release notes for Jam 2.1.
 
@@ -331,7 +474,10 @@ Release notes for Jam 2.1.
 	The parsing debug output now uses indenting to indicate when
 	one rule invokes another.
 
+===============================================================================
+===============================================================================
 
+
 Release notes for Jam 2.0.
 
 1.  Release info:

@@ -6,20 +6,6 @@
 
 /*
  * command.c - maintain lists of commands
- *
- * Each target has a list of actions that are to be applied to it, but due
- * to modifications on the actions they do not map one-to-one to the commands
- * that are the be executed against the target.  The CMD datatype holds
- * a single command that is to be executed against a target, and they can
- * chain together to represent the full collection of commands used to
- * update a target.
- *
- * External routines:
- *	cmd_new() - make a new CMD and chain it
- *	cmd_free() - free a CMD
- *
- * Macros:
- *	cmd_next() - follow chain of CMDs	
  */
 
 # include "jam.h"
@@ -32,48 +18,36 @@
 # include "command.h"
 
 /*
- * cmd_new() - make a new CMD and chain it
+ * cmd_new() - return a new CMD or 0 if too many args
  */
 
 CMD *
-cmd_new( chain, rule, targets, sources, shell, chunk )
-CMD	*chain;
-RULE	*rule;
-LIST	*targets;
-LIST	*sources;
-LIST	*shell;
-int	chunk;
+cmd_new(
+	RULE	*rule,
+	LIST	*targets,
+	LIST	*sources,
+	LIST	*shell )
 {
-	int     len;
-
 	CMD *cmd = (CMD *)malloc( sizeof( CMD ) );
 
 	cmd->rule = rule;
 	cmd->shell = shell;
+	cmd->next = 0;
 
 	lol_init( &cmd->args );
 	lol_add( &cmd->args, targets );
 	lol_add( &cmd->args, sources );
 
-	len = var_string( rule->actions, cmd->buf, CMDBUF, &cmd->args );
-	
-	if( len < 0 )
+	/* Bail if the result won't fit in MAXLINE */
+	/* We don't free targets/sources/shell if bailing. */
+
+	if( var_string( rule->actions, cmd->buf, MAXLINE, &cmd->args ) < 0 )
 	{
-	    if ( chunk == 1 ) {
-		printf( "fatal error: %s command block too long (max %d)\n", 
-			rule->name, CMDBUF );
-		exit( EXITBAD );
-	    }
-	    free( cmd );
-	    return NULL;
+	    cmd_free( cmd );
+	    return 0;
 	}
 
-	if( !chain ) chain = cmd;
-	else chain->tail->next = cmd;
-	chain->tail = cmd;
-	cmd->next = 0;
-
-	return chain;
+	return cmd;
 }
 
 /*
@@ -81,8 +55,7 @@ int	chunk;
  */
 
 void
-cmd_free( cmd )
-CMD	*cmd;
+cmd_free( CMD *cmd )
 {
 	lol_free( &cmd->args );
 	list_free( cmd->shell );

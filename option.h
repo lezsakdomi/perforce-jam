@@ -19,5 +19,5 @@ typedef struct option
 
 # define N_OPTS 256
 
-int 	getoptions( /* int argc, char **argv, char *opts, option *optv */ );
-char 	*getoptval( /* option *optv, char opt, int subopt */ );
+int 	getoptions( int argc, char **argv, char *opts, option *optv );
+char *	getoptval( option *optv, char opt, int subopt );

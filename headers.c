@@ -1,5 +1,5 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993, 2000 Christopher Seiwald.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
@@ -30,9 +30,12 @@
  *    headers1() - using regexp, scan a file and build include LIST
  *
  * 04/13/94 (seiwald) - added shorthand L0 for null list pointer
+ * 09/10/00 (seiwald) - replaced call to compile_rule with evaluate_rule,
+ *		so that headers() doesn't have to mock up a parse structure
+ *		just to invoke a rule.
  */
 
-static LIST *headers1();
+static LIST *headers1( LIST *l, char *file, int rec, regexp *re[] );
 
 /*
  * headers() - scan a target for include files and call HDRRULE
@@ -41,13 +44,12 @@ static LIST *headers1();
 # define MAXINC 10
 
 void
-headers( t )
-TARGET *t;
+headers( TARGET *t )
 {
 	LIST	*hdrscan;
 	LIST	*hdrrule;
 	LIST	*headlist = 0;
-	PARSE	p[3];
+	LOL	lol;
 	regexp	*re[ MAXINC ];
 	int	rec = 0;
 
@@ -69,24 +71,16 @@ TARGET *t;
 	/* Doctor up call to HDRRULE rule */
 	/* Call headers1() to get LIST of included files. */
 
-	p[0].string = hdrrule->string;
-	p[0].left = &p[1];
-	p[1].llist = list_new( L0, t->name );
-	p[1].left = &p[2];
-	p[2].llist = headers1( headlist, t->boundname, rec, re );
-	p[2].left = 0;
+	lol_init( &lol );
+	lol_add( &lol, list_new( L0, t->name ) );
+	lol_add( &lol, headers1( headlist, t->boundname, rec, re ) );
 
-	if( p[2].llist )
-	{
-	    LOL lol0;
-	    lol_init( &lol0 );
-	    compile_rule( p, &lol0 );
-	}
+	if( lol_get( &lol, 1 ) )
+	    evaluate_rule( hdrrule->string, &lol );
 
 	/* Clean up */
 
-	list_free( p[1].llist );
-	list_free( p[2].llist );
+	lol_free( &lol );
 
 	while( rec )
 	    free( (char *)re[--rec] );
@@ -97,41 +91,40 @@ TARGET *t;
  */
 
 static LIST *
-headers1( l, file, rec, re )
-LIST	*l;
-char	*file;
-int	rec;
-regexp	*re[];
+headers1( 
+	LIST	*l,
+	char	*file,
+	int	rec,
+	regexp	*re[] )
 {
-    FILE	*f;
-    char	buf[ 1024 ];
-    int		i;
+	FILE	*f;
+	char	buf[ 1024 ];
+	int		i;
 
-    if( !( f = fopen( file, "r" ) ) )
-	return l;
+	if( !( f = fopen( file, "r" ) ) )
+	    return l;
 
-    while( fgets( buf, sizeof( buf ), f ) )
-    {
-	for( i = 0; i < rec; i++ )
-	    if( regexec( re[i], buf ) && re[i]->startp[1] )
+	while( fgets( buf, sizeof( buf ), f ) )
 	{
-	    re[i]->endp[1][0] = '\0';
+	    for( i = 0; i < rec; i++ )
+		if( regexec( re[i], buf ) && re[i]->startp[1] )
+	    {
+		re[i]->endp[1][0] = '\0';
 
-	    if( DEBUG_HEADER )
-		printf( "header found: %s\n", re[i]->startp[1] );
+		if( DEBUG_HEADER )
+		    printf( "header found: %s\n", re[i]->startp[1] );
 
-	    l = list_new( l, newstr( re[i]->startp[1] ) );
+		l = list_new( l, newstr( re[i]->startp[1] ) );
+	    }
 	}
-    }
 
-    fclose( f );
+	fclose( f );
 
-    return l;
+	return l;
 }
 
 void
-regerror( s )
-char *s;
+regerror( char *s )
 {
 	printf( "re error %s\n", s );
 }

@@ -29,11 +29,7 @@ struct keyword {
 	char *word;
 	int type;
 } keywords[] = {
-#ifdef FATFS
-# include "jamgramt.h"
-#else
 # include "jamgramtab.h"
-#endif
 	{ 0, 0 }
 } ;
 
@@ -51,7 +47,7 @@ static struct include *incp = 0; /* current file; head of chain */
 
 static int scanmode = SCAN_NORMAL;
 static int anyerrors = 0;
-static char *symdump();
+static char *symdump( YYSTYPE *s );
 
 # define BIGGEST_TOKEN 10240	/* no single token can be larger */
 
@@ -60,15 +56,13 @@ static char *symdump();
  */
 
 void
-yymode( n )
-int n;
+yymode( int n )
 {
 	scanmode = n;
 }
 
 void
-yyerror( s )
-char *s;
+yyerror( char *s )
 {
 	if( incp )
 	    printf( "%s: line %d: ", incp->fname, incp->line );
@@ -85,8 +79,7 @@ yyanyerrors()
 }
 
 void
-yyfparse( s )
-char *s;
+yyfparse( char *s )
 {
 	struct include *i = (struct include *)malloc( sizeof( *i ) );
 
@@ -355,8 +348,7 @@ eof:
 }
 
 static char *
-symdump( s )
-YYSTYPE *s;
+symdump( YYSTYPE *s )
 {
 	static char buf[ BIGGEST_TOKEN + 20 ];
 

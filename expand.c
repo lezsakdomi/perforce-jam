@@ -27,8 +27,14 @@
  * 04/13/94 (seiwald) - added shorthand L0 for null list pointer
  */
 
-static void	var_edit();
-static void	var_mods();
+typedef struct {
+	char	downshift;	/* :L -- downshift result */
+	char	upshift;	/* :U -- upshift result */
+	char	parent;		/* :P -- go to parent directory */
+} VAR_ACTS ;
+
+static void var_edit( char *in, char *mods, char *out );
+static void var_mods( char *mods, FILENAME *f, VAR_ACTS *acts );
 
 # define MAGIC_COLON	'\001'
 # define MAGIC_LEFT	'\002'
@@ -47,12 +53,12 @@ static void	var_mods();
  */
 
 LIST *
-var_expand( l, in, end, lol, cancopyin )
-LIST	*l;
-char	*in;
-char	*end;
-LOL	*lol;
-int	cancopyin;
+var_expand( 
+	LIST	*l,
+	char	*in,
+	char	*end,
+	LOL	*lol,
+	int	cancopyin )
 {
 	char out_buf[ MAXSYM ];
 	char *out = out_buf;
@@ -304,58 +310,52 @@ int	cancopyin;
 /*
  * var_edit() - copy input target name to output, performing : modifiers
  */
-
-typedef struct {
-	char	downshift;	/* :L -- downshift result */
-	char	upshift;	/* :U -- upshift result */
-	char	parent;		/* :P -- go to parent directory */
-} VAR_ACTS ;
 	
 static void
-var_edit( in, mods, out )
-char	*in;
-char	*mods;
-char	*out;
+var_edit( 
+	char	*in,
+	char	*mods,
+	char	*out )
 {
-	FILENAME old, new;
+	FILENAME oldf, newf;
 	VAR_ACTS acts;
 
-	/* Parse apart original filename, putting parts into "old" */
+	/* Parse apart original filename, putting parts into "oldf" */
 
-	file_parse( in, &old );
+	file_parse( in, &oldf );
 
-	/* Parse apart modifiers, putting them into "new" */
+	/* Parse apart modifiers, putting them into "newf" */
 
-	var_mods( mods, &new, &acts );
+	var_mods( mods, &newf, &acts );
 
-	/* Replace any old with new */
+	/* Replace any oldf with newf */
 
-	if( new.f_grist.ptr )
-	    old.f_grist = new.f_grist;
+	if( newf.f_grist.ptr )
+	    oldf.f_grist = newf.f_grist;
 
-	if( new.f_root.ptr )
-	    old.f_root = new.f_root;
+	if( newf.f_root.ptr )
+	    oldf.f_root = newf.f_root;
 
-	if( new.f_dir.ptr )
-	    old.f_dir = new.f_dir;
+	if( newf.f_dir.ptr )
+	    oldf.f_dir = newf.f_dir;
 
-	if( new.f_base.ptr )
-	    old.f_base = new.f_base;
+	if( newf.f_base.ptr )
+	    oldf.f_base = newf.f_base;
 
-	if( new.f_suffix.ptr )
-	    old.f_suffix = new.f_suffix;
+	if( newf.f_suffix.ptr )
+	    oldf.f_suffix = newf.f_suffix;
 
-	if( new.f_member.ptr )
-	    old.f_member = new.f_member;
+	if( newf.f_member.ptr )
+	    oldf.f_member = newf.f_member;
 
-	/* If requested, modify old to point to parent */
+	/* If requested, modify oldf to point to parent */
 
 	if( acts.parent )
-	    file_parent( &old );
+	    file_parent( &oldf );
 
 	/* Put filename back together */
 
-	file_build( &old, out, 0 );
+	file_build( &oldf, out, 0 );
 
 	/* Handle upshifting, downshifting now */
 
@@ -408,10 +408,10 @@ char	*out;
  */
 
 static void
-var_mods( mods, f, acts )
-char		*mods;
-FILENAME	*f;
-VAR_ACTS	*acts;
+var_mods(
+	char		*mods,
+	FILENAME	*f,
+	VAR_ACTS	*acts )
 {
 	char *flags = "GRDBSM";
 	int havezeroed = 0;
@@ -421,7 +421,7 @@ VAR_ACTS	*acts;
 	while( *mods )
 	{
 	    char *fl;
-	    struct filepart *fp;
+	    FILEPART *fp;
 
 	    /* First take care of :U or :L (upshift, downshift) */
 

@@ -21,12 +21,19 @@
  */
 
 typedef struct _filename FILENAME;
+typedef struct _filepart FILEPART;
+
+struct _filepart {
+	char	*ptr;
+	int	len;
+};
 
 struct _filename {
-	struct filepart {
-		char	*ptr;
-		int	len;
-	} part[6];
+	FILEPART	part[6];
+# ifdef OS_VMS
+	int		parent;
+# endif
+
 # define f_grist	part[0]
 # define f_root		part[1]
 # define f_dir		part[2]
@@ -34,17 +41,13 @@ struct _filename {
 # define f_suffix	part[4]
 # define f_member	part[5]
 
-# ifdef VMS
-	int		parent;
-# endif
-
 } ;
 
-void file_parse();
-void file_build();
-void file_parent();
+void file_build( FILENAME *f, char *file, int binding );
+void file_parse( char *file, FILENAME *f );
+void file_parent( FILENAME *f );
 
-void file_archscan();
-void file_dirscan();
+void file_dirscan( char *dir, void (*func)( char *f, int s, time_t t ) );
+void file_archscan( char *arch, void (*func)( char *f, int s, time_t t ) );
 
-int file_time();
+int file_time( char *filename, time_t *time );

@@ -1,6 +1,6 @@
 /*
  * /+\
- * +\	Copyright 1993, 1996 Christopher Seiwald.
+ * +\	Copyright 1993, 2000 Christopher Seiwald.
  * \+/
  *
  * This file is part of jam.
@@ -12,46 +12,10 @@
  * ALL WARRANTIES ARE HEREBY DISCLAIMED.
  */
 
-# include "jam.h"
-# include "option.h"
-# include "make.h"
-# ifdef FATFS
-# include "patchlev.h"
-# else
-# include "patchlevel.h"
-# endif
-
-/* These get various function declarations. */
-
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "compile.h"
-# include "rules.h"
-# include "newstr.h"
-# include "scan.h"
-# ifdef FATFS
-# include "timestam.h"
-# else
-# include "timestamp.h"
-# endif
-
-/* Macintosh is "special" */
-
-# ifdef macintosh
-# include <QuickDraw.h>
-# endif
-
-/* And UNIX for this */
-
-# ifdef unix
-# include <sys/utsname.h>
-# endif
-
 /*
  * jam.c - make redux
  *
- * See jam(1) and Jamfile(5) for usage information.
+ * See Jam.html and Jamlang.html for usage information.
  *
  * These comments document the code.
  *
@@ -122,12 +86,41 @@
  * 05/04/94 (seiwald) - async multiprocess (-j) support
  * 02/08/95 (seiwald) - -n implies -d2.
  * 02/22/95 (seiwald) - -v for version info.
+ * 09/11/00 (seiwald) - PATCHLEVEL folded into VERSION.
  */
+
+# include "jam.h"
+# include "option.h"
+# include "patchlevel.h"
+
+/* These get various function declarations. */
+
+# include "lists.h"
+# include "parse.h"
+# include "variable.h"
+# include "compile.h"
+# include "rules.h"
+# include "newstr.h"
+# include "scan.h"
+# include "timestamp.h"
+# include "make.h"
+
+/* Macintosh is "special" */
+
+# ifdef OS_MAC
+# include <QuickDraw.h>
+# endif
+
+/* And UNIX for this */
+
+# ifdef unix
+# include <sys/utsname.h>
+# endif
 
 struct globs globs = {
 	0,			/* noexec */
 	1,			/* jobs */
-# ifdef macintosh
+# ifdef OS_MAC
 	{ 0, 0 },		/* debug - suppress tracing output */
 # else
 	{ 0, 1 }, 		/* debug ... */
@@ -137,25 +130,28 @@ struct globs globs = {
 
 /* Symbols to be defined as true for use in Jambase */
 
-static char *othersyms[] = { OSSYMS OSPLATSYM, JAMVERSYM, 0 } ;
+static char *othersyms[] = { OSMAJOR, OSMINOR, OSPLAT, JAMVERSYM, 0 } ;
 
-# ifndef __WATCOM__
-# ifndef __OS2__
-# ifndef NT
-extern char **environ;
-# endif
-# endif
-# endif
+/* Known for sure: 
+ *	mac needs arg_enviro
+ *	OS2 needs extern environ
+ */
 
-# ifdef macintosh
+# ifdef OS_MAC
+# define use_environ arg_environ
 # ifdef MPW
 QDGlobals qd;
 # endif
-main( int argc, char **argv, char **environ )
-# else
-main( argc, argv )
-char	**argv;
 # endif
+
+# ifndef use_environ
+# define use_environ environ
+# if !defined( __WATCOM__ ) && !defined( OS_OS2 ) && !defined( OS_NT ) 
+extern char **environ;
+# endif
+# endif
+
+main( int argc, char **argv, char **arg_environ )
 {
 	int		n;
 	char		*s;
@@ -164,7 +160,7 @@ char	**argv;
 	int		anyhow = 0;
 	int		status;
 
-# ifdef macintosh
+# ifdef OS_MAC
 	InitGraf(&qd.thePort);
 # endif
 
@@ -194,8 +190,9 @@ char	**argv;
 	if( ( s = getoptval( optv, 'v', 0 ) ) )
 	{
 	    printf( "Jam/MR  " );
-	    printf( "Version %s.%s.  ", VERSION, PATCHLEVEL );
-	    printf( "Copyright 1993, 1999 Christopher Seiwald.\n" );
+	    printf( "Version %s.  ", VERSION );
+	    printf( "Copyright 1993, 2000 Christopher Seiwald.  " );
+	    printf( "%s.\n", OSMINOR );
 
 	    return EXITOK;
 	}
@@ -278,47 +275,15 @@ char	**argv;
 	}
 # endif /* unix */
 
+	/*
+	 * Jam defined variables OS, OSPLAT
+	 */
+
+	var_defines( othersyms );
+
 	/* load up environment variables */
 
-# ifdef MPW
-	/*
-	 * The third parameter of main() on the mac (at least when this
-	 * is compiled with MPW tools) does not have entries of the form
-	 * "name=value", but instead "name\0value".  Since var_defines()
-	 * expects the former, we need to munge them before passing.
-	 */
-	{
-	    char **munged, **src, **dest;
-	    int envsize;
-
-	    /* First determine the size of environ */
-	    for( src = environ, envsize = 1; *src; src++, envsize++ );
-	    munged = malloc( sizeof( char* ) * envsize );
-
-	    for( src = environ, dest = munged; *src; src++, dest++ )
-	    {
-	    	/*
-		 * Can't use strlen() to find the length of the environ
-		 * entries without finding the first \0, and adding the
-		 * lengths of the "name" and "value" parts (taking into
-		 * account the terminating \0's.
-		 */
-		char *first0;
-		int lenplusterminator;
-		for( first0 = *src; *first0; first0++ );
-
-		lenplusterminator = 2 + (first0-*src) + strlen(first0+1);
-		*dest = malloc( lenplusterminator );
-		memcpy( *dest, *src, lenplusterminator);
-		*(*dest + (first0-*src)) = '=';
-	    }
-	    *dest = NULL;
-	    var_defines( munged );
-	}
-# else
-	var_defines( environ );
-# endif
-	var_defines( othersyms );
+	var_defines( use_environ );
 
 	/* Load up variables set on command line. */
 
@@ -331,6 +296,7 @@ char	**argv;
 	}
 
 	/* Initialize builtins */
+
 
 	compile_builtins();
 

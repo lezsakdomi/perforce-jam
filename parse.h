@@ -1,5 +1,5 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993, 2000 Christopher Seiwald.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
@@ -15,17 +15,27 @@
 typedef struct _PARSE PARSE;
 
 struct _PARSE {
-	void	(*func)();
+	LIST	*(*func)( PARSE *p, LOL *args );
 	PARSE	*left;
 	PARSE	*right;
+	PARSE	*third;
 	char	*string;
 	char	*string1;
-	LIST	*llist;
-	LIST	*rlist;
 	int	num;
+	int	refs;
 } ;
 
-void 	parse_file();
-void 	parse_save();
-PARSE	*parse_make();
-void	parse_free();
+void 	parse_file( char *f );
+void 	parse_save( PARSE *p );
+
+PARSE * parse_make( 
+	LIST 	*(*func)( PARSE *p, LOL *args ),
+	PARSE	*left,
+	PARSE	*right,
+	PARSE	*third,
+	char	*string,
+	char	*string1,
+	int	num );
+
+void 	parse_refer( PARSE *p );
+void 	parse_free( PARSE *p );

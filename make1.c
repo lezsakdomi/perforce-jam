@@ -25,7 +25,6 @@
  * Internal support routines:
  *
  *	make1cmds() - turn ACTIONS into CMDs, grouping, splitting, etc
- *	make1chunk() - compute number of source that can fit on cmd line
  *	make1list() - turn a list of targets into a LIST, for $(<) and $(>)
  * 	make1settings() - for vars that get bound values, build up replacement lists
  * 	make1bind() - bind targets that weren't bound in dependency analysis
@@ -54,16 +53,15 @@
 # include "command.h"
 # include "execcmd.h"
 
-static void make1a();
-static void make1b();
-static void make1c();
-static void make1d();
+static void make1a( TARGET *t, TARGET *parent );
+static void make1b( TARGET *t );
+static void make1c( TARGET *t );
+static void make1d( void *closure, int status );
 
-static CMD *make1cmds();
-static int make1chunk();
-static LIST *make1list();
-static SETTINGS *make1settings();
-static void make1bind();
+static CMD *make1cmds( ACTIONS *a0 );
+static LIST *make1list( LIST *l, TARGETS *targets, int flags );
+static SETTINGS *make1settings( LIST *vars );
+static void make1bind( TARGET *t, int warn );
 
 /* Ugly static - it's too hard to carry it through the callbacks. */
 
@@ -81,8 +79,7 @@ static struct {
 static int intr = 0;
 
 int
-make1( t )
-TARGET *t;
+make1( TARGET *t )
 {
 	memset( (char *)counts, 0, sizeof( *counts ) );
 
@@ -114,9 +111,9 @@ TARGET *t;
  */
 
 static void
-make1a( t, parent )
-TARGET	*t;
-TARGET	*parent;
+make1a( 
+	TARGET	*t,
+	TARGET	*parent )
 {
 	TARGETS	*c;
 	int i;
@@ -168,8 +165,7 @@ TARGET	*parent;
  */
 
 static void
-make1b( t )
-TARGET	*t;
+make1b( TARGET *t )
 {
 	TARGETS	*c;
 	int 	i;
@@ -260,8 +256,7 @@ TARGET	*t;
  */
 
 static void
-make1c( t )
-TARGET	*t;
+make1c( TARGET *t )
 {
 	CMD	*cmd = (CMD *)t->cmds;
 
@@ -341,10 +336,11 @@ TARGET	*t;
  */
 
 static void
-make1d( t, status )
-TARGET	*t;
-int	status;
+make1d( 
+	void	*closure,
+	int	status )
 {
+	TARGET	*t = (TARGET *)closure;
 	CMD	*cmd = (CMD *)t->cmds;
 
 	/* Execcmd() has completed.  All we need to do is fiddle with the */
@@ -404,11 +400,9 @@ int	status;
  */
 
 static CMD *
-make1cmds( a0 )
-ACTIONS	*a0;
+make1cmds( ACTIONS *a0 )
 {
 	CMD *cmds = 0;
-	CMD *cmdlast = 0;
 	LIST *shell = var_get( "JAMSHELL" );	/* shell is per-target */
 
 	/* Step through actions */
@@ -419,9 +413,10 @@ ACTIONS	*a0;
 	{
 	    RULE    *rule = a0->action->rule;
 	    SETTINGS *boundvars;
-	    int	    chunk = 0;
 	    LIST    *nt, *ns;
 	    ACTIONS *a1;
+	    CMD	    *cmd;
+	    int	    start, chunk, length;
 
 	    /* Only do rules with commands to execute. */
 	    /* If this action has already been executed, use saved status */
@@ -460,57 +455,65 @@ ACTIONS	*a0;
 	    boundvars = make1settings( rule->bindlist );
 	    pushsettings( boundvars );
 
-	    /* If rule is to be cut into (at most) MAXLINE pieces, estimate */
-	    /* bytes per $(>) element and aim for using MAXLINE minus a */
-	    /* fudgefactor. */
+	    /*
+	     * Build command, starting with all source args. 
+	     *
+	     * If cmd_new returns 0, it's because the resulting command
+	     * length is > MAXLINE.  In this case, we'll slowly reduce
+	     * the number of source arguments presented until it does
+	     * fit.  This only applies to actions that allow PIECEMEAL 
+	     * commands.
+	     *
+	     * While reducing slowly takes a bit of compute time to get
+	     * things just right, it's worth it to get as close to MAXLINE
+	     * as possible, because launching the commands we're executing 
+	     * is likely to be much more compute intensive!
+	     *
+	     * Note we loop through at least once, for sourceless actions.
+	     */
 
-	    if( rule->flags & RULE_PIECEMEAL )
-		chunk = make1chunk( rule->actions, nt, ns );
+	    start = 0;
+	    chunk = length = list_length( ns );
 
-	    /* Either cut the actions into pieces, or do it whole. */
-
-	    if( chunk < 0 )
+	    do
 	    {
-		printf( "fatal error: %s command line too long (max %d)\n", 
-			rule->name, MAXLINE );
-		exit( EXITBAD );
-	    }
+		/* Build cmd: cmd_new consumes its lists. */
 
-	    if( chunk )
-	    {
-		int  start;
-		LIST *somes;
+		CMD *cmd = cmd_new( rule, 
+			list_copy( L0, nt ), 
+			list_sublist( ns, start, chunk ),
+			list_copy( L0, shell ) );
 
-		if( DEBUG_EXECCMD )
-		    printf( "%s: %d args per exec\n", rule->name, chunk );
-
-		for( start = 0;
-		     somes = list_sublist( ns, start, chunk );
-		     start += chunk )
+		if( cmd )
 		{
-		    cmdlast = cmds;
-		    cmds = cmd_new( cmds, rule, 
-				list_copy( L0, nt ), somes, 
-				list_copy( L0, shell ), chunk );
-		    if ( cmds == NULL ) {
-			cmds = cmdlast; /* remember where we were */
-			chunk = chunk >> 1; /* adjust chunk size */
-			if ( DEBUG_EXECCMD )
-			    printf( "warning: adjusted chunk size to %d\n",
-				    chunk );
-			if ( chunk == 0 )
-			    chunk = 1;
-			start -= chunk; /* back up */
-                    }
-		}
+		    /* It fit: chain it up. */
 
-		list_free( nt );
-		list_free( ns );
+		    if( !cmds ) cmds = cmd;
+		    else cmds->tail->next = cmd;
+		    cmds->tail = cmd;
+		    start += chunk;
+		}
+		else if( ( rule->flags & RULE_PIECEMEAL ) && chunk > 1 )
+		{
+		    /* Reduce chunk size slowly. */
+
+		    chunk = chunk * 9 / 10;
+		}
+		else
+		{
+		    /* Too long and not splittable. */
+
+		    printf( "%s actions too long (max %d)!\n", 
+			rule->name, MAXLINE );
+		    exit( EXITBAD );
+		}
 	    }
-	    else
-	    {
-		cmds = cmd_new( cmds, rule, nt, ns, list_copy( L0, shell ), 1 );
-	    }
+	    while( start < length );
+
+	    /* These were always copied when used. */
+
+	    list_free( nt );
+	    list_free( ns );
 
 	    /* Free the variables whose values were bound by */
 	    /* 'actions xxx bind vars' */
@@ -523,58 +526,14 @@ ACTIONS	*a0;
 }
 
 /*
- * make1chunk() - compute number of source that can fit on cmd line
- */
-
-static int
-make1chunk( cmd, targets, sources )
-char	*cmd;
-LIST	*targets;
-LIST	*sources;
-{
-	int onesize;
-	int twosize;
-	int chunk = 0;
-	char buf[ MAXLINE ];
-	LOL lol;
-
-	/* XXX -- egregious manipulation of lol */
-	/* a) we set items directly, b) we don't free it */
-
-	lol_init( &lol );
-	lol.count = 2;
-	lol.list[0] = targets;
-
-	lol.list[1] = list_sublist( sources, 0, 1 );
-	onesize = var_string( cmd, buf, MAXLINE, &lol );
-	list_free( lol.list[1] );
-
-	if( onesize < 0 )
-	    return -1;
-
-	lol.list[1] = list_sublist( sources, 0, 2 );
-	twosize = var_string( cmd, buf, MAXLINE, &lol );
-	list_free( lol.list[1] );
-
-	if( twosize < 0 )
-	    return -1;
-
-	if( twosize > onesize )
-	    chunk = 3 * ( MAXLINE - onesize ) / 5 / ( twosize - onesize ) + 1;
-
-	return chunk;
-}
-
-
-/*
  * make1list() - turn a list of targets into a LIST, for $(<) and $(>)
  */
 
 static LIST *
-make1list( l, targets, flags )
-LIST	*l;
-TARGETS	*targets;
-int	flags;
+make1list( 
+	LIST	*l,
+	TARGETS	*targets,
+	int	flags )
 {
     for( ; targets; targets = targets->next )
     {
@@ -621,8 +580,7 @@ int	flags;
  */
 
 static SETTINGS *
-make1settings( vars )
-LIST	*vars;
+make1settings( LIST *vars )
 {
 	SETTINGS *settings = 0;
 
@@ -662,9 +620,9 @@ LIST	*vars;
  */
 
 static void
-make1bind( t, warn )
-TARGET	*t;
-int	warn;
+make1bind( 
+	TARGET	*t,
+	int	warn )
 {
 	if( t->flags & T_FLAG_NOTFILE )
 	    return;

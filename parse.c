@@ -1,5 +1,5 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993, 2000 Christopher Seiwald.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
@@ -12,13 +12,17 @@
 
 /*
  * parse.c - make and destroy parse trees as driven by the parser
+ *
+ * 09/07/00 (seiwald) - ref count on PARSE to avoid freeing when used,
+ *		as per Matt Armstrong.
+ * 09/11/00 (seiwald) - structure reworked to reflect that (*func)()
+ *		returns a LIST *.
  */
 
 static PARSE *yypsave;
 
 void
-parse_file( f )
-char *f;
+parse_file( char *f )
 {
 	/* Suspend scan of current file */
 	/* and push this new file in the stream */
@@ -34,12 +38,20 @@ char *f;
 	    LOL l;
 	    PARSE *p;
 
+	    /* $(<) and $(>) empty in outer scope. */
+
 	    lol_init( &l );
+
+	    /* Filled by yyparse() calling parse_save() */
 
 	    yypsave = 0;
 
+	    /* If parse error or empty parse, outta here */
+
 	    if( yyparse() || !( p = yypsave ) )
 		break;
+
+	    /* Run the parse tree. */
 
 	    (*(p->func))( p, &l );
 
@@ -48,53 +60,57 @@ char *f;
 }
 
 void
-parse_save( p )
-PARSE *p;
+parse_save( PARSE *p )
 {
 	yypsave = p;
 }
 
 PARSE *
-parse_make( func, left, right, string, string1, llist, rlist, num )
-void	(*func)();
-PARSE	*left;
-PARSE	*right;
-char	*string;
-char	*string1;
-LIST	*llist;
-LIST	*rlist;
-int	num;
+parse_make( 
+	LIST	*(*func)( PARSE *p, LOL *args ),
+	PARSE	*left,
+	PARSE	*right,
+	PARSE	*third,
+	char	*string,
+	char	*string1,
+	int	num )
 {
 	PARSE	*p = (PARSE *)malloc( sizeof( PARSE ) );
 
 	p->func = func;
 	p->left = left;
 	p->right = right;
+	p->third = third;
 	p->string = string;
 	p->string1 = string1;
-	p->llist = llist;
-	p->rlist = rlist;
 	p->num = num;
+	p->refs = 1;
 
 	return p;
 }
 
 void
-parse_free( p )
-PARSE	*p;
+parse_refer( PARSE *p )
 {
+	++p->refs;
+}
+
+void
+parse_free( PARSE *p )
+{
+	if( --p->refs )
+	    return;
+
 	if( p->string )
 	    freestr( p->string );
 	if( p->string1 )
 	    freestr( p->string1 );
-	if( p->llist )
-	    list_free( p->llist );
-	if( p->rlist )
-	    list_free( p->rlist );
 	if( p->left )
 	    parse_free( p->left );
 	if( p->right )
 	    parse_free( p->right );
+	if( p->third )
+	    parse_free( p->third );
 	
 	free( (char *)p );
 }

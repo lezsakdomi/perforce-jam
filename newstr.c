@@ -38,8 +38,7 @@ static int strtotal = 0;
  */
 
 char *
-newstr( string )
-char *string;
+newstr( char *string )
 {
 	STRING str, *s = &str;
 
@@ -66,8 +65,7 @@ char *string;
  */
 
 char *
-copystr( s )
-char	*s;
+copystr( char *s )
 {
 	return s;
 }
@@ -77,8 +75,7 @@ char	*s;
  */
 
 void
-freestr( s )
-char *s;
+freestr( char *s )
 {
 }
 

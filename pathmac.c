@@ -7,7 +7,7 @@
 # include "jam.h"
 # include "filesys.h"
 
-# ifdef macintosh
+# ifdef OS_MAC
 
 # define DELIM ':'
 
@@ -43,9 +43,9 @@
  */
 
 void
-file_parse( file, f )
-char		*file;
-FILENAME	*f;
+file_parse( 
+	char	*file,
+	FILENAME *f )
 {
 	char *p, *q;
 	char *end;
@@ -71,12 +71,7 @@ FILENAME	*f;
 	    f->f_dir.len = p - file;
 	    
 	    /* Dir of : is : */
-#if 0
-	    if( !f->f_dir.len )
-	    	++f->f_dir.len;
-# else
 	    f->f_dir.len++;
-# endif
 	    file = p + 1;
 	}
 
@@ -140,9 +135,9 @@ char grid[5][5] = {
 } ;
 
 static int
-file_flags( ptr, len )
-char	*ptr;
-int	len;
+file_flags( 
+	char	*ptr,
+	int	len )
 {
 	if( !len )
 	    return DIR_EMPTY;
@@ -156,10 +151,10 @@ int	len;
 }
 
 void
-file_build( f, file, binding )
-FILENAME	*f;
-char		*file;
-int		binding;
+file_build(
+	FILENAME *f,
+	char	*file,
+	int	binding )
 {
 	char *ofile = file;
 	int dflag, rflag, act;
@@ -265,8 +260,7 @@ int		binding;
  */
 
 void
-file_parent( f )
-FILENAME *f;
+file_parent( FILENAME *f )
 {
 	/* just set everything else to nothing */
 
@@ -279,4 +273,4 @@ FILENAME *f;
 	f->f_member.len = 0;
 }
 
-# endif /* macintosh */
+# endif /* OS_MAC */

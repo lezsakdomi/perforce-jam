@@ -7,6 +7,31 @@
 /*
  * lists.h - the LIST structure and routines to manipulate them
  *
+ * The whole of jam relies on lists of strings as a datatype.  This
+ * module, in conjunction with newstr.c, handles these relatively
+ * efficiently.
+ *
+ * Structures defined:
+ *
+ *	LIST - list of strings
+ *	LOL - list of LISTs
+ *
+ * External routines:
+ *
+ *	list_append() - append a list onto another one, returning total
+ *	list_new() - tack a string onto the end of a list of strings
+ * 	list_copy() - copy a whole list of strings
+ *	list_sublist() - copy a subset of a list of strings
+ *	list_free() - free a list of strings
+ *	list_print() - print a list of strings to stdout
+ *	list_length() - return the number of items in the list
+ *
+ *	lol_init() - initialize a LOL (list of lists)
+ *	lol_add() - append a LIST onto an LOL
+ *	lol_free() - free the LOL and its LISTs
+ *	lol_get() - return one of the LISTs in the LOL
+ *	lol_print() - debug print LISTS separated by ":"
+ *
  * 04/13/94 (seiwald) - added shorthand L0 for null list pointer
  * 08/23/94 (seiwald) - new list_append()
  */
@@ -23,6 +48,10 @@ struct _list {
 	char	*string;	/* private copy */
 } ;
 
+/*
+ * LOL - list of LISTs
+ */
+
 typedef struct _lol LOL;
 
 # define LOL_MAX 9
@@ -32,19 +61,20 @@ struct _lol {
 	LIST	*list[ LOL_MAX ];
 } ;
 
-LIST	*list_append();
-LIST 	*list_copy();
-LIST 	*list_new();
-void	list_free();
-void	list_print();
-LIST	*list_sublist();
+LIST *	list_append( LIST *l, LIST *nl );
+LIST *	list_copy( LIST *l, LIST  *nl );
+void	list_free( LIST *head );
+LIST *	list_new( LIST *head, char *string );
+void	list_print( LIST *l );
+int	list_length( LIST *l );
+LIST *	list_sublist( LIST *l, int start, int count );
 
 # define list_next( l ) ((l)->next)
 
 # define L0 ((LIST *)0)
 
-void	lol_init();
-void	lol_add();
-void	lol_free();
-LIST	*lol_get();
-void	lol_print();
+void	lol_add( LOL *lol, LIST *l );
+void	lol_init( LOL *lol );
+void	lol_free( LOL *lol );
+LIST *	lol_get( LOL *lol, int i );
+void	lol_print( LOL *lol );

@@ -4,7 +4,10 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# ifdef VMS
+# include "jam.h"
+# include "filesys.h"
+
+# ifdef OS_VMS
 
 /*
  * filevms.c - scan directories and libaries on VMS
@@ -40,9 +43,6 @@
 #include <lib$routines.h>
 #include <starlet.h>
 
-# include "jam.h"
-# include "filesys.h"
-
 /* Supply missing prototypes for lbr$-routines*/
 int lbr$close();
 int lbr$get_index();
@@ -54,16 +54,19 @@ int lbr$set_module();
  * unlink() - remove a file
  */
 
-unlink( f )
-char *f;
+#if __CRTL_VER < 70000000
+
+unlink( char *f )
 {
 	remove( f );
 }
 
+#endif
+
 static void
-file_cvttime( curtime, unixtime )
-unsigned int *curtime;
-time_t *unixtime;
+file_cvttime( 
+    unsigned int *curtime,
+    time_t *unixtime )
 {
     static const size_t divisor = 10000000;
     static unsigned int bastim[2] = { 0x4BEB4000, 0x007C9567 }; /* 1/1/1970 */
@@ -78,7 +81,9 @@ time_t *unixtime;
 # define min( a,b ) ((a)<(b)?(a):(b))
 
 void
-file_dirscan( char *dir, void (*func)() )
+file_dirscan( 
+	char *dir,
+	void (*func)( char *file, int status, time_t t ) )
 {
 
     struct FAB xfab;
@@ -88,7 +93,7 @@ file_dirscan( char *dir, void (*func)() )
     char filename[256];
     char filename2[256];
     char dirname[256];
-    register status;
+    register int status;
     FILENAME f;
 
     memset( (char *)&f, '\0', sizeof( f ) );
@@ -153,7 +158,7 @@ file_dirscan( char *dir, void (*func)() )
 	sys$open( &xfab );
 	sys$close( &xfab );
 
-	file_cvttime( &xab.xab$q_rdt, &time );
+	file_cvttime( (unsigned int *)&xab.xab$q_rdt, &time );
 
 	filename[xnam.nam$b_rsl] = '\0';
 
@@ -203,9 +208,9 @@ file_dirscan( char *dir, void (*func)() )
 }    
 
 int
-file_time( filename, time )
-char	*filename;
-time_t	*time;
+file_time(
+	char	*filename,
+	time_t	*time )
 {
 	/* This should never be called, as all files are */
 	/* timestampped in file_dirscan() and file_archscan() */
@@ -213,13 +218,13 @@ time_t	*time;
 }
 
 static char *VMS_archive = 0;
-static void (*VMS_func)() = 0;
+static void (*VMS_func)( char *file, int status, time_t t ) = 0;
 static void *context;
 
 static int
-file_archmember( module, rfa )
-struct dsc$descriptor_s *module;
-unsigned long *rfa;
+file_archmember( 
+    struct dsc$descriptor_s *module,
+    unsigned long *rfa )
 {
     static struct dsc$descriptor_s bufdsc =
 		  {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, NULL};
@@ -228,7 +233,8 @@ unsigned long *rfa;
     char filename[128];
     char buf[ MAXJPATH ];
 
-    int library_date, status;
+    int status;
+    time_t library_date;
 
     register int i;
     register char *p;
@@ -257,9 +263,9 @@ unsigned long *rfa;
 }
 
 void
-file_archscan( archive, func )
-char *archive;
-void (*func)();
+file_archscan(
+	char *archive,
+	void (*func)( char *file, int status, time_t t ) )
 {
     static struct dsc$descriptor_s library =
 		  {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, NULL};
@@ -268,7 +274,7 @@ void (*func)();
     unsigned long typ = LBR$C_TYP_UNK;
     unsigned long index = 1;
 
-    register status;
+    register int status;
 
     VMS_archive = archive;
     VMS_func = func;

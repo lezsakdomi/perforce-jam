@@ -7,7 +7,7 @@
 # include "jam.h"
 # include "filesys.h"
 
-# ifdef __OS2__
+# ifdef OS_OS2
 
 # include <io.h>
 # include <dos.h>
@@ -29,6 +29,7 @@
  *
  * 07/10/95 (taylor)  Findfirst() returns the first file on NT.
  * 05/03/96 (seiwald) split apart into pathnt.c
+ * 09/22/00 (seiwald) handle \ and c:\ specially: don't add extra /
  */
 
 /*
@@ -36,9 +37,9 @@
  */
 
 void
-file_dirscan( dir, func )
-char	*dir;
-void	(*func)();
+file_dirscan( 
+	char *dir,
+	void (*func)( char *file, int status, time_t t ) )
 {
 	FILENAME f;
 	char filespec[ MAXJPATH ];
@@ -56,17 +57,23 @@ void	(*func)();
 
 	dir = *dir ? dir : ".";
 
- 	/* Special case \ : enter it */
+ 	/* Special case \ or d:\ : enter it */
  
+	strcpy( filespec, dir );
+
  	if( f.f_dir.len == 1 && f.f_dir.ptr[0] == '\\' )
  	    (*func)( dir, 0 /* not stat()'ed */, (time_t)0 );
+ 	else if( f.f_dir.len == 3 && f.f_dir.ptr[1] == ':' )
+ 	    (*func)( dir, 0 /* not stat()'ed */, (time_t)0 );
+	else
+	    strcat( filespec, "/" );
+
+	strcat( filespec, "*" );
 
 	/* Now enter contents of directory */
 
-	sprintf( filespec, "%s/*", dir );
-
 	if( DEBUG_BINDSCAN )
-	    printf( "scan directory %s\n", dir );
+	    printf( "scan directory %s\n", filespec );
 
 	/* Time info in dos find_t is not very useful.  It consists */
 	/* of a separate date and time, and putting them together is */
@@ -93,9 +100,9 @@ void	(*func)();
  */
 
 int
-file_time( filename, time )
-char	*filename;
-time_t	*time;
+file_time(
+	char	*filename,
+	time_t	*time )
 {
 	/* This is called on OS2, not NT.  */
 	/* NT fills in the time in the dirscan. */
@@ -111,9 +118,9 @@ time_t	*time;
 }
 
 void
-file_archscan( archive, func )
-char *archive;
-void (*func)();
+file_archscan(
+	char *archive,
+	void (*func)( char *file, int status, time_t t ) )
 {
 }
 

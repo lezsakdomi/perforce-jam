@@ -2,7 +2,7 @@
 
 CC = cc
 TARGET = -o jam0
-CFLAGS = 
+CFLAGS =
 
 # Special flavors - uncomment appropriate lines
 
@@ -13,7 +13,6 @@ CFLAGS =
 # Use _AIX41 if you're not on 3.2 anymore.
 #LINKLIBS = -lbsd
 #CFLAGS = -D_AIX
-#CFLAGS = -D_AIX41
 
 # NT (with Microsoft compiler)
 # Use FATFS if building on a DOS FAT file system
@@ -34,6 +33,17 @@ CFLAGS =
 #LINKLIBS = -lnet
 
 # Interix - gcc
+#CC = gcc
+
+# Cygwin - gcc & cygwin
+#CC = gcc
+#CFLAGS = -D__cygwin__
+
+# MPEIX
+#CC = gcc
+#CFLAGS = -I/usr/include -D_POSIX_SOURCE
+
+# QNX rtp (neutrino)
 #CC = gcc
 
 SOURCES = \

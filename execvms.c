@@ -4,11 +4,11 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# ifdef VMS
-
 # include "jam.h"
-# include "execcmd.h"
 # include "lists.h"
+# include "execcmd.h"
+
+# ifdef OS_VMS
 
 #include <stdio.h>
 #include <string.h>
@@ -47,11 +47,11 @@
 char tempnambuf[ L_tmpnam + 1 + 4 ] = {0};
 
 void
-execcmd( string, func, closure, shell )
-char *string;
-void (*func)();
-void *closure;
-LIST *shell;
+execcmd( 
+	char *string,
+	void (*func)( void *closure, int status ),
+	void *closure,
+	LIST *shell )
 {
 	char *s, *e, *p;
 	int rstat = EXEC_CMD_OK;

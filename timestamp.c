@@ -7,15 +7,13 @@
 # include "jam.h"
 # include "hash.h"
 # include "filesys.h"
-#ifdef FATFS
-# include "timestam.h"
-#else
 # include "timestamp.h"
-#endif
 # include "newstr.h"
 
 /*
  * timestamp.c - get the timestamp of a file or archive member
+ *
+ * 09/22/00 (seiwald) - downshift names on OS2, too
  */
 
 /*
@@ -42,7 +40,7 @@ struct _binding {
 } ;
 
 static struct hash *bindhash = 0;
-static void time_enter();
+static void time_enter( char *target, int found, time_t time );
 
 static char *time_progress[] =
 {
@@ -59,15 +57,15 @@ static char *time_progress[] =
  */
 
 void
-timestamp( target, time )
-char	*target;
-time_t	*time;
+timestamp( 
+	char	*target,
+	time_t	*time )
 {
 	FILENAME f1, f2;
 	BINDING	binding, *b = &binding;
 	char buf[ MAXJPATH ];
 
-#if defined( NT ) || defined( VMS )
+# ifdef DOWNSHIFT_PATHS
 	char path[ MAXJPATH ];
 	char *p = path;
 
@@ -75,7 +73,7 @@ time_t	*time;
 	while( *target++ );
 
 	target = path;
-#endif /* NT or VMS */
+# endif 
 
 	if( !bindhash )
 	    bindhash = hashinit( sizeof( BINDING ), "bindings" );
@@ -161,14 +159,14 @@ time_t	*time;
 }
 
 static void
-time_enter( target, found, time )
-char	*target;
-int	found;
-time_t	time;
+time_enter( 
+	char	*target,
+	int	found,
+	time_t	time )
 {
 	BINDING	binding, *b = &binding;
 
-#if defined( NT ) || defined( VMS )
+# ifdef DOWNSHIFT_PATHS
 	char path[ MAXJPATH ];
 	char *p = path;
 
@@ -176,7 +174,7 @@ time_t	time;
 	while( *target++ );
 
 	target = path;
-#endif /* NT or VMS */
+# endif
 
 	b->name = target;
 	b->flags = 0;

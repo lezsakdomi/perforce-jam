@@ -10,7 +10,12 @@
  * 05/04/94 (seiwald) - async multiprocess interface
  */
 
-void execcmd();
+void execcmd(
+	char *string,
+	void (*func)( void *closure, int status ),
+	void *closure,
+	LIST *shell );
+
 int execwait();
 
 # define EXEC_CMD_OK	0

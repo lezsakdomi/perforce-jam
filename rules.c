@@ -43,8 +43,7 @@ static struct hash *targethash = 0;
  */
 
 RULE *
-bindrule( rulename ) 
-char 	*rulename;
+bindrule( char *rulename )
 {
 	RULE rule, *r = &rule;
 
@@ -70,8 +69,7 @@ char 	*rulename;
  */
 
 TARGET *
-bindtarget( targetname )
-char	*targetname;
+bindtarget( char *targetname )
 {
 	TARGET target, *t = &target;
 
@@ -95,8 +93,7 @@ char	*targetname;
  */
 
 void
-touchtarget( t )
-char *t;
+touchtarget( char *t )
 {
 	bindtarget( t )->flags |= T_FLAG_TOUCHED;
 }
@@ -110,9 +107,9 @@ char *t;
  */
 
 TARGETS *
-targetlist( chain, targets )
-TARGETS	*chain;
-LIST 	*targets;
+targetlist( 
+	TARGETS	*chain,
+	LIST 	*targets )
 {
 	for( ; targets; targets = list_next( targets ) )
 	    chain = targetentry( chain, bindtarget( targets->string ) );
@@ -129,9 +126,9 @@ LIST 	*targets;
  */
 
 TARGETS *
-targetentry( chain, target )
-TARGETS	*chain;
-TARGET	*target;
+targetentry( 
+	TARGETS	*chain,
+	TARGET	*target )
 {
 	TARGETS *c;
 
@@ -151,9 +148,9 @@ TARGET	*target;
  */
 
 ACTIONS *
-actionlist( chain, action )
-ACTIONS	*chain;
-ACTION	*action;
+actionlist(
+	ACTIONS	*chain,
+	ACTION	*action )
 {
 	ACTIONS *actions = (ACTIONS *)malloc( sizeof( ACTIONS ) );
 
@@ -177,11 +174,11 @@ ACTION	*action;
  */
 
 SETTINGS *
-addsettings( head, append, symbol, value )
-SETTINGS *head;
-int	append;
-char	*symbol;
-LIST	*value;
+addsettings(
+	SETTINGS *head,
+	int	append,
+	char	*symbol,
+	LIST	*value )
 {
 	SETTINGS *v;
 	
@@ -223,8 +220,7 @@ LIST	*value;
  */
 
 void
-pushsettings( v )
-SETTINGS *v;
+pushsettings( SETTINGS *v )
 {
 	for( ; v; v = v->next )
 	    v->value = var_swap( v->symbol, v->value );
@@ -235,8 +231,7 @@ SETTINGS *v;
  */
 
 void
-popsettings( v )
-SETTINGS *v;
+popsettings( SETTINGS *v )
 {
 	pushsettings( v );	/* just swap again */
 }
@@ -246,8 +241,7 @@ SETTINGS *v;
  */
 
 void
-freesettings( v )
-SETTINGS *v;
+freesettings( SETTINGS *v )
 {
 	while( v )
 	{

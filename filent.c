@@ -4,17 +4,19 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# ifdef NT
+# include "jam.h"
+# include "filesys.h"
+
+# ifdef OS_NT
 
 # ifdef __BORLANDC__
+# if __BORLANDC__ < 0x550
 # include <dir.h>
 # include <dos.h>
+# endif
 # undef FILENAME	/* cpp namespace collision */
 # define _finddata_t ffblk
 # endif
-
-# include "jam.h"
-# include "filesys.h"
 
 # include <io.h>
 # include <sys/stat.h>
@@ -43,9 +45,9 @@
  */
 
 void
-file_dirscan( dir, func )
-char	*dir;
-void	(*func)();
+file_dirscan( 
+	char *dir,
+	void (*func)( char *file, int status, time_t t ) )
 {
 	FILENAME f;
 	char filespec[ MAXJPATH ];
@@ -77,7 +79,7 @@ void	(*func)();
 	if( DEBUG_BINDSCAN )
 	    printf( "scan directory %s\n", dir );
 
-# ifdef __BORLANDC__
+# if defined(__BORLANDC__) && __BORLANDC__ < 0x550
 	if ( ret = findfirst( filespec, finfo, FA_NORMAL | FA_DIREC ) )
 	    return;
 
@@ -123,9 +125,9 @@ void	(*func)();
  */
 
 int
-file_time( filename, time )
-char	*filename;
-time_t	*time;
+file_time(
+	char	*filename,
+	time_t	*time )
 {
 	/* On NT this is called only for C:/ */
 
@@ -164,9 +166,9 @@ struct ar_hdr {
 # define SARHDR sizeof( struct ar_hdr )
 
 void
-file_archscan( archive, func )
-char *archive;
-void (*func)();
+file_archscan(
+	char *archive,
+	void (*func)( char *file, int status, time_t t ) )
 {
 	struct ar_hdr ar_hdr;
 	char *string_table = 0;

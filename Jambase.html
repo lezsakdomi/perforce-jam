@@ -30,8 +30,6 @@ Jambase Reference
 	<a href="Jamfile.html">Using Jamfiles and Jambase</A>
 <LI>
 	<a href="Jam.html">The Jam/MR Executable Program</A>
-<LI>
-       <a href="Jamlang.html">The Jam/MR Language</A>
 </UL>
 <P>
 Jam/MR documentation and source are available from the
@@ -311,7 +309,7 @@ Jambase Pseudotargets
 </H3>
 </A>
 <P>
-There are two kinds of Jam/MR targets: file targets and pseudotargets.
+There are two kinds of Jam targets: file targets and pseudotargets.
 File targets are objects that can be found in the filesystem.
 Pseudotargets are symbolic, and usually represent other targets.
 Most Jambase rules that define file targets also define pseudotargets
@@ -440,10 +438,44 @@ Jambase Variables
 		values on its targets.
 </BLOCKQUOTE>
 
+       CHMOD
+
+<BLOCKQUOTE>
+		Program (usually chmod(1)) used to set file
+		permissions for Chmod rule.
+</BLOCKQUOTE>
+
        CP
 
 <BLOCKQUOTE>
               The file copy program, used by File and Install* rules.
+</BLOCKQUOTE>
+
+       CRELIB
+
+<BLOCKQUOTE>
+	      If set, causes the Library rule to invoke the CreLib
+	      rule on the target library before attempting to archive
+	      any members, so that the library can be created if
+	      needed.
+</BLOCKQUOTE>
+
+       CW
+
+<BLOCKQUOTE>
+	      On Macintosh, the root of the Code Warrior Pro 5 directory.
+</BLOCKQUOTE>
+
+       DOT
+
+<BLOCKQUOTE>
+	      The operating system-specific name for the current directory.
+</BLOCKQUOTE>
+
+       DOTDOT
+
+<BLOCKQUOTE>
+	      The operating system-specific name for the parent directory.
 </BLOCKQUOTE>
 
        EXEMODE
@@ -479,6 +511,13 @@ Jambase Variables
               The  group  owner  for Install* rule targets.
 </BLOCKQUOTE>
 
+       HDRGRIST
+
+<BLOCKQUOTE>
+	      If set, used by the HdrRule to distinguish header files
+	      with the same name in diffrent directories.
+</BLOCKQUOTE>
+
        HDRPATTERN
 
 <BLOCKQUOTE>
@@ -500,14 +539,6 @@ Jambase Variables
 	      invoked on included files found in the matching $(HDRSCAN) lines.
 </BLOCKQUOTE>
 
-       HDRSCAN
-
-<BLOCKQUOTE>
-		Regular expression pattern to use for header file
-		scanning. The Object rule sets this to $(HDRPATTERN).
-              This is a jam-special variable; see HDRRULE.
-</BLOCKQUOTE>
-
        HDRS
 
 <BLOCKQUOTE>
@@ -521,12 +552,19 @@ Jambase Variables
 	      (See STDHDRS.)
 </BLOCKQUOTE>
 
-       INSTALL
+       HDRSCAN
 
 <BLOCKQUOTE>
-              The file copying program for the Install* rules.   If
-              not set, $(CP) is used. On Unix, the $(INSTALL) default
-	      is "install".
+		Regular expression pattern to use for header file
+		scanning. The Object rule sets this to $(HDRPATTERN).
+              This is a jam-special variable; see HDRRULE.
+</BLOCKQUOTE>
+
+       HDRSEARCH
+
+<BLOCKQUOTE>
+		Used by the HdrRule to fix the list of directories where
+		header files can be found for a given source file.
 </BLOCKQUOTE>
 
        JAMFILE
@@ -541,6 +579,13 @@ Jambase Variables
 <BLOCKQUOTE>
 		Default is "Jamrules"; the name of a rule definition
 		file to be read in at the first SubDir rule invocation.
+</BLOCKQUOTE>
+
+       KEEPOBJS
+
+<BLOCKQUOTE>
+	      If set, tells the LibraryFromObjects rule not to delete
+	      object files once they are archived.  
 </BLOCKQUOTE>
 
        LEX
@@ -575,6 +620,12 @@ Jambase Variables
               List of external libraries to link with.  The target  image
               does not depend on these libraries.
 </BLOCKQUOTE>
+       
+       LN
+
+<BLOCKQUOTE>
+              The hard link command for HardLink rule.
+</BLOCKQUOTE>
 
 	LOCATE_SOURCE
 <BLOCKQUOTE>
@@ -596,12 +647,6 @@ Jambase Variables
 		(See ALL_LOCATE_TARGET.)
 </BLOCKQUOTE>
 
-       
-       LN
-
-<BLOCKQUOTE>
-              The hard link command for HardLink rule.
-</BLOCKQUOTE>
 
        MANDIR
 
@@ -646,11 +691,43 @@ Jambase Variables
               The file rename command and options.
 </BLOCKQUOTE>
 
+       NEEDLIBS
+
+<BLOCKQUOTE>
+	      The list of libraries used when linking an executable.
+	      Used by the Link rule.
+</BLOCKQUOTE>
+
+       NOARSCAN
+
+<BLOCKQUOTE>
+	      If set, indicates that library members' timestamps can't
+	      be found, and prevents the individual objects from being
+	      deleted, so that their timestamps can be used instead.
+</BLOCKQUOTE>
+
+       NOARUPDATE
+
+<BLOCKQUOTE>
+	      If set, indicates that libraries can't be updated, but only
+	      created whole.
+</BLOCKQUOTE>
+
        OPTIM
 
 <BLOCKQUOTE>
               The C compiler flag for optimization, used by Cc and C++
 	      rules.
+</BLOCKQUOTE>
+
+       OSFULL
+
+<BLOCKQUOTE>
+              The concatenation of $(OS)$(OSVER)$(OSPLAT), used when jam
+	      builds itself to determine the target binary directory.
+	      $(OS) and $(OSPLAT) are determined by jam at its compile
+	      time (in jam.h).  $(OSVER) can optionally be set by the user.
+
 </BLOCKQUOTE>
 
        OWNER
@@ -724,6 +801,20 @@ Jambase Variables
 	      compiler commands as -I paths.
 </BLOCKQUOTE>
 
+       SUBDIR
+
+<BLOCKQUOTE>
+	      The path from the current directory to the directory
+	      last named by the SubDir rule.
+</BLOCKQUOTE>
+
+       TOP
+
+<BLOCKQUOTE>
+	      The path from the current directory to the directory
+	      that has the Jamrules file.  Used by the SubDir rule.
+</BLOCKQUOTE>
+
        SUFEXE
 
 <BLOCKQUOTE>
@@ -760,16 +851,31 @@ Jambase Variables
        YACC
 
 <BLOCKQUOTE>
-              The yacc(1) command and flags.
+              The yacc(1) command.
 </BLOCKQUOTE>
+
+       YACCFILES
+
+<BLOCKQUOTE>
+              The base filename generated by yacc(1).
+</BLOCKQUOTE>
+
+       YACCFLAGS
+
+<BLOCKQUOTE>
+              The yacc(1) command flags.
+</BLOCKQUOTE>
+
 <P>
 <HR>
 <A HREF="#TOP">Back to top.</A>
 <P>
-	Copyright 1997, 1999 Perforce Software, Inc.
+	Copyright 1997, 2000 Perforce Software, Inc.
 	<BR>
 	Comments to <A HREF="mailto:info@perforce.com">info@perforce.com</A>
 	<BR>
-	Last updated: Jan 27, 1999
+	Last updated: Dec 31, 2000
+	<BR>
+	$Id$
 </BODY>
 </HTML>

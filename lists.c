@@ -11,19 +11,6 @@
 /*
  * lists.c - maintain lists of strings
  *
- * The whole of jam relies on lists of strings as a datatype.  This
- * module, in conjunction with newstr.c, handles these relatively
- * efficiently.
- *
- * External routines:
- *
- *	list_append() - append a list onto another one, returning total
- *	list_new() - tack a string onto the end of a list of strings
- * 	list_copy() - copy a whole list of strings
- *	list_sublist() - copy a subset of a list of strings
- *	list_free() - free a list of strings
- *	list_print() - print a list of strings to stdout
- *
  * This implementation essentially uses a singly linked list, but
  * guarantees that the head element of every list has a valid pointer
  * to the tail of the list, so the new elements can efficiently and 
@@ -35,6 +22,7 @@
  * chain: it lazily lets list_new() do so.
  *
  * 08/23/94 (seiwald) - new list_append()
+ * 09/07/00 (seiwald) - documented lol_*() functions
  */
 
 static LIST *freelist = 0;	/* junkpile for list_free() */
@@ -44,9 +32,9 @@ static LIST *freelist = 0;	/* junkpile for list_free() */
  */
 
 LIST *
-list_append( l, nl )
-LIST	*l;
-LIST	*nl;
+list_append( 
+	LIST	*l,
+	LIST	*nl )
 {
 	if( !nl )
 	{
@@ -71,9 +59,9 @@ LIST	*nl;
  */
 
 LIST *
-list_new( head, string )
-LIST	*head;
-char	*string;
+list_new( 
+	LIST	*head,
+	char	*string )
 {
 	LIST *l;
 
@@ -114,9 +102,9 @@ char	*string;
  */
 
 LIST *
-list_copy( l, nl )
-LIST	*l;
-LIST 	*nl;
+list_copy( 
+	LIST	*l,
+	LIST 	*nl )
 {
 	for( ; nl; nl = list_next( nl ) )
 	    l = list_new( l, copystr( nl->string ) );
@@ -129,8 +117,10 @@ LIST 	*nl;
  */
 
 LIST *
-list_sublist( l, start, count )
-LIST	*l;
+list_sublist( 
+	LIST	*l,
+	int	start,
+	int	count )
 {
 	LIST	*nl = 0;
 
@@ -148,8 +138,7 @@ LIST	*l;
  */
 
 void
-list_free( head )
-LIST	*head;
+list_free( LIST	*head )
 {
 	/* Just tack onto freelist. */
 
@@ -165,32 +154,56 @@ LIST	*head;
  */
 
 void
-list_print( l )
-LIST	*l;
+list_print( LIST *l )
 {
 	for( ; l; l = list_next( l ) )
 	    printf( "%s ", l->string );
 }
 
+/*
+ * list_length() - return the number of items in the list
+ */
+
+int
+list_length( LIST *l )
+{
+	int n = 0;
+
+	for( ; l; l = list_next( l ), ++n )
+	    ;
+
+	return n;
+}
+
+/*
+ * lol_init() - initialize a LOL (list of lists)
+ */
+
 void
-lol_init( lol )
-LOL	*lol;
+lol_init( LOL *lol )
 {
 	lol->count = 0;
 }
 
+/*
+ * lol_add() - append a LIST onto an LOL
+ */
+
 void
-lol_add( lol, l )
-LOL	*lol;
-LIST	*l;
+lol_add( 
+	LOL	*lol,
+	LIST	*l )
 {
 	if( lol->count < LOL_MAX )
 	    lol->list[ lol->count++ ] = l;
 }
 
+/*
+ * lol_free() - free the LOL and its LISTs
+ */
+
 void
-lol_free( lol )
-LOL	*lol;
+lol_free( LOL *lol )
 {
 	int i;
 
@@ -200,17 +213,24 @@ LOL	*lol;
 	lol->count = 0;
 }
 
+/*
+ * lol_get() - return one of the LISTs in the LOL
+ */
+
 LIST *
-lol_get( lol, i )
-LOL	*lol;
-int	i;
+lol_get( 
+	LOL	*lol,
+	int	i )
 {
 	return i < lol->count ? lol->list[i] : 0;
 }
 
+/*
+ * lol_print() - debug print LISTS separated by ":"
+ */
+
 void
-lol_print( lol )
-LOL	*lol;
+lol_print( LOL *lol )
 {
 	int i;
 

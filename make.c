@@ -33,6 +33,7 @@
  * 02/02/95 (seiwald) - propagate leaf source time for new LEAVES rule.
  * 02/14/95 (seiwald) - NOUPDATE rule means don't update existing target.
  * 08/22/95 (seiwald) - NOUPDATE targets immune to anyhow (-a) flag.
+ * 09/06/00 (seiwald) - NOCARE affects targets with sources/actions.
  */
 
 # include "jam.h"
@@ -48,8 +49,6 @@
 # include "headers.h"
 # include "command.h"
 
-static void make0();
-
 # ifndef max
 # define max( a,b ) ((a)>(b)?(a):(b))
 # endif
@@ -62,6 +61,9 @@ typedef struct {
 	int	targets;
 	int	made;
 } COUNTS ;
+
+static void make0( TARGET *t, int pbinding, time_t ptime, 
+		int depth, COUNTS *counts, int anyhow );
 
 static char *target_fate[] = 
 {
@@ -93,10 +95,10 @@ static char *target_bind[] =
  */
 
 int
-make( n_targets, targets, anyhow )
-int	n_targets;
-char	**targets;
-int	anyhow;
+make( 
+	int	n_targets,
+	char	**targets,
+	int	anyhow )
 {
 	int i;
 	COUNTS counts[1];
@@ -141,13 +143,13 @@ int	anyhow;
  */
 
 static void
-make0( t, pbinding, ptime, depth, counts, anyhow )
-TARGET	*t;
-int	pbinding;	/* parent target's binding */
-time_t	ptime;		/* parent target's timestamp */
-int	depth;		/* for display purposes */
-COUNTS	*counts;	/* for reporting */
-int	anyhow;		/* forcibly touch all (real) targets */
+make0( 
+	TARGET	*t,
+	int	pbinding,	/* parent target's binding */
+	time_t	ptime,		/* parent target's timestamp */
+	int	depth,		/* for display purposes */
+	COUNTS	*counts,	/* for reporting */
+	int	anyhow )	/* forcibly touch all (real) targets */
 {
 	TARGETS	*c;
 	int	fate, hfate;
@@ -344,20 +346,18 @@ int	anyhow;		/* forcibly touch all (real) targets */
 	}
 
 	/* Step 3c: handle missing files */
-	/* If it's missing and there are no actions to create it, boom. */
 	/* If we can't make a target we don't care about, 'sokay */
+	/* If it's missing and there are no actions to create it, boom. */
 	/* We could insist that there are updating actions for all missing */
 	/* files, but if they have dependents we just pretend it's NOTFILE. */
 
-	if( fate == T_FATE_MISSING && 
-		!t->actions && 
-		!t->deps[ T_DEPS_DEPENDS ] )
+	if( fate == T_FATE_MISSING )
 	{
 	    if( t->flags & T_FLAG_NOCARE )
 	    {
 		fate = T_FATE_STABLE;
 	    }
-	    else
+	    else if( !t->actions && !t->deps[ T_DEPS_DEPENDS ] )
 	    {
 		printf( "don't know how to make %s\n", t->name );
 

@@ -1,10 +1,10 @@
-Jam/MR (formerly "jam - make(1) redux") 
+Jam/MR (aka "jam - make(1) redux") 
 
     /+\
-    +\	Copyright 1993, 1997 Christopher Seiwald.
+    +\	Copyright 1993, 2000 Christopher Seiwald.
     \+/
 
-    This is Release 2.2 of Jam/MR, a make-like program.
+    This is Release 2.3 of Jam/MR, a make-like program.
 
     License is hereby granted to use this software and distribute it
     freely, as long as this copyright notice is retained and modifications 
@@ -14,32 +14,32 @@ Jam/MR (formerly "jam - make(1) redux")
 
 FEATURES
 
-   ->	Jam/MR is a make(1) replacement that makes building simple things
+   ->	Jam is a make(1) replacement that makes building simple things
 	simple and building complicated things manageable.
 
-   ->	Jam/MR's language is expressive, making Jamfiles (c.f. Makefiles) 
+   ->	Jam's language is expressive, making Jamfiles (c.f. Makefiles) 
 	compact.  Here's a sample:
 
 	    Main smail : main.c map.c resolve.c deliver.c
 			 misc.c parser.y alias.c pw.c headers.c
 			 scanner.l getpath.c str.c ;
 
-	This builds "smail" from a dozen source files.  Jam/MR handles 
+	This builds "smail" from a dozen source files.  Jam handles 
 	header file dependencies automatically and on-the-fly.
 
-   ->	Jam/MR is very portable: it runs on UNIX, VMS, and NT.  Most
-	Jamfiles themselves are portable, like the sample above.
+   ->	Jam is very portable: it runs on UNIX, VMS, Mac, and NT.  
+	Most Jamfiles themselves are portable, like the sample above.
 
-   ->   Jam/MR is unintrusive: it is small, it has negligible CPU 
+   ->   Jam is unintrusive: it is small, it has negligible CPU 
 	overhead, and it doesn't create any of its own funny files
 	(c.f. Odin, nmake, SunOS make).
 
-   ->	Jam/MR can build large projects spread across many directories
+   ->	Jam can build large projects spread across many directories
 	in one pass, without recursing, tracking the relationships
-	among all files. Jam/MR can do this with multiple, concurrent 
+	among all files. Jam can do this with multiple, concurrent 
 	processes.
 
-   ->   Jam/MR isn't under the blinkin GNU copyright, so you can 
+   ->   Jam isn't under the blinkin GNU copyright, so you can 
 	incorporate it into commercial products.
 
 
@@ -51,9 +51,9 @@ INFORMATION GUIDE
 
     Jamfile.html	Easy reading on creating a Jamfile and using jam.
 
-    Jamlang.html	The JamMR language description.
+    Jamlang.html	The Jam language description.
 
-    RELNOTES		Release 2.2 release notes.
+    RELNOTES		Release 2.3 release notes.
 
     Porting		Notes on porting jam to wildcat platforms.
 
@@ -125,8 +125,7 @@ INSTALLING
 	    -------------------------
 	    Macintosh		MAC		
 
-	You'll need to edit Build.mpw to set CWGUSI and CWMAC.  Jam
-	requires GUSI and Mac specific stuff to build (sorry).
+	You'll need to edit Build.mpw to set CW.  
 
     VMS
 
@@ -143,6 +142,7 @@ November, 1993 - release 1.0
 March, 1995 - release 2.0 
 February, 1996 - release 2.1
 November, 1997 - release 2.2
+December, 2000 - release 2.3
 
 Christopher Seiwald
 

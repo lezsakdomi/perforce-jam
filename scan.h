@@ -39,12 +39,13 @@ typedef struct _YYSTYPE {
 
 extern YYSTYPE yylval;
 
-void yyerror();
-void yyfparse();
-int yylex();
-void yymode();
-int yyparse();
+void yymode( int n );
+void yyerror( char *s );
 int yyanyerrors();
+void yyfparse( char *s );
+int yyline();
+int yylex();
+int yyparse();
 
 # define SCAN_NORMAL	0	/* normal parsing */
 # define SCAN_STRING	1	/* look only for matching } */

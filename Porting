@@ -1,4 +1,4 @@
-Notes on porting Jam - revised 11/11/97
+Notes on porting Jam - revised 12/31/2000
 
 1) Working out system dependencies in the Jam code.
 
@@ -32,7 +32,7 @@ Notes on porting Jam - revised 11/11/97
 	    execunix.c - UNIX, OS/2, NT
 	    execvms.c - VMS
 
-2) Defining OTHERSYMS in jam.h
+2) Defining OSMAJOR, OSMINOR in jam.h
 
     So that the Jambase and Jamfile know their host, Jam defines $(OS)
     to be something useful for each platform.  Make sure that there is
@@ -41,8 +41,7 @@ Notes on porting Jam - revised 11/11/97
     doesn't itself defines such a symbol, add a define to the Makefile.
 
     In addition to $(OS), you can also set $(OSPLAT) if the OS runs on
-    multiple platforms (like Linux or NT), or $(OSVER) if the OS has
-    multiple, incompatible releases, like HPUX 9 and 10 and AIX 3 and 4.
+    multiple platforms (like Linux or NT).
 
 3) Working out system dependencies in the Jambase
 

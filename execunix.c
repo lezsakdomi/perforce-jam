@@ -5,31 +5,25 @@
  */
 
 # include "jam.h"
-# include "execcmd.h"
 # include "lists.h"
+# include "execcmd.h"
 # include <errno.h>
 
-# if defined( unix ) || defined( NT ) || defined( __OS2__ ) || defined(AMIGA)
+# ifdef USE_EXECUNIX
 
-# if defined( _AIX) || \
-	(defined (COHERENT) && defined (_I386)) || \
-	defined(__sgi) || \
-	defined(__Lynx__) || \
-	defined(M_XENIX) || \
-	defined(__QNX__) || \
-	defined(__BEOS__) || \
-	defined(__ISC) || \
-	defined(__OPENNT )
+# ifdef NO_VFORK
 # define vfork() fork()
 # endif
 
-# if defined( NT ) || defined( __OS2__ )
+# if defined( OS_NT ) || defined( OS_OS2 )
+
+# define USE_EXECNT
 
 # include <process.h>
 
-# if !defined( __BORLANDC__ ) && !defined( __OS2__ )
+# if !defined( __BORLANDC__ ) && !defined( OS_OS2 )
 # define wait my_wait
-static int my_wait(int *status);
+static int my_wait( int *status );
 # endif
 
 # endif
@@ -66,24 +60,19 @@ static int my_wait(int *status);
  */
 
 static int intr = 0;
-
 static int cmdsrunning = 0;
-
-# ifdef NT
 static void (*istat)( int );
-void onintr( int );
-# else
-static void (*istat)();
-#endif
 
 static struct
 {
-	int	pid;		/* on win32, a real process handle */
-	void	(*func)();
+	int	pid; /* on win32, a real process handle */
+	void	(*func)( void *closure, int status );
 	void 	*closure;
-# if defined( NT ) || defined( __OS2__ )
+
+# ifdef USE_EXECNT
 	char	*tempfile;
 # endif
+
 } cmdtab[ MAXJOBS ] = {{0}};
 
 /*
@@ -91,8 +80,7 @@ static struct
  */
 
 void
-onintr( disp )
-int disp;
+onintr( int disp )
 {
 	intr++;
 	printf( "...interrupted\n" );
@@ -103,29 +91,18 @@ int disp;
  */
 
 void
-execcmd( string, func, closure, shell )
-char *string;
-void (*func)();
-void *closure;
-LIST *shell;
+execcmd( 
+	char *string,
+	void (*func)( void *closure, int status ),
+	void *closure,
+	LIST *shell )
 {
 	int pid;
 	int slot;
 	char *argv[ MAXARGC + 1 ];	/* +1 for NULL */
 
-# if defined( NT ) || defined( __OS2__ )
-	static char *comspec;
+# ifdef USE_EXECNT
 	char *p;
-
-	/* XXX this is questionable practice, since COMSPEC has
-	 * a high degree of variability, resulting in Jamfiles
-	 * that frequently won't work.  COMSPEC also denotes a shell
-	 * fit for interative use, not necessarily/merely a shell
-	 * capable of launching commands.  Besides, people can
-	 * just set JAMSHELL instead.
-	 */
-	if( !comspec && !( comspec = getenv( "COMSPEC" ) ) )
-	    comspec = "cmd.exe";
 # endif
 
 	/* Find a slot in the running commands table for this one. */
@@ -140,7 +117,7 @@ LIST *shell;
 	    exit( EXITBAD );
 	}
 
-# if defined( NT ) || defined( __OS2__ )
+# ifdef USE_EXECNT
 	if( !cmdtab[ slot ].tempfile )
 	{
 	    char *tempdir;
@@ -186,7 +163,7 @@ LIST *shell;
 
 	/* Forumulate argv */
 	/* If shell was defined, be prepared for % and ! subs. */
-	/* Otherwise, use stock /bin/sh (on unix) or comspec (on NT). */
+	/* Otherwise, use stock /bin/sh (on unix) or cmd.exe (on NT). */
 
 	if( shell )
 	{
@@ -215,8 +192,8 @@ LIST *shell;
 	}
 	else
 	{
-# if defined( NT ) || defined( __OS2__ )
-	    argv[0] = comspec;
+# ifdef USE_EXECNT
+	    argv[0] = "cmd.exe";
 	    argv[1] = "/Q/C";		/* anything more is non-portable */
 # else
 	    argv[0] = "/bin/sh";
@@ -233,8 +210,8 @@ LIST *shell;
 
 	/* Start the command */
 
-# if defined( NT ) || defined( __OS2__ )
-	if( ( pid = spawnvp( P_NOWAIT, argv[0], argv ) ) < 0 )
+# ifdef USE_EXECNT
+	if( ( pid = spawnvp( P_NOWAIT, argv[0], argv ) ) == -1 )
 	{
 	    perror( "spawn" );
 	    exit( EXITBAD );
@@ -325,15 +302,14 @@ execwait()
 	return 1;
 }
 
-# if defined( NT ) && !defined( __BORLANDC__ )
+# if defined( OS_NT ) && !defined( __BORLANDC__ )
 
 # define WIN32_LEAN_AND_MEAN
 
 # include <windows.h>		/* do the ugly deed */
 
 static int
-my_wait( status )
-int *status;
+my_wait( int *status )
 {
 	int i, num_active = 0;
 	DWORD exitcode, waitcode;
@@ -391,4 +367,4 @@ FAILED:
 
 # endif /* NT && !__BORLANDC__ */
 
-# endif /* unix || NT || __OS2__ || AMIGA */
+# endif /* USE_EXECUNIX */

@@ -4,7 +4,10 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# ifdef VMS
+# include "jam.h"
+# include "filesys.h"
+
+# ifdef OS_VMS
 
 # define DEBUG
 
@@ -28,17 +31,14 @@
  * 05/03/96 (seiwald) - split from filevms.c
  */
 
-# include "jam.h"
-# include "filesys.h"
-
 /*
  * file_parse() - split a file name into dir/base/suffix/member
  */
 
 void
-file_parse( file, f )
-char		*file;
-FILENAME	*f;
+file_parse( 
+	char	*file,
+	FILENAME *f )
 {
 	char *p, *q;
 	char *end;
@@ -165,10 +165,10 @@ struct dirinf {
 } ;
 
 static char *
-strnchr( buf, c, len )
-char	*buf;
-int	c;
-int	len;
+strnchr( 
+	char	*buf,
+	int	c,
+	int	len )
 {
 	while( len-- )
 	    if( *buf && *buf++ == c )
@@ -178,10 +178,10 @@ int	len;
 }
 
 static void
-dir_flags( buf, len, i )
-char	*buf;
-int	len;
-struct dirinf *i;
+dir_flags( 
+	char	*buf,
+	int	len,
+	struct dirinf *i )
 {
 	char *p;
 
@@ -229,10 +229,10 @@ struct dirinf *i;
  */
 
 void
-file_build( f, file, binding )
-FILENAME	*f;
-char		*file;
-int		binding;
+file_build(
+	FILENAME *f,
+	char	*file,
+	int	binding )
 {
 	char *ofile = file;
 	struct dirinf root, dir;
@@ -409,8 +409,7 @@ int		binding;
  */
 
 void
-file_parent( f )
-FILENAME *f;
+file_parent( FILENAME *f )
 {
 	if( f->f_base.len )
 	{

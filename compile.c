@@ -1,5 +1,5 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993, 2000 Christopher Seiwald.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
@@ -10,6 +10,7 @@
 # include "parse.h"
 # include "compile.h"
 # include "variable.h"
+# include "expand.h"
 # include "rules.h"
 # include "newstr.h"
 # include "make.h"
@@ -20,9 +21,11 @@
  *
  * External routines:
  *
+ *	compile_append() - append list results of two statements
  *	compile_foreach() - compile the "for x in y" statement
  *	compile_if() - compile 'if' rule
  *	compile_include() - support for 'include' - call include() on file
+ *	compile_list() - expand and return a list 
  *	compile_local() - declare (and set) local variables
  *	compile_null() - do nothing -- a stub for parsing
  *	compile_rule() - compile a single user defined rule
@@ -38,6 +41,7 @@
  *	debug_compile() - printf with indent to show rule expansion.
  *
  *	evaluate_if() - evaluate if to determine which leg to compile
+ *	evaluate_rule() - execute a rule invocation
  *
  *	builtin_depends() - DEPENDS/INCLUDES rule
  *	builtin_echo() - ECHO rule
@@ -51,23 +55,29 @@
  * 04/13/94 (seiwald) - added shorthand L0 for null list pointer
  * 05/13/94 (seiwald) - include files are now bound as targets, and thus
  *			can make use of $(SEARCH)
+ * 06/01/94 (seiwald) - new 'actions existing' does existing sources
  * 08/23/94 (seiwald) - Support for '+=' (append to variable)
  * 12/20/94 (seiwald) - NOTIME renamed NOTFILE.
  * 01/22/95 (seiwald) - Exit rule.
  * 02/02/95 (seiwald) - Always rule; LEAVES rule.
  * 02/14/95 (seiwald) - NoUpdate rule.
+ * 09/11/00 (seiwald) - new evaluate_rule() for headers().
+ * 09/11/00 (seiwald) - compile_xxx() now return LIST *.
+ *			New compile_append() and compile_list() in
+ *			support of building lists here, rather than
+ *			in jamgram.yy.
  */
 
-static void debug_compile();
+static void debug_compile( int which, char *s );
 
-static int evaluate_if();
+static int evaluate_if( PARSE *parse, LOL *args );
 
-static void builtin_depends();
-static void builtin_echo();
-static void builtin_exit();
-static void builtin_flags();
+static LIST *builtin_depends( PARSE *parse, LOL *args );
+static LIST *builtin_echo( PARSE *parse, LOL *args );
+static LIST *builtin_exit( PARSE *parse, LOL *args );
+static LIST *builtin_flags( PARSE *parse, LOL *args );
 
-int glob();
+int glob( char *s, char *c );
 
 
 
@@ -83,44 +93,63 @@ compile_builtins()
 {
     bindrule( "Always" )->procedure = 
     bindrule( "ALWAYS" )->procedure = 
-	parse_make( builtin_flags, P0, P0, C0, C0, L0, L0, T_FLAG_TOUCHED );
+	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TOUCHED );
 
     bindrule( "Depends" )->procedure = 
     bindrule( "DEPENDS" )->procedure = 
-	parse_make( builtin_depends, P0, P0, C0, C0, L0, L0, T_DEPS_DEPENDS );
+	parse_make( builtin_depends, P0, P0, P0, C0, C0, T_DEPS_DEPENDS );
 
     bindrule( "Echo" )->procedure = 
     bindrule( "ECHO" )->procedure = 
-	parse_make( builtin_echo, P0, P0, C0, C0, L0, L0, 0 );
+	parse_make( builtin_echo, P0, P0, P0, C0, C0, 0 );
 
     bindrule( "Exit" )->procedure = 
     bindrule( "EXIT" )->procedure = 
-	parse_make( builtin_exit, P0, P0, C0, C0, L0, L0, 0 );
+	parse_make( builtin_exit, P0, P0, P0, C0, C0, 0 );
 
     bindrule( "Includes" )->procedure = 
     bindrule( "INCLUDES" )->procedure = 
-	parse_make( builtin_depends, P0, P0, C0, C0, L0, L0, T_DEPS_INCLUDES );
+	parse_make( builtin_depends, P0, P0, P0, C0, C0, T_DEPS_INCLUDES );
 
     bindrule( "Leaves" )->procedure = 
     bindrule( "LEAVES" )->procedure = 
-	parse_make( builtin_flags, P0, P0, C0, C0, L0, L0, T_FLAG_LEAVES );
+	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_LEAVES );
 
     bindrule( "NoCare" )->procedure = 
     bindrule( "NOCARE" )->procedure = 
-	parse_make( builtin_flags, P0, P0, C0, C0, L0, L0, T_FLAG_NOCARE );
+	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOCARE );
 
     bindrule( "NOTIME" )->procedure = 
     bindrule( "NotFile" )->procedure = 
     bindrule( "NOTFILE" )->procedure = 
-	parse_make( builtin_flags, P0, P0, C0, C0, L0, L0, T_FLAG_NOTFILE );
+	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOTFILE );
 
     bindrule( "NoUpdate" )->procedure = 
     bindrule( "NOUPDATE" )->procedure = 
-	parse_make( builtin_flags, P0, P0, C0, C0, L0, L0, T_FLAG_NOUPDATE );
+	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOUPDATE );
 
     bindrule( "Temporary" )->procedure = 
     bindrule( "TEMPORARY" )->procedure = 
-	parse_make( builtin_flags, P0, P0, C0, C0, L0, L0, T_FLAG_TEMP );
+	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TEMP );
+}
+
+/*
+ * compile_append() - append list results of two statements
+ *
+ *	parse->left	more compile_append() by left-recursion
+ *	parse->right	single rule
+ */
+
+LIST *
+compile_append(
+	PARSE	*parse,
+	LOL	*args )
+{
+	/* Append right to left. */
+
+	return list_append( 
+		(*parse->left->func)( parse->left, args ),
+		(*parse->right->func)( parse->right, args ) );
 }
 
 /*
@@ -130,16 +159,16 @@ compile_builtins()
  * value, executing the commands enclosed in braces for each iteration.
  *
  *	parse->string	index variable
- *	parse->left	rule to compile
- *	parse->llist	variable values
+ *	parse->left	variable values
+ *	parse->right	rule to compile
  */
 
-void
-compile_foreach( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_foreach(
+	PARSE	*parse,
+	LOL	*args )
 {
-	LIST	*nv = var_list( parse->llist, args );
+	LIST	*nv = (*parse->left->func)( parse->left, args );
 	LIST	*l;
 
 	/* Call var_set to reset $(parse->string) for each val. */
@@ -150,32 +179,34 @@ LOL		*args;
 
 	    var_set( parse->string, val, VAR_SET );
 
-	    (*parse->left->func)( parse->left, args );
+	    list_free( (*parse->right->func)( parse->right, args ) );
 	}
 
 	list_free( nv );
+
+	return L0;
 }
 
 /*
  * compile_if() - compile 'if' rule
  *
  *	parse->left		condition tree
- *	parse->right->left	then tree
- *	parse->right->right	else tree
+ *	parse->right		then tree
+ *	parse->third		else tree
  */
 
-void
-compile_if( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_if(
+	PARSE	*p,
+	LOL	*args )
 {
-	if( evaluate_if( parse->left, args ) )
+	if( evaluate_if( p->left, args ) )
 	{
-	    (*parse->right->left->func)( parse->right->left, args );
+	    return (*p->right->func)( p->right, args );
 	}
 	else
 	{
-	    (*parse->right->right->func)( parse->right->right, args );
+	    return (*p->third->func)( p->third, args );
 	}
 }
 
@@ -188,9 +219,9 @@ LOL		*args;
  */
 
 static int
-evaluate_if( parse, args )
-PARSE		*parse;
-LOL		*args;
+evaluate_if(
+	PARSE	*parse,
+	LOL	*args )
 {
 	int	status;
 
@@ -223,9 +254,8 @@ LOL		*args;
 	    /* Handle one of the comparison operators */
 	    /* Expand targets and sources */
 
-	    LIST *nt, *ns;
-	    nt = var_list( parse->llist, args );
-	    ns = var_list( parse->rlist, args );
+	    LIST *nt = (*parse->left->func)( parse->left, args );
+	    LIST *ns = (*parse->right->func)( parse->right, args );
 
 	    /* "a in b" make sure each of a is equal to something in b. */
 	    /* Otherwise, step through pairwise comparison. */
@@ -298,15 +328,15 @@ LOL		*args;
 /*
  * compile_include() - support for 'include' - call include() on file
  *
- * 	parse->llist	list of files to include (can only do 1)
+ * 	parse->left	list of files to include (can only do 1)
  */
 
-void
-compile_include( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_include(
+	PARSE	*parse,
+	LOL	*args )
 {
-	LIST	*nt = var_list( parse->llist, args );
+	LIST	*nt = (*parse->left->func)( parse->left, args );
 
 	if( DEBUG_COMPILE )
 	{
@@ -331,25 +361,44 @@ LOL		*args;
 	}
 
 	list_free( nt );
+
+	return L0;
+}
+
+/*
+ * compile_list() - expand and return a list 
+ *
+ * 	parse->string - character string to expand
+ */
+
+LIST *
+compile_list(
+	PARSE	*parse,
+	LOL	*args )
+{
+	/* voodoo 1 means: s is a copyable string */
+	char *s = parse->string;
+	return var_expand( L0, s, s + strlen( s ), args, 1 );
 }
 
 /*
  * compile_local() - declare (and set) local variables
  *
- *	parse->llist	list of variables
- *	parse->rlist	list of values
- *	parse->left	rules to execute
+ *	parse->left	list of variables
+ *	parse->right	list of values
+ *	parse->third	rules to execute
  */
 
-void
-compile_local( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_local(
+	PARSE	*parse,
+	LOL	*args )
 {
 	LIST *l;
 	SETTINGS *s = 0;
-	LIST	*nt = var_list( parse->llist, args );
-	LIST	*ns = var_list( parse->rlist, args );
+	LIST	*nt = (*parse->left->func)( parse->left, args );
+	LIST	*ns = (*parse->right->func)( parse->right, args );
+	LIST	*result;
 
 	if( DEBUG_COMPILE )
 	{
@@ -372,21 +421,24 @@ LOL		*args;
 	/* variable, making it not so much local as layered. */
 
 	pushsettings( s );
-	(*parse->left->func)( parse->left, args );
+	result = (*parse->third->func)( parse->third, args );
 	popsettings( s );
 
 	freesettings( s );
+
+	return result;
 }
 
 /*
  * compile_null() - do nothing -- a stub for parsing
  */
 
-void
-compile_null( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_null(
+	PARSE	*parse,
+	LOL	*args )
 {
+	return L0;
 }
 
 /*
@@ -394,15 +446,17 @@ LOL		*args;
  *
  *	parse->string	name of user defined rule
  *	parse->left	parameters (list of lists) to rule, recursing left
+ *
+ * Wrapped around evaluate_rule() so that headers() can share it.
  */
 
-void
-compile_rule( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_rule(
+	PARSE	*parse,
+	LOL	*args )
 {
-	RULE	*rule = bindrule( parse->string );
 	LOL	nargs[1];
+	LIST	*result;
 	PARSE	*p;
 
 	/* Build up the list of arg lists */
@@ -410,20 +464,37 @@ LOL		*args;
 	lol_init( nargs );
 
 	for( p = parse->left; p; p = p->left )
-	    lol_add( nargs, var_list( p->llist, args ) );
+	    lol_add( nargs, (*p->right->func)( p->right, args ) );
+
+	/* And invoke rule */
+
+	result = evaluate_rule( parse->string, nargs );
+
+	lol_free( nargs );
+
+	return result;
+}
+
+/*
+ * evaluate_rule() - execute a rule invocation
+ */
+
+LIST *
+evaluate_rule(
+	char	*rulename,
+	LOL	*args )
+{
+	LIST	*result = L0;
+	RULE	*rule = bindrule( rulename );
 
 	if( DEBUG_COMPILE )
 	{
-	    debug_compile( 1, parse->string );
-	    lol_print( nargs );
+	    debug_compile( 1, rulename );
+	    lol_print( args );
 	    printf( "\n" );
 	}
 
 	/* Check traditional targets $(<) and sources $(>) */
-
-	if( !lol_get( nargs, 0 ) )
-	    printf( "warning: no targets on rule %s %s\n",
-		    rule->name, parse->llist ? parse->llist->string : "" );
 
 	if( !rule->actions && !rule->procedure )
 	    printf( "warning: unknown rule %s\n", rule->name );
@@ -442,8 +513,8 @@ LOL		*args;
 	    memset( (char *)action, '\0', sizeof( *action ) );
 
 	    action->rule = rule;
-	    action->targets = targetlist( (TARGETS *)0, lol_get( nargs, 0 ) );
-	    action->sources = targetlist( (TARGETS *)0, lol_get( nargs, 1 ) );
+	    action->targets = targetlist( (TARGETS *)0, lol_get( args, 0 ) );
+	    action->sources = targetlist( (TARGETS *)0, lol_get( args, 1 ) );
 
 	    /* Append this action to the actions of each target */
 
@@ -452,14 +523,20 @@ LOL		*args;
 	}
 
 	/* Now recursively compile any parse tree associated with this rule */
+	/* refer/free to ensure rule not freed during use */
 
 	if( rule->procedure )
-	    (*rule->procedure->func)( rule->procedure, nargs );
-
-	lol_free( nargs );
+	{
+	    PARSE *parse = rule->procedure;
+	    parse_refer( parse );
+	    result = (*parse->func)( parse, args );
+	    parse_free( parse );
+	}
 
 	if( DEBUG_COMPILE )
 	    debug_compile( -1, 0 );
+
+	return result;
 }
 
 /*
@@ -469,30 +546,32 @@ LOL		*args;
  *	parse->right	single rule
  */
 
-void
-compile_rules( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_rules(
+	PARSE	*parse,
+	LOL	*args )
 {
-	(*parse->left->func)( parse->left, args );
-	(*parse->right->func)( parse->right, args );
+	/* Ignore result from first statement; return the 2nd. */
+
+	list_free( (*parse->left->func)( parse->left, args ) );
+	return (*parse->right->func)( parse->right, args );
 }
 
 /*
  * compile_set() - compile the "set variable" statement
  *
- *	parse->llist	variable names
- *	parse->rlist	variable values
+ *	parse->left	variable names
+ *	parse->right	variable values 
  *	parse->num	ASSIGN_SET/APPEND/DEFAULT
  */
 
-void
-compile_set( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_set(
+	PARSE	*parse,
+	LOL	*args )
 {
-	LIST	*nt = var_list( parse->llist, args );
-	LIST	*ns = var_list( parse->rlist, args );
+	LIST	*nt = (*parse->left->func)( parse->left, args );
+	LIST	*ns = (*parse->right->func)( parse->right, args );
 	LIST	*l;
 	int	setflag;
 	char	*trace;
@@ -516,17 +595,13 @@ LOL		*args;
 
 	/* Call var_set to set variable */
 	/* var_set keeps ns, so need to copy it */
-	/* avoid copy if just setting one variable. */
 
 	for( l = nt; l; l = list_next( l ) )
-	    var_set( l->string, 
-		list_next( l ) ? list_copy( (LIST*)0, ns ) : ns,
-		setflag );
-
-	if( !nt )
-	    list_free( ns );
+	    var_set( l->string, list_copy( L0, ns ), setflag );
 
 	list_free( nt );
+
+	return ns;
 }
 
 /*
@@ -536,10 +611,10 @@ LOL		*args;
  *	parse->left	rules for rule
  */
 
-void
-compile_setcomp( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_setcomp(
+	PARSE	*parse,
+	LOL	*args )
 {
 	RULE	*rule = bindrule( parse->string );
 
@@ -554,6 +629,8 @@ LOL		*args;
 	/* don't let parse_free() release it */
 
 	parse->left = 0;	
+
+	return L0;
 }
 
 /*
@@ -562,18 +639,19 @@ LOL		*args;
  *	parse->string	rule name
  *	parse->string1	OS command string
  *	parse->num	flags
- *	parse->llist	`bind` variables
+ *	parse->left	`bind` variables
  *
  * Note that the parse flags (as defined in compile.h) are transfered
  * directly to the rule flags (as defined in rules.h).
  */
 
-void
-compile_setexec( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_setexec(
+	PARSE	*parse,
+	LOL	*args )
 {
 	RULE	*rule = bindrule( parse->string );
+	LIST	*bindlist = (*parse->left->func)( parse->left, args );
 	
 	/* Free old one, if present */
 
@@ -584,32 +662,31 @@ LOL		*args;
 	}
 
 	rule->actions = copystr( parse->string1 );
-	rule->bindlist = list_copy( L0, parse->llist );
-	rule->flags |= parse->num; /* XXX translate this properly */
+	rule->bindlist = bindlist;
+	rule->flags = parse->num; /* XXX translate this properly */
+
+	return L0;
 }
 
 /*
  * compile_settings() - compile the "on =" (set variable on exec) statement
  *
- *	parse->llist		target names
- *	parse->left->llist	variable names
- *	parse->left->rlist	variable values
- *	parse->num		ASSIGN_SET/APPEND	
+ *	parse->left	variable names
+ *	parse->right	target name 
+ *	parse->third	variable value 
+ *	parse->num	ASSIGN_SET/APPEND	
  */
 
-void
-compile_settings( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_settings(
+	PARSE	*parse,
+	LOL	*args )
 {
-	LIST	*nt = var_list( parse->left->llist, args );
-	LIST	*ns = var_list( parse->left->rlist, args );
-	LIST	*targets, *ts;
+	LIST	*nt = (*parse->left->func)( parse->left, args );
+	LIST	*ns = (*parse->third->func)( parse->third, args );
+	LIST	*targets = (*parse->right->func)( parse->right, args );
+	LIST	*ts;
 	int	append = parse->num == ASSIGN_APPEND;
-
-	/* Reset targets */
-
-	targets = var_list( parse->llist, args );
 
 	if( DEBUG_COMPILE )
 	{
@@ -636,16 +713,17 @@ LOL		*args;
 				l->string, list_copy( (LIST*)0, ns ) );
 	}
 
-	list_free( ns );
 	list_free( nt );
 	list_free( targets );
+
+	return ns;
 }
 
 /*
  * compile_switch() - compile 'switch' rule
  *
- *	parse->llist	switch value (only 1st used)
- *	parse->left	cases
+ *	parse->left	switch value (only 1st used)
+ *	parse->right	cases
  *
  *	cases->left	1st case
  *	cases->right	next cases
@@ -654,14 +732,13 @@ LOL		*args;
  *	case->left	parse tree to execute
  */
 
-void
-compile_switch( parse, args )
-PARSE		*parse;
-LOL		*args;
+LIST *
+compile_switch(
+	PARSE	*parse,
+	LOL	*args )
 {
-	LIST	*nt;
-
-	nt = var_list( parse->llist, args );
+	LIST	*nt = (*parse->left->func)( parse->left, args );
+	LIST	*result = 0;
 
 	if( DEBUG_COMPILE )
 	{
@@ -672,18 +749,20 @@ LOL		*args;
 
 	/* Step through cases */
 
-	for( parse = parse->left; parse; parse = parse->right )
+	for( parse = parse->right; parse; parse = parse->right )
 	{
 	    if( !glob( parse->left->string, nt ? nt->string : "" ) )
 	    {
 		/* Get & exec parse tree for this case */
 		parse = parse->left->left;
-		(*parse->func)( parse, args );
+		result = (*parse->func)( parse, args );
 		break;
 	    }
 	}
 
 	list_free( nt );
+
+	return result;
 }
 
 
@@ -696,10 +775,10 @@ LOL		*args;
  * targets and sources as TARGETs.
  */
 
-static void
-builtin_depends( parse, args )
-PARSE		*parse;
-LOL		*args;
+static LIST *
+builtin_depends(
+	PARSE	*parse,
+	LOL	*args )
 {
 	LIST *targets = lol_get( args, 0 );
 	LIST *sources = lol_get( args, 1 );
@@ -711,6 +790,8 @@ LOL		*args;
 	    TARGET *t = bindtarget( l->string );
 	    t->deps[ which ] = targetlist( t->deps[ which ], sources );
 	}
+
+	return L0;
 }
 
 /*
@@ -720,13 +801,14 @@ LOL		*args;
  * actions are taken.
  */
 
-static void
-builtin_echo( parse, args )
-PARSE		*parse;
-LOL		*args;
+static LIST *
+builtin_echo(
+	PARSE	*parse,
+	LOL	*args )
 {
 	list_print( lol_get( args, 0 ) );
 	printf( "\n" );
+	return L0;
 }
 
 /*
@@ -736,14 +818,15 @@ LOL		*args;
  * the program with a failure status.
  */
 
-static void
-builtin_exit( parse, args )
-PARSE		*parse;
-LOL		*args;
+static LIST *
+builtin_exit(
+	PARSE	*parse,
+	LOL	*args )
 {
 	list_print( lol_get( args, 0 ) );
 	printf( "\n" );
 	exit( EXITBAD ); /* yeech */
+	return L0;
 }
 
 /*
@@ -753,15 +836,17 @@ LOL		*args;
  * by make0().  It binds each target as a TARGET.
  */
 
-static void
-builtin_flags( parse, args )
-PARSE		*parse;
-LOL		*args;
+static LIST *
+builtin_flags(
+	PARSE	*parse,
+	LOL	*args )
 {
 	LIST *l = lol_get( args, 0 );
 
 	for( ; l; l = list_next( l ) )
 	    bindtarget( l->string )->flags |= parse->num;
+
+	return L0;
 }
 
 /*
@@ -769,9 +854,7 @@ LOL		*args;
  */
 
 static void
-debug_compile( which, s )
-int which;
-char *s;
+debug_compile( int which, char *s )
 {
 	static int level = 0;
 	static char indent[36] = ">>>>|>>>>|>>>>|>>>>|>>>>|>>>>|>>>>|";

@@ -4,11 +4,10 @@
 # There are no user-serviceable parts in this file.
 #
 # Put executables in platform-specific  subdirectory.
-# If $(OSVER) isn't set, second value is used.
 
-if $(VMS) {	LOCATE_TARGET ?= [.binvms] ; }
-else if $(MAC) { LOCATE_TARGET ?= :bin.mac ; }
-else { 		LOCATE_TARGET ?= bin.$(OSFULL[1]:L) ; }
+if $(VMS) 	{ LOCATE_TARGET ?= [.binvms] ; }
+else if $(MAC) 	{ LOCATE_TARGET ?= :bin.mac ; }
+else 		{ LOCATE_TARGET ?= bin.$(OSFULL[1]:L) ; }
 
 # Leave generated source in current directory; it would be nice to use
 # these lines below to build the source into the platform-specific
@@ -29,13 +28,25 @@ else if $(VMS) 	{ code = execvms.c filevms.c pathvms.c ; }
 else if $(MAC)	{ code = execmac.c filemac.c pathmac.c ; }
 else 		{ code = execunix.c fileunix.c pathunix.c ; }
 
-if $(UNIX) 	{ code += jamgram.y ; }
+# We have to signal jam.h for these
+
+if $(OS) = NT 			{ CCFLAGS += /DNT ; }
+
+# Do we know yacc?
+
+if $(YACC) 	{ code += jamgram.y ; }
 else            { code += jamgram.c ; }
 
+#
+# Build the jamgram.y from the jamgram.yy
+# yyacc is a slippery script that makes grammars a little
+# easier to read/maintain.
+#
 
-if $(OS) = NT { CCFLAGS += /DNT ; }
-if $(OS) = MVS { CCFLAGS += -DMVS ; }
-if $(OS)$(OSVER) = AIX41 { CCFLAGS += -D_AIX41 ; }
+if $(UNIX) && $(YACC)
+{
+	GenFile jamgram.y jamgramtab.h : yyacc jamgram.yy ;
+}
 
 #
 # How to build the compiled in jambase.
@@ -57,45 +68,25 @@ Library         libjam.a :
 		    option.c parse.c regexp.c rules.c scan.c search.c
 		    timestamp.c variable.c ;
 
+
+if $(BINDIR) 	{ InstallBin $(BINDIR) : jam ; }
+
 #
-# On UNIX, we install this stuff for easy use.
+# Distribution making from here on out.
 #
-
-if $(UNIX)
-{
-	InstallBin $(BINDIR) : jam ;
-}
-
-#### --- cut
-
-if $(UNIX) 
-{
-	GenFile jamgram.y jamgramtab.h : yyacc jamgram.yy ;
-}
-
-rule TempCopy
-{
-	DEPENDS $(<) : $(>) ;
-}
-
-actions TempCopy
-{
-	cp $(>) $(<)
-}
 
 ALLSOURCE =
 	Build.com Build.mpw Jam.html Jambase Jambase.html Jamfile
-	Jamfile.html Jamlang.html Makefile Porting README RELNOTES
-	command.c command.h compile.c compile.h execcmd.h execmac.c
-	execunix.c execvms.c expand.c expand.h filemac.c filent.c
-	fileos2.c filesys.h fileunix.c filevms.c glob.c hash.c
-	hash.h headers.c headers.h jam.c jam.h jambase.c jambase.h
-	jamgram.c jamgram.h jamgram.y jamgramtab.h lists.c lists.h
-	make.c make.h make1.c mkjambase.c newstr.c newstr.h option.c
-	option.h parse.c parse.h patchlevel.h pathmac.c pathunix.c
-	pathvms.c regexp.c regexp.h rules.c rules.h scan.c scan.h
-	search.c search.h timestamp.c timestamp.h variable.c
-	variable.h ;
+	Jamfile.html Makefile Porting README RELNOTES command.c command.h
+	compile.c compile.h execcmd.h execmac.c execunix.c execvms.c
+	expand.c expand.h filemac.c filent.c fileos2.c filesys.h fileunix.c
+	filevms.c glob.c hash.c hash.h headers.c headers.h jam.c jam.h
+	jambase.c jambase.h jamgram.c jamgram.h jamgram.y jamgram.yy
+	jamgramtab.h lists.c lists.h make.c make.h make1.c mkjambase.c
+	newstr.c newstr.h option.c option.h parse.c parse.h patchlevel.h
+	pathmac.c pathunix.c pathvms.c regexp.c regexp.h rules.c rules.h
+	scan.c scan.h search.c search.h timestamp.c timestamp.h variable.c
+	variable.h yyacc ;
 
 rule Ball
 {
@@ -104,30 +95,15 @@ rule Ball
 
 	DEPENDS $(<) : $(>) ;
 
-	PreBall $(<) ;
-
 	switch $(<) 
 	{
 	case *.tar : Tar $(<) : $(>) ;
 	case *.shar : Shar $(<) : $(>) ;
 	case *.zip : Zip $(<) : $(>) ;
 	}
-
-	PostBall $(<) ;
 }
 
-actions PreBall 
-{
-	mv Jamfile Jamfile.sav
-	sed '/--- cut/,$d' Jamfile.sav > Jamfile
-}
-
-actions PostBall 
-{
-	mv Jamfile.sav Jamfile
-}
-
-VERSION = jam-2.2 ;
+VERSION = jam-2.3 ;
 
 actions Tar
 {
@@ -149,5 +125,3 @@ actions Zip
 Ball $(VERSION).shar : $(ALLSOURCE) ;
 Ball $(VERSION).tar : $(ALLSOURCE) ;
 Ball $(VERSION).zip : $(ALLSOURCE) ;
-
-

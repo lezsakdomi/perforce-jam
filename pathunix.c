@@ -7,13 +7,7 @@
 # include "jam.h"
 # include "filesys.h"
 
-# if defined( unix ) || defined( NT ) || defined( __OS2__ ) || defined(AMIGA)
-
-# if defined(unix) || defined(AMIGA)
-# define DELIM '/'
-# else
-# define DELIM '\\'
-# endif
+# ifdef USE_PATHUNIX
 
 /*
  * pathunix.c - manipulate file names on UNIX, NT, OS2, AmigaOS
@@ -47,9 +41,9 @@
  */
 
 void
-file_parse( file, f )
-char		*file;
-FILENAME	*f;
+file_parse( 
+	char	*file,
+	FILENAME *f )
 {
 	char *p, *q;
 	char *end;
@@ -118,7 +112,7 @@ FILENAME	*f;
 	p = 0;
 	q = file;
 
-	while( q = memchr( q, '.', end - q ) )
+	while( q = (char *)memchr( q, '.', end - q ) )
 	    p = q++;
 
 	if( p )
@@ -139,10 +133,10 @@ FILENAME	*f;
  */
 
 void
-file_build( f, file, binding )
-FILENAME	*f;
-char		*file;
-int		binding;
+file_build(
+	FILENAME *f,
+	char	*file,
+	int	binding )
 {
 	/* Start with the grist.  If the current grist isn't */
 	/* surrounded by <>'s, add them. */
@@ -157,7 +151,7 @@ int		binding;
 
 	/* Don't prepend root if it's . or directory is rooted */
 
-# if defined(unix) || defined(AMIGA)
+# if PATH_DELIM == '/'
 
 	if( f->f_root.len 
 	    && !( f->f_root.len == 1 && f->f_root.ptr[0] == '.' )
@@ -176,7 +170,7 @@ int		binding;
 	{
 	    memcpy( file, f->f_root.ptr, f->f_root.len );
 	    file += f->f_root.len;
-	    *file++ = DELIM;
+	    *file++ = PATH_DELIM;
 	}
 
 	if( f->f_dir.len )
@@ -193,13 +187,11 @@ int		binding;
 	    /* UNIX: Special case for dir \ : don't add another \ */
 	    /* NT:   Special case for dir / : don't add another / */
 
-# ifndef UNIX
-# ifndef AMIGA
+# if PATH_DELIM == '\\'
 	    if( !( f->f_dir.len == 3 && f->f_dir.ptr[1] == ':' ) )
 # endif
-# endif
-		if( !( f->f_dir.len == 1 && f->f_dir.ptr[0] == DELIM ) )
-		    *file++ = DELIM;
+		if( !( f->f_dir.len == 1 && f->f_dir.ptr[0] == PATH_DELIM ) )
+		    *file++ = PATH_DELIM;
 	}
 
 	if( f->f_base.len )
@@ -229,8 +221,7 @@ int		binding;
  */
 
 void
-file_parent( f )
-FILENAME *f;
+file_parent( FILENAME *f )
 {
 	/* just set everything else to nothing */
 

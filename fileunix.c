@@ -7,25 +7,34 @@
 # include "jam.h"
 # include "filesys.h"
 
-# if defined(unix) || defined(AMIGA)
+# ifdef USE_FILEUNIX
 
-# if defined(_SEQUENT_) || defined(__DGUX__) || \
-     defined(M_XENIX) || defined(__ISC) 
+# if defined( OS_SEQUENT ) || \
+     defined( OS_DGUX ) || \
+     defined( OS_SCO ) || \
+     defined( OS_ISC ) 
 # define PORTAR 1
 # endif
 
-#ifdef NeXT
+# if defined( OS_RHAPSODY ) || \
+     defined( OS_MACOSX ) || \
+     defined( OS_NEXT )
 /* need unistd for rhapsody's proper lseek */
 # include <sys/dir.h>
 # include <unistd.h>
-#else
-# include <dirent.h>
-#endif
-
-# if defined (COHERENT) && defined (_I386)
-# include <arcoff.h>
+# define STRUCT_DIRENT struct direct 
 # else
-# if defined( __MVS__ ) || defined( __OPENNT )
+# include <dirent.h>
+# define STRUCT_DIRENT struct dirent 
+# endif
+
+# ifdef OS_COHERENT
+# include <arcoff.h>
+# define HAVE_AR
+# endif
+
+# if defined( OS_MVS ) || \
+     defined( OS_INTERIX )
 
 #define	ARMAG	"!<arch>\n"
 #define	SARMAG	8
@@ -42,13 +51,19 @@ struct ar_hdr		/* archive file member header - printable ascii */
 	char	ar_fmag[2];	/* ARFMAG - string to end header */
 };
 
-# else
-# if !defined( __QNX__ ) && !defined( __BEOS__ )
+# define HAVE_AR
+# endif
+
+# if defined( OS_QNX ) || \
+     defined( OS_BEOS ) || \
+     defined( OS_MPEIX )
+# define NO_AR
+# define HAVE_AR
+# endif
+
+# ifndef HAVE_AR
 # include <ar.h>
-# endif /* QNX */
-# endif /* MVS */
-# endif	/* COHERENT */
-  
+# endif	
 
 /*
  * fileunix.c - manipulate file names and scan directories on UNIX/AmigaOS
@@ -77,17 +92,13 @@ struct ar_hdr		/* archive file member header - printable ascii */
  */
 
 void
-file_dirscan( dir, func )
-char	*dir;
-void	(*func)();
+file_dirscan( 
+	char *dir,
+	void (*func)( char *file, int status, time_t t ) )
 {
 	FILENAME f;
 	DIR *d;
-#ifdef NeXT
-	struct direct *dirent;
-#else
-	struct dirent *dirent;
-#endif
+	STRUCT_DIRENT *dirent;
 	char filename[ MAXJPATH ];
 
 	/* First enter directory itself */
@@ -135,9 +146,9 @@ void	(*func)();
  */
 
 int
-file_time( filename, time )
-char	*filename;
-time_t	*time;
+file_time(
+	char	*filename,
+	time_t	*time )
 {
 	struct stat statbuf;
 
@@ -158,11 +169,11 @@ time_t	*time;
 # define SARHDR sizeof( struct ar_hdr )
 
 void
-file_archscan( archive, func )
-char *archive;
-void (*func)();
+file_archscan(
+	char *archive,
+	void (*func)( char *file, int status, time_t t ) )
 {
-# if !defined( __QNX__ ) && !defined( __BEOS__ )
+# ifndef NO_AR
 	struct ar_hdr ar_hdr;
 	char buf[ MAXJPATH ];
 	long offset;
@@ -208,7 +219,7 @@ void (*func)();
 		    ** 15 characters (ie. don't fit into a ar_name
 		    */
 
-		    string_table = malloc(lar_size);
+		    string_table = (char *)malloc(lar_size);
 		    lseek(fd, offset + SARHDR, 0);
 		    if (read(fd, string_table, lar_size) != lar_size)
 			printf("error reading string table\n");
@@ -249,16 +260,16 @@ void (*func)();
 
 	close( fd );
 
-# endif /* QNX */
+# endif /* NO_AR */
 
 }
 
 # else /* AIAMAG - RS6000 AIX */
 
 void
-file_archscan( archive, func )
-char *archive;
-void (*func)();
+file_archscan(
+	char *archive,
+	void (*func)( char *file, int status, time_t t ) )
 {
 	struct fl_hdr fl_hdr;
 
@@ -312,5 +323,5 @@ void (*func)();
 
 # endif /* AIAMAG - RS6000 AIX */
 
-# endif /* unix || AMIGA */
+# endif /* USE_FILEUNIX */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993, 2000 Christopher Seiwald.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
@@ -19,7 +19,6 @@
  * External routines:
  *
  *	var_defines() - load a bunch of variable=value settings
- *	var_list() - variable expand an input list, generating a new list
  *	var_string() - expand a string with variables in it
  *	var_get() - get value of a user defined symbol
  *	var_set() - set a variable in jam's user defined symbol table
@@ -35,6 +34,7 @@
  * 08/23/94 (seiwald) - Support for '+=' (append to variable)
  * 01/22/95 (seiwald) - split environment variables at blanks or :'s
  * 05/10/95 (seiwald) - split path variables at SPLITPATH (not :)
+ * 09/11/00 (seiwald) - defunct var_list() removed
  */
 
 static struct hash *varhash = 0;
@@ -50,8 +50,8 @@ struct _variable {
 	LIST	*value;
 } ;
 
-static VARIABLE	*var_enter();
-static void	var_dump();
+static VARIABLE *var_enter( char *symbol );
+static void var_dump( char *symbol, LIST *value, char *what );
 
 
 
@@ -63,18 +63,34 @@ static void	var_dump();
  */
 
 void
-var_defines( e )
-char **e;
+var_defines( char **e )
 {
 	for( ; *e; e++ )
 	{
 	    char *val;
 
+	    /* Just say "no": windows defines this in the env, */
+	    /* but we don't want it to override our notion of OS. */
+
+	    if( !strcmp( *e, "OS=Windows_NT" ) )
+		continue;
+
+# ifdef OS_MAC
+	    /* On the mac (MPW), the var=val is actually var\0val */
+	    /* Think different. */
+	
+	    if( ( val = strchr( *e, '=' ) ) || ( val = *e + strlen( *e ) ) )
+# else
 	    if( val = strchr( *e, '=' ) )
+# endif
 	    {
 		LIST *l = L0;
 		char *pp, *p;
-		char split = ' ';
+# ifdef OS_MAC
+		char split = ',';
+# else
+		char split = ' ';	
+# endif
 		char buf[ MAXSYM ];
 
 		/* Split *PATH at :'s, not spaces */
@@ -109,41 +125,17 @@ char **e;
 }
 
 /*
- * var_list() - variable expand an input list, generating a new list
- *
- * Returns a newly created list.
- */
-
-LIST *
-var_list( ilist, lol )
-LIST	*ilist;
-LOL	*lol;
-{
-	LIST *olist = 0;
-
-	while( ilist )
-	{
-	    char *s = ilist->string;
-	    olist = var_expand( olist, s, s + strlen(s), lol, 1 );
-	    ilist = list_next( ilist );
-	}
-
-	return olist;
-}
-
-
-/*
  * var_string() - expand a string with variables in it
  *
  * Copies in to out; doesn't modify targets & sources.
  */
 
 int
-var_string( in, out, outsize, lol )
-char	*in;
-char	*out;
-int	outsize;
-LOL	*lol;
+var_string(
+	char	*in,
+	char	*out,
+	int	outsize,
+	LOL	*lol )
 {
 	char 	*out0 = out;
 	char	*oute = out + outsize - 1;
@@ -220,8 +212,7 @@ LOL	*lol;
  */
 
 LIST *
-var_get( symbol )
-char	*symbol;
+var_get( char *symbol )
 {
 	VARIABLE var, *v = &var;
 
@@ -249,10 +240,10 @@ char	*symbol;
  */
 
 void
-var_set( symbol, value, flag )
-char	*symbol;
-LIST	*value;
-int	flag;
+var_set(
+	char	*symbol,
+	LIST	*value,
+	int	flag )
 {
 	VARIABLE *v = var_enter( symbol );
 
@@ -287,9 +278,9 @@ int	flag;
  */
 
 LIST *
-var_swap( symbol, value )
-char	*symbol;
-LIST	*value;
+var_swap(
+	char	*symbol,
+	LIST	*value )
 {
 	VARIABLE *v = var_enter( symbol );
 	LIST 	 *oldvalue = v->value;
@@ -309,8 +300,7 @@ LIST	*value;
  */
 
 static VARIABLE *
-var_enter( symbol )
-char	*symbol;
+var_enter( char	*symbol )
 {
 	VARIABLE var, *v = &var;
 
@@ -331,10 +321,10 @@ char	*symbol;
  */
 
 static void
-var_dump( symbol, value, what )
-char	*symbol;
-LIST	*value;
-char	*what;
+var_dump(
+	char	*symbol,
+	LIST	*value,
+	char	*what )
 {
 	printf( "%s %s = ", what, symbol );
 	list_print( value );

@@ -159,14 +159,14 @@ struct _target {
 	char	*cmds;			/* type-punned command list */
 } ;
 
-RULE	*bindrule();
-TARGET	*bindtarget();
-void	touchtarget();
-TARGETS	*targetlist();
-TARGETS	*targetentry();
-ACTIONS	*actionlist();
-SETTINGS *addsettings();
-void 	pushsettings();
-void 	popsettings();
-void	freesettings();
+RULE 	*bindrule( char *rulename );
+TARGET *bindtarget( char *targetname );
+void 	touchtarget( char *t );
+TARGETS *targetlist( TARGETS *chain, LIST  *targets );
+TARGETS *targetentry( TARGETS *chain, TARGET *target );
+ACTIONS *actionlist( ACTIONS *chain, ACTION *action );
+SETTINGS *addsettings( SETTINGS *head, int append, char *symbol, LIST *value );
+void 	pushsettings( SETTINGS *v );
+void 	popsettings( SETTINGS *v );
+void 	freesettings( SETTINGS *v );
 void	donerules();

@@ -1,22 +1,19 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
+ * Copyright 1993, 2000 Christopher Seiwald.
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
 /*
  * variable.h - handle jam multi-element variables
- *
- * 08/23/94 (seiwald) - Support for '+=' (append to variable)
  */
 
-LIST *var_get();
-void var_defines();
-void var_set();
-LIST *var_swap();
-LIST *var_list();
-int var_string();
-void var_done();
+void 	var_defines( char **e );
+int 	var_string( char *in, char *out, int outsize, LOL *lol );
+LIST * 	var_get( char *symbol );
+void 	var_set( char *symbol, LIST *value, int flag );
+LIST * 	var_swap( char *symbol, LIST *value );
+void 	var_done();
 
 /*
  * Defines for var_set().

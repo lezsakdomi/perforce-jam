@@ -18,10 +18,11 @@
  */
 
 int
-getoptions(argc, argv, opts, optv)
-char **argv;
-char *opts;
-option *optv;
+getoptions(
+    int argc,
+    char **argv,
+    char *opts,
+    option *optv )
 {
     int i;
     int optc = N_OPTS;
@@ -87,10 +88,10 @@ option *optv;
  */
 
 char *
-getoptval( optv, opt, subopt )
-option *optv;
-char opt;
-int subopt;
+getoptval( 
+	option *optv,
+	char opt,
+	int subopt )
 {
 	int i;
 

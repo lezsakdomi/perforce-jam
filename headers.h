@@ -8,4 +8,4 @@
  * headers.h - handle #includes in source files
  */
 
-void headers();
+void headers( TARGET *t );

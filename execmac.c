@@ -5,11 +5,11 @@
  */
 
 # include "jam.h"
-# include "execcmd.h"
 # include "lists.h"
+# include "execcmd.h"
 # include <errno.h>
 
-# ifdef macintosh
+# ifdef OS_MAC
 
 /*
  * execunix.c - execute a shell script on UNIX
@@ -45,11 +45,11 @@
  */
 
 void
-execcmd( string, func, closure, shell )
-char *string;
-void (*func)();
-void *closure;
-LIST *shell;
+execcmd( 
+	char *string,
+	void (*func)( void *closure, int status ),
+	void *closure,
+	LIST *shell )
 {
 	
 	printf( "%s", string );
@@ -66,4 +66,4 @@ execwait()
 	return 0;
 }
 
-# endif /* macintosh */
+# endif /* OS_MAC */

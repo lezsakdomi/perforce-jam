@@ -20,13 +20,11 @@ Related documents of interest are:
 <UL>
 <LI>
 	<a href="Jam.html">The Jam/MR Executable Program</A>,
-	which describes using the <b>jam</b> command
+	which describes using the <b>jam</b> command and the 
+	langauge used in Jambase
 <LI>
 	<A href="Jambase.html">Jambase Reference</A>,
 	which summarizes the Jambase rules and variables
-<LI>
-	<a href="Jamlang.html">The Jam/MR Language</A>,
-	which explains the syntax used in Jambase
 </UL>
 <P>
 Jam/MR documentation and source are available from the
@@ -37,10 +35,10 @@ Jam/MR documentation and source are available from the
 Overview
 </H2>
 <P>
-        <B>jam,</B> the Jam/MR executable program,
+        <B>jam,</B> the Jam executable program,
        recursively  builds  target files  from source files
        using dependency and build specifications defined
-       in Jam/MR rules files.
+       in Jam rules files.
         <B>jam</B> parses the rules files to identify targets
         and sources,
         examines the filesystem to determine which
@@ -48,7 +46,7 @@ Overview
         targets.
 <P>
         A base rules file called "Jambase" is provided with the 
-	Jam/MR distribution. 
+	Jam distribution. 
 	The Jambase file defines rules and variables which support
 	standard software build operations, like compiling, linking,
 	etc.
@@ -107,7 +105,7 @@ whitespace, e.g.,
 <PRE>
 	Main myprog: main.c util.c ; #<I>WRONG!</I>
 </PRE>
-Jam/MR doesn't distinguish between a typo and a target called "myprog:", 
+Jam doesn't distinguish between a typo and a target called "myprog:", 
 so if you get strange results, the first thing
 you should check for in your Jamfile is missing whitespace.
 <P>
@@ -480,7 +478,7 @@ Handling Directory Trees
        $(SEARCH_SOURCE) for the sources they use.
 <P>
        $(LOCATE) and $(SEARCH) are better  explained  in  
-       <A HREF="Jam.html">The Jam/MR Executable Program</A>
+       <A HREF="Jam.html">The Jam Executable Program</A>
        but in brief they tell <B>jam</B> where to create new targets and
        where to find existing ones, respectively.
 <P>
@@ -694,7 +692,7 @@ and LinkLibraries.
               LinkLibraries xprog : libxutil ;
               Library libxutil : xtop.c xbottom.c xutil.c ;
 </PRE>
-       This  example  uses the Jam/MR syntax "variable on target" to
+       This  example  uses the Jam syntax "variable on target" to
        set a target-specific variable.  In this way,  only  xprog
        will  be linked with this special $(X11LINKLIBS), 
        even if other executables were going to  be  built
@@ -1441,10 +1439,12 @@ RmTemps Rule
 <HR>   
 <A HREF="#TOP">Back to top.</A>
 <P>
-        Copyright 1997, 1999 Perforce Software, Inc.
+        Copyright 1997, 2000 Perforce Software, Inc.
         <BR>
         Comments to <A HREF="mailto:info@perforce.com">info@perforce.com</A>
         <BR>
-        Last updated: Jan 27, 1999
+        Last updated: Dec 31, 2000
+	<BR>
+	$Id$
 </BODY> 
 </HTML>

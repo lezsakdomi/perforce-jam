@@ -3,21 +3,16 @@
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
-
+ 
 # include "jam.h"
 # include "filesys.h"
 
-# ifdef macintosh
+# ifdef OS_MAC
 
-# include <sys/types.h>
+#include <Files.h>
+#include <Folders.h>
 
-# ifdef MPW
-# include <sys/stat.h>
-# else
-# include <stat.h>
-# endif
-
-# include <dirent.h>
+# include <:sys:stat.h>
 
 /*
  * filemac.c - manipulate file names and scan directories on macintosh
@@ -41,21 +36,35 @@
  * 11/21/96 (peterk) - BEOS does not have Unix-style archives
  */
 
+void CopyC2PStr(const char * cstr, StringPtr pstr)
+{
+	int	len;
+	
+	for (len = 0; *cstr && len<255; pstr[++len] = *cstr++)
+		;
+	
+	pstr[0] = len;
+}
+
 /*
  * file_dirscan() - scan a directory for files
  */
 
 void
-file_dirscan( dir, func )
-char	*dir;
-void	(*func)();
+file_dirscan( 
+	char	*dir,
+	void	(*func)( char *file, int s, time_t t ) )
 {
 	FILENAME f;
-	DIR *d;
-	struct dirent *dirent;
 	char filename[ MAXJPATH ];
-	struct stat statbuf;
+	unsigned char fullPath[ 512 ];
 
+	FSSpec spec;
+	WDPBRec vol;
+	Str63 volName;	
+	CInfoPBRec lastInfo;
+	int index = 1;
+	
 	/* First enter directory itself */
 
 	memset( (char *)&f, '\0', sizeof( f ) );
@@ -73,20 +82,49 @@ void	(*func)();
 
 	/* Now enter contents of directory */
 
-	if( !( d = opendir( dir ) ) )
-	    return;
+	vol.ioNamePtr = volName;
+	
+	if( PBHGetVolSync( &vol ) )
+		return;
 
-	while( dirent = readdir( d ) )
+	CopyC2PStr( dir, fullPath );
+	
+	if( FSMakeFSSpec( vol.ioWDVRefNum, vol.ioWDDirID, fullPath, &spec ) )
+		return;
+	
+      	lastInfo.dirInfo.ioVRefNum 	= spec.vRefNum;
+   	lastInfo.dirInfo.ioDrDirID 	= spec.parID;
+   	lastInfo.dirInfo.ioNamePtr 	= spec.name;
+   	lastInfo.dirInfo.ioFDirIndex 	= 0;
+   	lastInfo.dirInfo.ioACUser 	= 0;
+			
+   	if( PBGetCatInfoSync(&lastInfo) )
+		return;
+
+	if (!(lastInfo.dirInfo.ioFlAttrib & 0x10))
+		return;
+
+	// ioDrDirID must be reset each time.
+	
+	spec.parID = lastInfo.dirInfo.ioDrDirID;
+		
+	for( ;; )
 	{
-	    f.f_base.ptr = dirent->d_name;
-	    f.f_base.len = strlen( f.f_base.ptr );
-
+       	    lastInfo.dirInfo.ioVRefNum 	= spec.vRefNum;
+	    lastInfo.dirInfo.ioDrDirID	= spec.parID;
+	    lastInfo.dirInfo.ioNamePtr 	= fullPath;
+	    lastInfo.dirInfo.ioFDirIndex = index++;
+	   		
+	    if( PBGetCatInfoSync(&lastInfo) )
+		return;
+			
+	    f.f_base.ptr = (char *)fullPath + 1;
+	    f.f_base.len = *fullPath;
+	    
 	    file_build( &f, filename, 0 );
 
 	    (*func)( filename, 0 /* not stat()'ed */, (time_t)0 );
 	}
-
-	closedir( d );
 }
 
 /*
@@ -94,9 +132,9 @@ void	(*func)();
  */
 
 int
-file_time( filename, time )
-char	*filename;
-time_t	*time;
+file_time( 
+	char	*filename,
+	time_t	*time )
 {
 	struct stat statbuf;
 
@@ -113,9 +151,10 @@ time_t	*time;
  */
 
 void
-file_archscan( archive, func )
-char *archive;
-void (*func)();
+file_archscan(
+	char 	*archive,
+	void	(*func)( char *file, int s, time_t t ) )
+
 {
 }
 
