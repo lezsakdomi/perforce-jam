@@ -270,7 +270,7 @@ builtin_match(
 		/* Find highest parameter */
 
 		for( top = NSUBEXP; top-- > 1; )
-		    if( re->startp[top] != re->endp[top] )
+		    if( re->startp[top] )
 			break;
 
 		/* And add all parameters up to highest onto list. */
