@@ -435,10 +435,8 @@ compile_null(
 /*
  * compile_on() - run rule under influence of on-target variables
  *
- * 	parse->left	list of files to include (can only do 1)
+ * 	parse->left	target list; only first used
  *	parse->right	rule to run
- *
- * EXPERIMENTAL!
  */
 
 LIST *
