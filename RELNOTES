@@ -45,6 +45,15 @@ Release notes for Jam/MR [UNRELEASED]
 	\ can now be used to escape a space (or any single whitespace
 	character), so that you don't have to resort to quotes. 
 
+	New 'Match regexp : string' rule matches regexp against string
+	and returns list of results.
+
+	Rules can now be invoked indirectly, through variable names.
+	If the variable expands to an empty list, no rule is run.
+	If the variable expands to multiple entries, each rule is
+	run with the same arguments.  The result of the rule invocation
+	is the concatenation of the results of the rules invoked.
+
 	'Echo' and 'Exit' now have aliases 'echo' and 'exit', since it
 	is really hard to tell that these are built-in rules and not
 	part of the language, like 'include'.  Real rules continue to
@@ -89,6 +98,9 @@ Release notes for Jam/MR [UNRELEASED]
 	essentially the same but returns a LIST.
 
 4.  Fixed bugs
+
+	'actions updated', not 'actions together', now protects targets
+	from being deleted on failed/interrupted updates.
 
 	Fixed broken $(v[1-]), which always returned an empty expansion.
 	Thanks to Ian Godin <ian@sgrail.com>.
