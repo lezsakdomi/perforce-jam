@@ -1,10 +1,10 @@
-Jam/MR (aka "jam - make(1) redux") 
+Jam - make(1) redux
 
     /+\
     +\	Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
     \+/
 
-    This is Release 2.4 of Jam/MR, a make-like program.
+    This is Release 2.4 of Jam, a make-like program.
 
     License is hereby granted to use this software and distribute it
     freely, as long as this copyright notice is retained and modifications 

@@ -1,4 +1,4 @@
-Changes since Jam/MR 2.4
+Changes since Jam 2.4
 
 	Makefile/Jambase: BEOS updates from "Ingo Weinhold"
 	<bonefish@cs.tu-berlin.de>.
@@ -48,12 +48,12 @@ Changes since Jam/MR 2.4
 ===============================================================================
 ===============================================================================
 
-Release notes for Jam/MR 2.4
+Release notes for Jam 2.4
 (aka Jam - make(1) redux)
 
 1.  Release info:
 
-	Jam/MR 2.4
+	Jam 2.4
 	March, 21, 2002
 	VERSION 2.4
 
@@ -246,7 +246,7 @@ Release notes for Jam/MR 2.4
 ===============================================================================
 
 
-Release notes for Jam/MR 2.3
+Release notes for Jam 2.3
 (aka Jam - make(1) redux)
 
 0.  Bugs fixed since 2.3.1
@@ -261,7 +261,7 @@ Release notes for Jam/MR 2.3
 
 1.  Release info:
 
-	Jam/MR 2.3
+	Jam 2.3
 	November 16, 2000
 	VERSION 2.3
 	PATCHLEVEL 1
