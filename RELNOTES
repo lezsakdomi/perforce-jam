@@ -5,7 +5,7 @@
 Release notes for Jam 2.5
 (aka Jam - make(1) redux)
 
-0. Changes between 2.4rc1 and 2.4rc2:
+0. Changes between 2.5rc1 and 2.5rc2:
 
 	Several uninitialized memory accesses have been corrected in
 	var_expand() and file_archscan(), thanks to Matt Armstrong.
@@ -15,6 +15,9 @@ Release notes for Jam 2.5
 
 	Fix "includes of includes not being considered", broken by 2499.
 	(See the description to change 2614 for details).
+
+	Remove NT FQuote rule, as, \" is required to pass quotes on
+	the command line.
 
 1.  Release info:
 

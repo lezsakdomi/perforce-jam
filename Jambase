@@ -1511,7 +1511,6 @@ if $(OS2)
 
 else if $(NT)
 {
-	rule FQuote { return \"$(<)\" ; }
 	rule FDefines { return /D$(<) ; }
 	rule FIncludes { return /I$(<) ; }
 }

@@ -914,7 +914,6 @@ const char *jambase[] = {
 "}\n",
 "else if $(NT)\n",
 "{\n",
-"rule FQuote { return \\\"$(<)\\\" ; }\n",
 "rule FDefines { return /D$(<) ; }\n",
 "rule FIncludes { return /I$(<) ; }\n",
 "}\n",
