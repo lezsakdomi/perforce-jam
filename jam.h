@@ -38,6 +38,7 @@
  * 11/05/02 (seiwald) - OSPLAT now set to sparc on solaris.
  * 06/03/03 (seiwald) - OpenBSD porting from Michael Champigny.
  * 05/06/04 (seiwald) - OSPLAT amd64.
+ * 06/23/04 (seiwald) - Nonstop unix porting from Kim Hae-Joo.
  */
 
 /*
@@ -361,6 +362,10 @@
 # if defined(__USLC__) && !defined(M_XENIX)
 # define OSMINOR "OS=UNIXWARE"
 # define OS_UNIXWARE
+# endif
+# ifdef __nonstopux
+# define OSMINOR "OS=NONSTOP"
+# define OS_NONSTOP
 # endif
 # ifndef OSMINOR
 # define OSMINOR "OS=UNKNOWN"
