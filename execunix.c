@@ -53,10 +53,10 @@
 # ifdef OS_NT 
 # define USE_EXECNT
 # include <process.h>
-# if !defined( __BORLANDC__ ) 
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>		/* do the ugly deed */
 # define USE_MYWAIT
+# if !defined( __BORLANDC__ ) 
 # define wait my_wait
 static int my_wait( int *status );
 # endif

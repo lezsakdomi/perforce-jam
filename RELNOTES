@@ -19,6 +19,8 @@ Release notes for Jam 2.5
 	Remove NT FQuote rule, as, \" is required to pass quotes on
 	the command line.
 
+	Porting changes allow jam to build with BorlandC 5.5
+
 1.  Release info:
 
 	Jam 2.5
