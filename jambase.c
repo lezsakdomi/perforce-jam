@@ -3,6 +3,7 @@ char *jambase[] = {
 /* Jambase */
 "if $(NT)\n",
 "{\n",
+"MV		?= move /y ;\n",
 "CP		?= copy ;\n",
 "RM		?= del /f/q ;\n",
 "SLASH		?= \\\\ ;\n",

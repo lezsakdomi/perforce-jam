@@ -68,6 +68,7 @@ Release notes for Jam/MR [UNRELEASED]
 	Jambase has been compacted by applying the new E: and J:
 	expansion modifiers.
 
+
 3.3.  Jam internal code changes
 
 	Optimize rule compilation, with right-recursion instead of left.
@@ -143,6 +144,8 @@ Release notes for Jam/MR [UNRELEASED]
 
         [NT] Add entry for DevStudio when the settings are already in the
         system environment.
+
+        [NT] default $(MV) to "move /y" in Jambase.
 
 ===============================================================================
 ===============================================================================
