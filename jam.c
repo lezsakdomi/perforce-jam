@@ -201,10 +201,8 @@ main( int argc, char **argv, char **arg_environ )
 
 	if( ( s = getoptval( optv, 'v', 0 ) ) )
 	{
-	    printf( "Jam/MR  " );
-	    printf( "Version %s.  ", VERSION );
-	    printf( "Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.  " );
-	    printf( "%s.\n", OSMINOR );
+	    printf( "Jam %s. %s. ", VERSION, OSMINOR );
+	    printf( "Copyright 1993-2002 Christopher Seiwald.\n" );
 
 	    return EXITOK;
 	}
