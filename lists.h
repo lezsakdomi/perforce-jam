@@ -24,6 +24,7 @@
  *	list_sublist() - copy a subset of a list of strings
  *	list_free() - free a list of strings
  *	list_print() - print a list of strings to stdout
+ *	list_printq() - print a list of safely quoted strings to a file
  *	list_length() - return the number of items in the list
  *
  *	lol_init() - initialize a LOL (list of lists)
@@ -36,6 +37,7 @@
  * 08/23/94 (seiwald) - new list_append()
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/09/02 (seiwald) - new list_printq() for writing lists to Jambase
  */
 
 /*

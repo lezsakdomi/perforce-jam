@@ -26,6 +26,7 @@
  * 03/02/02 (seiwald) - rules can be invoked via variable names
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/09/02 (seiwald) - push regexp creation down to headers1().
  */
 
 # include "jam.h"
@@ -38,7 +39,7 @@
 # include "headers.h"
 # include "newstr.h"
 
-static LIST *headers1( LIST *l, const char *file, int rec, regexp *re[] );
+static LIST *headers1( const char *file, LIST *hdrscan );
 
 /*
  * headers() - scan a target for include files and call HDRRULE
@@ -51,32 +52,23 @@ headers( TARGET *t )
 {
 	LIST	*hdrscan;
 	LIST	*hdrrule;
-	LIST	*headlist = 0;
+	LIST	*hdrcache;
 	LOL	lol;
-	regexp	*re[ MAXINC ];
-	int	rec = 0;
 
 	if( !( hdrscan = var_get( "HDRSCAN" ) ) || 
 	    !( hdrrule = var_get( "HDRRULE" ) ) )
 	        return;
 
-	if( DEBUG_HEADER )
-	    printf( "header scan %s\n", t->name );
-
-	/* Compile all regular expressions in HDRSCAN */
-
-	while( rec < MAXINC && hdrscan )
-	{
-	    re[rec++] = regcomp( hdrscan->string );
-	    hdrscan = list_next( hdrscan );
-	}
-
 	/* Doctor up call to HDRRULE rule */
 	/* Call headers1() to get LIST of included files. */
 
+	if( DEBUG_HEADER )
+	    printf( "header scan %s\n", t->name );
+
 	lol_init( &lol );
+
 	lol_add( &lol, list_new( L0, t->name, 1 ) );
-	lol_add( &lol, headers1( headlist, t->boundname, rec, re ) );
+	lol_add( &lol, headers1( t->boundname, hdrscan ) );
 
 	if( lol_get( &lol, 1 ) )
 	    list_free( evaluate_rule( hdrrule->string, &lol, L0 ) );
@@ -84,9 +76,6 @@ headers( TARGET *t )
 	/* Clean up */
 
 	lol_free( &lol );
-
-	while( rec )
-	    free( (char *)re[--rec] );
 }
 
 /*
@@ -95,17 +84,24 @@ headers( TARGET *t )
 
 static LIST *
 headers1( 
-	LIST	*result,
 	const char *file,
-	int	rec,
-	regexp	*re[] )
+	LIST *hdrscan )
 {
 	FILE	*f;
-	char	buf[ 1024 ];
 	int	i;
+	int	rec = 0;
+	LIST	*result = 0;
+	regexp	*re[ MAXINC ];
+	char	buf[ 1024 ];
 
 	if( !( f = fopen( file, "r" ) ) )
 	    return result;
+
+	while( rec < MAXINC && hdrscan )
+	{
+	    re[rec++] = regcomp( hdrscan->string );
+	    hdrscan = list_next( hdrscan );
+	}
 
 	while( fgets( buf, sizeof( buf ), f ) )
 	{
@@ -124,6 +120,9 @@ headers1(
 		    printf( "header found: %s\n", buf2 );
 	    }
 	}
+
+	while( rec )
+	    free( (char *)re[--rec] );
 
 	fclose( f );
 

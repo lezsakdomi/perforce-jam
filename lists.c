@@ -21,6 +21,7 @@
  * 09/07/00 (seiwald) - documented lol_*() functions
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/09/02 (seiwald) - new list_printq() for writing lists to Jambase
  */
 
 # include "jam.h"
@@ -165,6 +166,44 @@ list_print( LIST *l )
 {
 	for( ; l; l = list_next( l ) )
 	    printf( "%s ", l->string );
+}
+
+/*
+ * list_printq() - print a list of safely quoted strings to a file
+ */
+
+void
+list_printq( FILE *out, LIST *l )
+{
+	/* Dump each word, enclosed in "s */
+	/* Suitable for Jambase use. */
+
+	for( ; l; l = list_next( l ) )
+	{
+	    const char *p = l->string;
+	    const char *ep = p + strlen( p );
+	    const char *op = p;
+
+	    fputc( '\n', out );
+	    fputc( '\t', out );
+	    fputc( '"', out );
+
+	    /* Any embedded "'s?  Escape them */
+
+	    while( p = (char *)memchr( op, '"',  ep - op ) )
+	    {
+		fwrite( op, p - op, 1, out );
+		fputc( '\\', out );
+		fputc( '"', out );
+		op = p + 1;
+	    }
+
+	    /* Write remainder */
+
+	    fwrite( op, ep - op, 1, out );
+	    fputc( '"', out );
+	    fputc( ' ', out );
+	}
 }
 
 /*
