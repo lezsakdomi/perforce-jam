@@ -31,6 +31,7 @@
  * 12/27/02 (seiwald) - support for AIX big archives
  * 12/30/02 (seiwald) - terminate ar_hdr for solaris sscanf()
  * 12/30/02 (seiwald) - skip solaris' empty archive member names (/, //xxx)
+ * 09/02/04 (tony)    - Zeta porting (sic. BeOS 5.2)
  */
 
 # include "jam.h"
@@ -86,6 +87,7 @@ struct ar_hdr		/* archive file member header - printable ascii */
 
 # if defined( OS_QNX ) || \
      defined( OS_BEOS ) || \
+     defined( OS_ZETA ) || \
      defined( OS_MPEIX )
 # define NO_AR
 # define HAVE_AR
