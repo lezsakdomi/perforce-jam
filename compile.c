@@ -21,6 +21,7 @@
  * External routines:
  *
  *	compile_append() - append list results of two statements
+ *	compile_eval() - evaluate if to determine which leg to compile
  *	compile_foreach() - compile the "for x in y" statement
  *	compile_if() - compile 'if' rule
  *	compile_include() - support for 'include' - call include() on file
@@ -39,8 +40,6 @@
  * Internal routines:
  *
  *	debug_compile() - printf with indent to show rule expansion.
- *
- *	evaluate_if() - evaluate if to determine which leg to compile
  *	evaluate_rule() - execute a rule invocation
  *
  * 02/03/94 (seiwald) -	Changed trace output to read "setting" instead of 
@@ -120,10 +119,23 @@ compile_eval(
 	PARSE	*parse,
 	LOL	*args )
 {
-	LIST *ll = (*parse->left->func)( parse->left, args );
-	LIST *lr = (*parse->right->func)( parse->right, args );
-	LIST *s, *t;
+	LIST *ll, *lr, *s, *t;
 	int status = 0;
+
+	/* Short circuit lr eval for &&, ||, and 'in' */
+
+	ll = (*parse->left->func)( parse->left, args );
+	lr = 0;
+
+	switch( parse->num )
+	{
+	case EXPR_AND: 
+	case EXPR_IN: 	if( ll ) goto eval; break;
+	case EXPR_OR: 	if( !ll ) goto eval; break;
+	default: eval: 	lr = (*parse->right->func)( parse->right, args );
+	}
+
+	/* Now eval */
 
 	switch( parse->num )
 	{
