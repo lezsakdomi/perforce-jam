@@ -108,6 +108,10 @@ Release notes for Jam 2.5
 	in the code as "space separated".  Now the last blank is suppressed
 	to match.  From Miklos Fazekas.
 
+	The temp file name used by jam for .bat files on NT now contains
+	jam's pid, so that multiple jams can run on the same system (with
+	the same $TEMP).  Thanks to Steve Anichini.
+
 5.  Porting
 
 	The Makefile now uses $(EXENAME) (./jam0 on UNIX, .\jam0.exe
