@@ -16,8 +16,6 @@
 
 <DT> <P> <H2> USAGE </H2> <DD>
 
--q      Quit Quickly as soon as a target fails.
-
 <PRE>
 jam [ -a ] [ -n ] [ -v ] [ -q ]
     [ -d <I>debug</I> ] 
@@ -637,12 +635,14 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	GLOB <i>directories</I> : <I>patterns</I>
 	</CODE>
 
-	<DD>  Using the same wildcards as for the patterns in the
-        <A HREF="#switch">switch</A> statement).
-        It is invoked by being used as an argument to a rule invocation
-        inside of `[ ]`. For example: "<TT>FILES = [ GLOB dir1 dir2 : *.c *.h ]</TT>"
-        sets A to the list of C source and header files in
-        dir1 or dir2.
+	<DD>  Using the same wildcards as for the patterns in the <A
+	HREF="#switch">switch</A> statement).  It is invoked by being
+	used as an argument to a rule invocation inside of `[ ]`. For
+	example: "<TT>FILES = [ GLOB dir1 dir2 : *.c *.h ]</TT>" sets
+	A to the list of C source and header files in dir1 or dir2.
+	The resulting filenames are the full pathnames, including the
+	directory, but the pattern is applied only to the file name
+	without the directory.
 
 	</DL></TABLE>
 
@@ -653,19 +653,15 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
 
 	<P><DT><CODE>
-	MATCH <i>regexp</I> : <I>string</I>
+	MATCH <i>regexps</I> : <I>list</I>
 	</CODE>
 
-	<DD>  Matches the regular expression <I>regexp</I> against the string
-        <I>string</I>, returning a list of matching <tt>()</tt>
-        subexpressions. For example:
-	"<TT>MATCHED = [ MATCH (d.).*(9[0-9]).*(.a) : dodge1966dart ]</TT>"
-        sets MATCHED to the three-element list "<TT>do 96 da</TT>".
-
-	<P>
-	
-	 The matching routines are Henry Spencer's Unix V8
-	compatible implementation.
+	<DD> Matches the <b>egrep</b>(1) style regular expressions
+	<I>regexps</I> against the strings in <I>list</I>.  The result
+	is the concatenation of matching <tt>()</tt> subexpressions for
+	each string in <I>list</I>, and for each regular expression in    
+	<I>regexps</I>.  Only useful within the <tt>[ ]</tt> construct,
+	to change the result into a list.
 
 	</DL></TABLE>
 
@@ -1345,7 +1341,7 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
         <BR>
         Comments to <A HREF="mailto:info@perforce.com">info@perforce.com</A>
         <BR>
-        Last updated: December 31, 2000
+        Last updated: April 1, 2002
 	<BR>
 	$Id$
 
