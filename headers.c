@@ -76,7 +76,7 @@ headers( TARGET *t )
 	lol_add( &lol, headers1( headlist, t->boundname, rec, re ) );
 
 	if( lol_get( &lol, 1 ) )
-	    evaluate_rule( hdrrule->string, &lol );
+	    list_free( evaluate_rule( hdrrule->string, &lol, L0 ) );
 
 	/* Clean up */
 

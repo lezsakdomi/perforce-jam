@@ -414,8 +414,8 @@ compile_on(
 /*
  * compile_rule() - compile a single user defined rule
  *
- *	parse->string	name of user defined rule
- *	parse->left	parameters (list of lists) to rule, recursing left
+ *	parse->left	list of rules to run
+ *	parse->right	parameters (list of lists) to rule, recursing left
  *
  * Wrapped around evaluate_rule() so that headers() can share it.
  */
@@ -426,20 +426,27 @@ compile_rule(
 	LOL	*args )
 {
 	LOL	nargs[1];
-	LIST	*result;
+	LIST	*result = 0;
+	LIST	*ll, *l;
 	PARSE	*p;
+
+	/* list of rules to run -- normally 1! */
+
+	ll = (*parse->left->func)( parse->left, args );
 
 	/* Build up the list of arg lists */
 
 	lol_init( nargs );
 
-	for( p = parse->left; p; p = p->left )
+	for( p = parse->right; p; p = p->left )
 	    lol_add( nargs, (*p->right->func)( p->right, args ) );
 
-	/* And invoke rule */
+	/* Run rules, appending results from each */
 
-	result = evaluate_rule( parse->string, nargs );
+	for( l = ll; l; l = list_next( l ) )
+	    result = evaluate_rule( l->string, nargs, result );
 
+	list_free( ll );
 	lol_free( nargs );
 
 	return result;
@@ -452,9 +459,9 @@ compile_rule(
 LIST *
 evaluate_rule(
 	char	*rulename,
-	LOL	*args )
+	LOL	*args, 
+	LIST	*result )
 {
-	LIST	*result = L0;
 	RULE	*rule = bindrule( rulename );
 
 	if( DEBUG_COMPILE )

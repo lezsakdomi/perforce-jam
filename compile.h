@@ -28,7 +28,7 @@ LIST *compile_settings( PARSE *parse, LOL *args );
 LIST *compile_switch( PARSE *parse, LOL *args );
 LIST *compile_while( PARSE *parse, LOL *args );
 
-LIST *evaluate_rule( char *rulename, LOL *args );
+LIST *evaluate_rule( char *rulename, LOL *args, LIST *result );
 
 /* Flags for compile_set(), etc */
 
