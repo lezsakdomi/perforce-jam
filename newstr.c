@@ -52,6 +52,9 @@ newstr( char *string )
 	    int l = strlen( string );
 	    char *m = (char *)malloc( l + 1 );
 
+	    if (DEBUG_MEM)
+		    printf("newstr: allocating %d bytes\n", l + 1 );
+
 	    strtotal += l + 1;
 	    memcpy( m, string, l + 1 );
 	    *s = m;
