@@ -36,6 +36,7 @@
  * 08/16/02 (seiwald) - BEOS porting from Ingo Weinhold
  * 09/19/02 (seiwald) - new -d displays
  * 11/05/02 (seiwald) - OSPLAT now set to sparc on solaris.
+ * 06/03/03 (seiwald) - OpenBSD porting from Michael Champigny.
  */
 
 /*
@@ -290,6 +291,11 @@
 # define OS_NETBSD
 # define NO_VFORK
 # endif
+# ifdef __OpenBSD__
+# define unix
+# define OSMINOR "OS=OPENBSD"
+# define OS_OPENBSD
+# endif
 # ifdef __QNX__
 # ifdef __QNXNTO__
 # define OSMINOR "OS=QNXNTO"
@@ -393,7 +399,8 @@
      !defined(OS_MACHTEN) && \
      !defined(OS_MACOSX) && \
      !defined(OS_RHAPSODY) && \
-     !defined(OS_MVS)
+     !defined(OS_MVS) && \
+     !defined(OS_OPENBSD)
 # include <malloc.h>
 # endif
 
