@@ -38,12 +38,6 @@ LIST *compile_while( PARSE *parse, LOL *args, int *jmp );
 
 LIST *evaluate_rule( const char *rulename, LOL *args, LIST *result );
 
-/* Flags for compile_set(), etc */
-
-# define ASSIGN_SET	0x00	/* = assign variable */
-# define ASSIGN_APPEND	0x01	/* += append variable */
-# define ASSIGN_DEFAULT	0x02	/* set only if unset */
-
 /* Conditions for compile_if() */
 
 # define EXPR_NOT	0	/* ! cond */

@@ -79,6 +79,7 @@
 # include "newstr.h"
 # include "search.h"
 
+static const char *set_names[] = { "=", "+=", "?=" };
 static void debug_compile( int which, const char *s );
 int glob( const char *s, const char *c );
 
@@ -644,7 +645,7 @@ compile_rules(
  *
  *	parse->left	variable names
  *	parse->right	variable values 
- *	parse->num	ASSIGN_SET/APPEND/DEFAULT
+ *	parse->num	VAR_SET/APPEND/DEFAULT
  */
 
 LIST *
@@ -656,22 +657,12 @@ compile_set(
 	LIST	*nt = (*parse->left->func)( parse->left, args, jmp );
 	LIST	*ns = (*parse->right->func)( parse->right, args, jmp );
 	LIST	*l;
-	int	setflag;
-	const char *trace;
-
-	switch( parse->num )
-	{
-	case ASSIGN_SET:	setflag = VAR_SET; trace = "="; break;
-	case ASSIGN_APPEND:	setflag = VAR_APPEND; trace = "+="; break;
-	case ASSIGN_DEFAULT:	setflag = VAR_DEFAULT; trace = "?="; break;
-	default:		setflag = VAR_SET; trace = ""; break;
-	}
 
 	if( DEBUG_COMPILE )
 	{
 	    debug_compile( 0, "set" );
 	    list_print( nt );
-	    printf( " %s ", trace );
+	    printf( " %s ", set_names[ parse->num ] );
 	    list_print( ns );
 	    printf( "\n" );
 	}
@@ -680,7 +671,7 @@ compile_set(
 	/* var_set keeps ns, so need to copy it */
 
 	for( l = nt; l; l = list_next( l ) )
-	    var_set( l->string, list_copy( L0, ns ), setflag );
+	    var_set( l->string, list_copy( L0, ns ), parse->num );
 
 	list_free( nt );
 
@@ -779,7 +770,7 @@ compile_setexec(
  *	parse->left	variable names
  *	parse->right	target name 
  *	parse->third	variable value 
- *	parse->num	ASSIGN_SET/APPEND	
+ *	parse->num	VAR_SET/APPEND/DEFAULT
  */
 
 LIST *
@@ -792,7 +783,6 @@ compile_settings(
 	LIST	*ns = (*parse->third->func)( parse->third, args, jmp );
 	LIST	*targets = (*parse->right->func)( parse->right, args, jmp );
 	LIST	*ts;
-	int	append = parse->num == ASSIGN_APPEND;
 
 	if( DEBUG_COMPILE )
 	{
@@ -800,7 +790,7 @@ compile_settings(
 	    list_print( nt );
 	    printf( "on " );
 	    list_print( targets );
-	    printf( " %s ", append ? "+=" : "=" );
+	    printf( " %s ", set_names[ parse->num ] );
 	    list_print( ns );
 	    printf( "\n" );
 	}
@@ -815,7 +805,7 @@ compile_settings(
 	    LIST	*l;
 
 	    for( l = nt; l; l = list_next( l ) )
-		t->settings = addsettings( t->settings, append, 
+		t->settings = addsettings( t->settings, parse->num,
 				l->string, list_copy( (LIST*)0, ns ) );
 	}
 

@@ -84,6 +84,7 @@
 #include "jam.h"
 
 #include "lists.h"
+#include "variable.h"
 #include "parse.h"
 #include "scan.h"
 #include "compile.h"
@@ -194,13 +195,13 @@ rule	: _LBRACE_t block _RBRACE_t
  */
 
 assign	: _EQUALS_t
-		{ $$.number = ASSIGN_SET; }
+		{ $$.number = VAR_SET; }
 	| _PLUS_EQUALS_t
-		{ $$.number = ASSIGN_APPEND; }
+		{ $$.number = VAR_APPEND; }
 	| _QUESTION_EQUALS_t
-		{ $$.number = ASSIGN_DEFAULT; }
+		{ $$.number = VAR_DEFAULT; }
 	| DEFAULT_t _EQUALS_t
-		{ $$.number = ASSIGN_DEFAULT; }
+		{ $$.number = VAR_DEFAULT; }
 	;
 
 /*

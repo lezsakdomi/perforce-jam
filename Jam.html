@@ -646,25 +646,27 @@ jam [ -a ] [ -g ] [ -n ] [ -q ] [ -v ]
 	    <DT><CODE> 
 	    <I>variable</I> += <I>elements</I> ; </CODE>
 	    <DT><CODE> 
+	    <I>variable</I> ?= <I>elements</I> ; </CODE>
+	    <DT><CODE> 
 	    <I>variable</I> on <I>targets</I> = <I>elements</I> ; </CODE>
 	    <DT><CODE> 
 	    <I>variable</I> on <I>targets</I> += <I>elements</I> ; </CODE>
 	    <DT><CODE> 
-	    <I>variable</I> default = <I>elements</I> ; </CODE>
-	    <DT><CODE> 
-	    <I>variable</I> ?= <I>elements</I> ; </CODE>
+	    <I>variable</I> on <I>targets</I> ?= <I>elements</I> ; </CODE>
 
 	</DL></TABLE>
 
 	<P>
 
-	The first two forms set <I>variable</I> globally.  The third
-	and forth forms set a target-specific variable.  The = operator
+	The first three forms set <I>variable</I> globally.  The last
+	three forms set a target-specific variable.  The = operator
 	replaces any previous elements of <I>variable</I> with
 	<I>elements</I>; the += operation adds <I>elements</I> to
-	<I>variable</I>'s list of elements.  The final two forms are
-	synonymous: they set <I>variable</I> globally, but only if it
-	was previously unset.
+	<I>variable</I>'s list of elements; the ?= operator sets
+	<I>variable</I> only if it was previously unset.  The last form
+	"<I>variable</I> on <I>targets</I> ?= <I>elements</I>" checks
+	to see if the target-specific, not the global, variable is set.
+	(The ?= operator also has an old form "default =".)  
 
 	<P>
 

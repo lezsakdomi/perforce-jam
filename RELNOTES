@@ -95,6 +95,11 @@ Release notes for Jam 2.5
 	and with the "on target statement" syntax.  Now setting
 	target-specific variables works again.  Thanks to Matt Armstrong.
 
+	Setting "var on target ?= value" now works as expected: if the
+	variable is already set on the target, it is left unchanged.
+	Previously, ?= was ignored and the variable was set anyway.
+	Thanks to Chris Antos.
+
 5.  Porting
 
 	The Makefile now uses $(EXENAME) (./jam0 on UNIX, .\jam0.exe

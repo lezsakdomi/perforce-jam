@@ -168,7 +168,7 @@ TARGETS *targetlist( TARGETS *chain, LIST  *targets );
 TARGETS *targetentry( TARGETS *chain, TARGET *target );
 TARGETS *targetchain( TARGETS *chain, TARGETS *targets );
 ACTIONS *actionlist( ACTIONS *chain, ACTION *action );
-SETTINGS *addsettings( SETTINGS *v, int append, const char *sym, LIST *val );
+SETTINGS *addsettings( SETTINGS *v, int setflag, const char *sym, LIST *val );
 SETTINGS *copysettings( SETTINGS *v );
 void 	pushsettings( SETTINGS *v );
 void 	popsettings( SETTINGS *v );

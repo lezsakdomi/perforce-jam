@@ -208,7 +208,7 @@ actionlist(
 SETTINGS *
 addsettings(
 	SETTINGS *head,
-	int	append,
+	int	setflag,
 	const char *symbol,
 	LIST	*value )
 {
@@ -232,15 +232,24 @@ addsettings(
 	    v->next = head;
 	    head = v;
 	}
-	else if( append )
+	else switch( setflag )
 	{
-	    v->value = list_append( v->value, value );
-	}
-	else
-	{
+	case VAR_SET:
+	    /* Toss old, set new */
 	    list_free( v->value );
 	    v->value = value;
-	} 
+	    break;
+
+	case VAR_APPEND:
+	    /* Append new to old */
+	    v->value = list_append( v->value, value );
+	    break;
+
+	case VAR_DEFAULT:
+	    /* Toss new, old already set */
+	    list_free( value );
+	    break;
+	}
 
 	/* Return (new) head of list. */
 
