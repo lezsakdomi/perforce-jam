@@ -32,15 +32,6 @@ TARGET = -o $(EXENAME)
 #TARGET = /Fejam0
 #EXENAME = .\jam0.exe
 
-# BeOS - Metroworks CodeWarrior
-#CC = mwcc
-#Include = /NewDisk/develop/headers/posix
-#CFLAGS = -I $(Include)
-
-# BeOS - gcc
-#CC = gcc
-#LINKLIBS = -lnet
-
 # Interix - gcc
 #CC = gcc
 

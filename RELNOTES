@@ -1,5 +1,8 @@
 Changes since Jam/MR 2.4
 
+	Makefile/Jambase: BEOS updates from "Ingo Weinhold"
+	<bonefish@cs.tu-berlin.de>.
+
 	Jambase: MkDir now grists it directories with 'dir', so that
 	directory targets can be distinguished from other targets.
 
