@@ -314,15 +314,20 @@ make0(
 	}
 
 	/* Step 4b: pick up included headers time */
-	/* If a header is newer than a temp source that */
-	/* includes it, the temp source needs building */
+
+	/* 
+	 * If a header is newer than a temp source that includes it, 
+	 * the temp source will need building.   Only bother for temp
+	 * sources.
+	 */
 
 	hlast = 0;
 
-	for( c = t->includes; c; c = c->next )
-	    hlast = max( hlast, c->target->time );
+	if( t->binding == T_BIND_PARENTS )
+	    for( c = t->includes; c; c = c->next )
+		hlast = max( hlast, c->target->time );
 
-	/* Step 4b: handle NOUPDATE oddity */
+	/* Step 4c: handle NOUPDATE oddity */
 
 	/*
 	 * If a NOUPDATE file exists, make dependents eternally old.
@@ -337,7 +342,7 @@ make0(
 	    fate = T_FATE_STABLE;
 	}
 
-	/* Step 4c: determine fate: rebuild target or what? */
+	/* Step 4d: determine fate: rebuild target or what? */
 
 	/* 
 	    In English:
@@ -403,7 +408,7 @@ make0(
 	    fate = T_FATE_STABLE;
 	}
 
-	/* Step 4d: handle missing files */
+	/* Step 4e: handle missing files */
 	/* If it's missing and there are no actions to create it, boom. */
 	/* If we can't make a target we don't care about, 'sokay */
 	/* We could insist that there are updating actions for all missing */
@@ -423,7 +428,7 @@ make0(
 	    }
 	}
 
-	/* Step 4e: propagate dependents' time & fate. */
+	/* Step 4f: propagate dependents' time & fate. */
 	/* Set leaf time to be our time only if this is a leaf. */
 
 	t->time = max( t->time, last );
