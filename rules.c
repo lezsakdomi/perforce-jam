@@ -58,6 +58,7 @@ bindrule( char *rulename )
 	    r->procedure = (PARSE *)0;
 	    r->actions = (char *)0;
 	    r->bindlist = L0;
+	    r->params = L0;
 	    r->flags = 0;
 	}
 

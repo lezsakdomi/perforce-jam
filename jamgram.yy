@@ -72,7 +72,7 @@
 # define prules( l,r )	  	parse_make( compile_rules,l,r,P0,S0,S0,0 )
 # define pset( l,r,a ) 	  	parse_make( compile_set,l,r,P0,S0,S0,a )
 # define pset1( l,r,t,a )	parse_make( compile_settings,l,r,t,S0,S0,a )
-# define psetc( s,p )     	parse_make( compile_setcomp,p,P0,P0,s,S0,0 )
+# define psetc( s,l,r )     	parse_make( compile_setcomp,l,r,P0,s,S0,0 )
 # define psete( s,l,s1,f ) 	parse_make( compile_setexec,l,P0,P0,s,s1,f )
 # define pswitch( l,r )   	parse_make( compile_switch,l,r,P0,S0,S0,0 )
 # define pwhile( l,r )   	parse_make( compile_while,l,r,P0,S0,S0,0 )
@@ -135,8 +135,8 @@ rule	: `{` block `}`
 		{ $$.parse = pif( $2.parse, $4.parse, $7.parse ); }
 	| `while` expr `{` block `}`
 		{ $$.parse = pwhile( $2.parse, $4.parse ); }
-	| `rule` ARG rule
-		{ $$.parse = psetc( $2.string, $3.parse ); }
+	| `rule` ARG params `{` block `}`
+		{ $$.parse = psetc( $2.string, $3.parse, $5.parse ); }
 	| `on` arg rule
 		{ $$.parse = pon( $2.parse, $3.parse ); }
 	| `actions` eflags ARG bindlist `{`
@@ -209,6 +209,19 @@ cases	: /* empty */
 
 case	: `case` ARG `:` block
 		{ $$.parse = psnode( $2.string, $4.parse ); }
+	;
+
+/*
+ * params - optional parameter names to rule definition
+ * right-recursive rule so that params can be added in order.
+ */
+
+params	: /* empty */
+		{ $$.parse = P0; }
+	| ARG `:` params
+		{ $$.parse = psnode( $1.string, $3.parse ); }
+	| ARG
+		{ $$.parse = psnode( $1.string, P0 ); }
 	;
 
 /*

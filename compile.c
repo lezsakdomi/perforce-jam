@@ -509,14 +509,30 @@ evaluate_rule(
 	}
 
 	/* Now recursively compile any parse tree associated with this rule */
-	/* refer/free to ensure rule not freed during use */
 
 	if( rule->procedure )
 	{
 	    PARSE *parse = rule->procedure;
+	    SETTINGS *s = 0;
+	    LIST *l;
+	    int i;
+
+	    /* build parameters as local vars */
+
+	    for( l = rule->params, i = 0; l; l = l->next, i++ )
+		s = addsettings( s, 0, l->string, 
+		    list_copy( L0, lol_get( args, i ) ) );
+
+	    /* Run rule. */
+	    /* Bring in local params. */
+	    /* refer/free to ensure rule not freed during use. */
+
+	    pushsettings( s );
 	    parse_refer( parse );
 	    result = list_append( result, (*parse->func)( parse, args ) );
 	    parse_free( parse );
+	    popsettings( s );
+	    freesettings( s );
 	}
 
 	if( DEBUG_COMPILE )
@@ -597,7 +613,8 @@ compile_set(
  * compile_setcomp() - support for `rule` - save parse tree 
  *
  *	parse->string	rule name
- *	parse->left	rules for rule
+ *	parse->left	list of argument names
+ *	parse->right	rules for rule
  */
 
 LIST *
@@ -606,11 +623,20 @@ compile_setcomp(
 	LOL	*args )
 {
 	RULE	*rule = bindrule( parse->string );
+	LIST	*params = 0;
+	PARSE	*p;
+
+	/* Build param list */
+
+	for( p = parse->left; p; p = p->left )
+	    params = list_new( params, p->string );
 
 	if( DEBUG_COMPILE )
 	{
 	    debug_compile( 0, "rule" );
-	    printf( " %s\n", parse->string );
+	    printf( "%s ", parse->string );
+	    list_print( params );
+	    printf( "\n" );
 	}
 
 	/* Free old one, if present */
@@ -618,12 +644,16 @@ compile_setcomp(
 	if( rule->procedure )
 	    parse_free( rule->procedure );
 
-	rule->procedure = parse->left;
+	if( rule->params )
+	    list_free( rule->params );
+
+	rule->procedure = parse->right;
+	rule->params = params;
 
 	/* we now own this parse tree */
 	/* don't let parse_free() release it */
 
-	parse_refer( parse->left );
+	parse_refer( parse->right );
 
 	return L0;
 }

@@ -151,7 +151,7 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 	<P>
 
-	In the parsing phase, <b>jam</b> reads and parses the Jambase
+	In the parsing phase, <b>jam</b> reads and executes the Jambase
 	file, by default the built-in one.  It is written in the <b>jam</b>
 	language.  See <a href="#language"> Language</a> below.  The
 	last action of the Jambase is to read (via the "include" rule)
@@ -171,8 +171,6 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 <A NAME="binding">
 <DT> <P> <H3> Binding </H3> <DD>
 </A>
-
-	<P>
 
 	<P> <H5> Binding </H5>
 
@@ -204,8 +202,6 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	Binding</A> below.
 
 	<P> <H5> Header File Scanning </H5>
-
-	<P>
 
 	During the binding phase, <b>jam</b> also performs header file
 	scanning, where it looks inside source files for the implicit
@@ -239,8 +235,9 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 <DT> <P> <H3> Overview </H3> <DD>
 
-	<B>Jam</b> has an interpreted, procedural language.  Statements
-	in <b>jam</b> are rule (procedure) definitions, rule invocations,
+	<B>Jam</b> has a interpreted, procedural language with a few
+	select features to affect program construction.  Statements in
+	<b>jam</b> are rule (procedure) definitions, rule invocations,
 	flow-of-control structures, variable assignments, and sundry
 	language support.
 
@@ -251,33 +248,87 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	<B>Jam</b> treats its input files as whitespace-separated tokens,
 	with two exceptions: double quotes (") can enclose whitespace
 	to embed it into a token, and everything between the matching
-	curly braces ({}) in the definition of a  rule action is treated
+	curly braces ({}) in the definition of a rule action is treated
 	as a single string.  A backslash (\) can escape a double quote,
 	or any single whitespace character.
 
 	<P>
 
 	<B>Jam</b> requires whitespace (blanks, tabs, or newlines) to
-	surround all tokens, <i>including the colon (:) and semicolon
-	(;) tokens</i>.
+	surround all tokens, <b>including the colon (:) and semicolon
+	(;) tokens</b>.
 
 	<P>
 
-	<B>Jam</b> keywords (an mentioned in this document) are reserved
+	<B>Jam</b> keywords (as mentioned in this document) are reserved
 	and generally must be quoted with double quotes (") to be used
 	as arbitrary tokens, such as variable or target names.
+
+<DT> <P> <H3> Datatype </H3> <DD>
+
+	<P>
+
+	All data values in <B>jam</B> are one-dimensional lists of
+	arbitrary strings.  They arise in three ways:
+
+	<P>
+
+	<UL>
+	<LI> As literal (whitespace-separated) tokens in the Jambase
+	or included files.
+	<LI> As the result of variable expansion of tokens.
+	<LI> As the result of statements executed within <tt>[</tt>
+	and <tt>]</tt>.
+	</UL>
+
+	<P>
+
+	In general wherever a value is expected any combination these
+	three forms can be used.
+
+<DT> <P> <H3> Statements </H3> <DD>
+
+<DT> <P> <H3> Rule Values </H3> <DD>
+
+	<P>
+
+	Rules can return values.  Anywhere a list is expected, the
+	construct
+
+	<P><DL><DD><CODE> [ statement ] </CODE></DL>
+
+	<P>
+	executes <I>statement</I> and uses the return value as the
+	list.
+
+
+	A rule's value is the value
+	of its last statement, though only the following statements
+	have values: 'if' (value of the leg chosen), 'switch' (value of the case
+	chosen), set (value of the resulting variable), and 'return' (value
+        of its arguments). Note that 'return' doesn't actually cause a
+        return, i.e., is a no-op unless it is the last statement
+        of the last block executed within rule body.
+
+<DT> <P> <H3> Rules </H3> <DD>
+
+	Functions in the <b>jam</b> language are called <i>rules</i>.
+	They take arguments (each a list) and can have return values (a
+	single list).
 
 <DT> <P> <H3> Targets </H3> <DD>
 
 	<P>
 
-	The essential <b>jam</b> data entity is a target.  Built targets
-	are files to be updated.  Source targets are the files used in
-	updating built targets.  Built targets and source targets are
-	collectively referred to as file targets, and frequently built
-	targets are source targets for other built targets.  Pseudotargets
-	are symbols which represent dependencies on other targets, but
-	which are not themselves associated with any real file.
+	Any string value in <b>jam</b> can represent a target, and it
+	does so if the DEPENDS or INCLUDES rules make it part of the
+	dependency graph.  Built targets are files to be updated.  Source
+	targets are the files used in updating built targets.  Built
+	targets and source targets are collectively referred to as file
+	targets, and frequently built targets are source targets for
+	other built targets.  Pseudotargets are symbols which represent
+	dependencies on other targets, but which are not themselves
+	associated with any real file.
 
 	<P>
 
@@ -304,74 +355,6 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 	<P>
 
-	Rules can return values, which can be expanded into a list with
-        "[ <i>rule</i> <i>args</i> ... ]". A rule's value is the value
-	of its last statement, though only the following statements
-	have values: 'if' (value of the leg chosen), 'switch' (value of the case
-	chosen), set (value of the resulting variable), and 'return' (value
-        of its arguments). Note that 'return' doesn't actually cause a
-        return, i.e., is a no-op unless it is the last statement
-        of the last block executed within rule body.
-
-	<P>
-
-	The <b>jam</b> statements for defining and invoking rules are
-	as follows:
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
-
-	    <P> <DT> <CODE>
-	    rule <I>rulename</I> { <I>statements</I> }
-	    </CODE>
-
-	    <DD> Define a rule's procedure, replacing any previous
-	    definition.
-
-	    <P> <DT> <CODE>
-	    actions [ <I>modifiers</I> ] <I>rulename</I> { <I>commands</I> }
-	    </CODE>
-
-	    <DD> Define a rule's updating actions, replacing any
-	    previous definition.
-
-	    <P> <DT> <CODE>
-	    <I>rulename field1</I> : <I>field2</I> : <I>...</I> 
-	    : <I>fieldN</I> ;
-	    </CODE>
-
-	    <DD> Invoke a rule.
-
-	    <P> <DT> <CODE>
-	    on <I>target</I> <I>rulename field1</I> : <I>field2</I> : <I>...</I> 
-	    : <I>fieldN</I> ;
-	    </CODE>
-
-	    <DD> Invoke a rule under the influence of <I>target</I>'s specific
-            variables..
-
-	    <P> <DT> <CODE>
-	    [ <I>rulename field1</I> : <I>field2</I> : <I>...</I>
-            : <I>fieldN</I> ] <br>
-	    [  on <I>target</I> <I>rulename field1</I> : <I>field2</I> : <I>...</I>
-            : <I>fieldN</I> ] <br>
-
-	    </CODE>
-
-	    <DD> Used as an argument, expands to the return value of the rule invoked.
-
-	</DL></TABLE>
-
-	<P>
-
-	A rule is invoked with values in <I>field1</I> through
-	<I>fieldN</I>.  They may be referenced in the procedure's
-	<I>statements</I> as $(1) through $(<I>N</I>) (9 max), and the
-	first two only may be referenced in the action's <I>commands</I>
-	as $(1) and $(2).  $(&lt;) and $(&gt;) are synonymous with $(1)
-	and $(2).
-
-	<P>
-
 	Rules fall into two categories: updating rules (with actions),
 	and pure procedure rules (without actions).  Updating rules
 	treat arguments $(1) and $(2) as built targets and sources,
@@ -388,290 +371,82 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	target names.  See <A HREF="#binding"> Binding</A> above.
 
 	<P>
-	
-	Rule invokation may be indirected through a variable:
 
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
+<DT> <P> <H3> Rules </H3> <DD>
 
-	    <P> <DT> <CODE>
-	    $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I> 
-	    : <I>fieldN</I> ;
-	    </CODE>
 
-	    <P> <DT> <CODE>
-	    on <I>target</I> $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I> 
-	    : <I>fieldN</I> ;
-	    </CODE>
 
-	    <P> <DT> <CODE>
-	    [ $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I>
-	
-            : <I>fieldN</I> ] <br>
-	    [  on <I>target</I> $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I>
-            : <I>fieldN</I> ] <br>
 
-	    </CODE>
-
-	</DL></TABLE>
-
- 	The variable's value names the rule (or rules) to be invoked.
-	A rule is invoked for each element in the list of
-	<TT>$(<I>var</I>)</TT>'s values. The fields
-	<I>field1</I> : <I>field2</I> : <I>...</I> are passed as
-	arguments for each invokation. For the <TT> [ ... ] </TT> forms,
-	the return value is the concatenation of the return values for
-	all of the invokations.
-
-	<A NAME="actionmods">
-	<P> <H4> Action Modifiers </H4>
-	</A>
-
-	<P>
-
-	The following action <i>modifiers</i> are understood:
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
-
-	    <P><DT><CODE> actions bind <I>vars</I> </CODE>
-	    <DD> $(vars) will be replaced with bound values.
-
-	    <P><DT><CODE> actions existing </CODE>
-	    <DD> $(>) includes only source targets currently existing.
-
-	    <P><DT><CODE> actions ignore </CODE>
-	    <DD> The return status of the <I>commands</I> is ignored.
-
-	    <P><DT><CODE> actions piecemeal </CODE>
-	    <DD> <I>commands</I>  are repeatedly invoked with a subset
-	    of $(>) small enough to fit in the command buffer on this
-	    OS.
-
-	    <P><DT><CODE> actions quietly </CODE>
-	    <DD> The action is not echoed to the standard output.
-
-	    <P><DT><CODE> actions together </CODE>
-	    <DD> The $(>) from multiple invocations of the same action
-	    on the same built target are glommed together.
-
-	    <P><DT><CODE> actions updated </CODE>
-	    <DD> $(>) includes only source targets themselves marked
-	    for updating.
-
-	</DL></TABLE>
-
-
-<DT> <P> <H3> Built-in Rules </H3> <DD>
-
-	<P>
-	<B>Jam</b> has eleven built-in rules, all of which are pure
-	procedure rules without updating actions.  They are in
-	three groups:  the first builds the dependency graph;
-	the second modifies it; and the third are just utility
-	rules.
-
-	<P>
-
-	<P> <H5> Dependency Building </H5> 
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
-
-	<P><DT><CODE> 
-	DEPENDS <I>targets1</I> : <I>targets2</I> ; 
-	</CODE>
-
-	<DD> Builds a direct dependency: makes each of <I>targets1</I>
-	depend on each of <I>targets2</I>.  Generally, <I>targets1</I>
-	will be rebuilt if <I>targets2</I> are themselves rebuilt are
-	or are newer than <I>targets1</I>.
-
-	<P><DT><CODE>
-	INCLUDES <I>targets1</I> : <I>targets2</I> ;
-	</CODE>
-
-	<DD> Builds a sibling dependency: makes any target that depends
-	on any of <I>targets1</I> also depend on each of <I>targets2</I>.
-	This reflects the dependencies that arise when one source file
-	includes another:  the object built from the source file depends
-	both on the original and included source file,  but the two
-	sources files don't depend on each other.  For example:
-
-	<CODE>
-	<P>DEPENDS foo.o : foo.c ;
-	<BR>INCLUDES foo.c : foo.h ;
-	</CODE>
-
-	<P>
-
-	"foo.o" depends on "foo.c" and "foo.h" in this example.
-
-	</DL></TABLE>
-
-	<A NAME="bindingmods">
-	<P> <H5> Modifying Binding </H5> 
-	</A>
-
-	<P>
-
-	The six rules ALWAYS, LEAVES, NOCARE, NOTFILE, NOUPDATE, and
-	TEMPORARY modify the dependency graph so that <b>jam</b> treats
-	the targets differently during its target binding phase.  See
-	<A HREF="#binding">Binding</A> above.  Normally, <b>jam</b>
-	updates a target if it is missing, if its filesystem modification
-	time is older than any of its dependencies (recursively), or if
-	any of its dependencies are being updated.  This basic behavior
-	can be changed by invoking the following rules:
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
-
-	<P><DT><CODE>
-	ALWAYS <I>targets</I> ;
-	</CODE>
-
-	<DD> Causes <I>targets</I> to be rebuilt regardless of whether
-	they are up-to-date (they must still be in the dependency graph).
-	This is used for the clean and uninstall targets, as they have
-	no dependencies and would otherwise appear never to need building.
-	It is best applied to targets that are also NOTFILE targets,
-	but it can also be used to force a real file to be updated as
-	well.
-
-	<P><DT><CODE>
-	LEAVES <I>targets</I> ;
-	</CODE>
-
-	<DD> Makes each of <I>targets</I> depend only on its leaf sources,
-	and not on any intermediate targets.  This makes it immune to
-	its dependencies being updated, as the "leaf" dependencies are
-	those without their own dependencies and without updating actions.
-	This allows a target to be updated only if original source files
-	change.
-
-	<P><DT><CODE>
-	NOCARE <I>targets</I> ;
-	</CODE>
-
-	<DD> Causes <b>jam</b> to ignore <I>targets</I> that neither
-	can be found nor have updating actions to build them.  Normally
-	for such targets <B>jam</B> issues a warning and then skips
-	other targets that depend on these missing targets.  The HdrRule
-	in Jambase uses NOCARE on the header file names found during
-	header file scanning, to let <b>jam</b> know that the included
-	files may not exist.   For example,  if a #include is within an
-	#ifdef, the included file may not actually be around.
-
-	<P><DT><CODE>
-	NOTFILE <I>targets</I> ;
-	</CODE>
-
-	<DD> Marks <I>targets</I> as pseudotargets and not real files.
-	No timestamp is checked, and so the actions on such a target
-	are only executed if the target's dependencies are updated, or
-	if the target is also marked with ALWAYS.  The default <b>jam</b>
-	target "all" is a pseudotarget. In Jambase, NOTFILE is used to
-	define several addition convenient pseudotargets.
-
-	<P><DT><CODE>
-	NOUPDATE <I>targets</I> ;
-	</CODE>
-
-	<DD> Causes the timestamps on <I>targets</I> to be ignored.
-	This has two effects:  first,  once the target has been created
-	it will never be updated; second, manually updating target will
-	not cause other targets to be updated.  In Jambase, for example,
-	this rule is applied to directories by the MkDir rule, because
-	MkDir only cares that the target directory exists, not when it
-	has last been updated.
-
-	<P><DT><CODE>
-	TEMPORARY <I>targets</I> ;
-	</CODE>
-
-	<DD> Marks <I>targets</I> as temporary, allowing them to be
-	removed after other targets that depend upon them have been
-	updated.  If a TEMPORARY target is missing, <b>jam</b> uses the
-	timestamp of the target's parent.  Jambase uses TEMPORARY to
-	mark object files that are archived in a library after they are
-	built, so that they can be deleted after they are archived.
-
-	</DL></TABLE>
-
-	<P> <H5> Utility Rules </H5> 
-
-	<P>
-
-	The two rules ECHO and EXIT are utility rules, used only in
-	<b>jam</b>'s parsing phase.
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
-
-	<P><DT><CODE>
-	ECHO <i>args</I> ;
-	</CODE>
-
-	<DD> Blurts out the message <i>args</I> to stdout.
-
-	<P><DT><CODE>
-	EXIT <i>args</I> ;
-	</CODE>
-
-	<DD> Blurts out the message <i>args</I> to stdout and then exits
-	with a failure status.
-
-	<P>
-
-	"Echo", "echo", "Exit", and "exit" are accepted as aliases for ECHO
-	and EXIT, since it is hard to tell that these are built-in
-	rules and not part of the language, like "include".
-
-	</DL></TABLE>
-
-	<P>
-
-	The GLOB rule does filename globbing.
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
-
-	<P><DT><CODE>
-	GLOB <i>directories</I> : <I>patterns</I>
-	</CODE>
-
-	<DD>  Using the same wildcards as for the patterns in the <A
-	HREF="#switch">switch</A> statement).  It is invoked by being
-	used as an argument to a rule invocation inside of `[ ]`. For
-	example: "<TT>FILES = [ GLOB dir1 dir2 : *.c *.h ]</TT>" sets
-	A to the list of C source and header files in dir1 or dir2.
-	The resulting filenames are the full pathnames, including the
-	directory, but the pattern is applied only to the file name
-	without the directory.
-
-	</DL></TABLE>
-
-	<P>
-
-	The MATCH rule does pattern matching.
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
-
-	<P><DT><CODE>
-	MATCH <i>regexps</I> : <I>list</I>
-	</CODE>
-
-	<DD> Matches the <b>egrep</b>(1) style regular expressions
-	<I>regexps</I> against the strings in <I>list</I>.  The result
-	is the concatenation of matching <tt>()</tt> subexpressions for
-	each string in <I>list</I>, and for each regular expression in    
-	<I>regexps</I>.  Only useful within the <tt>[ ]</tt> construct,
-	to change the result into a list.
-
-	</DL></TABLE>
-
-<DT> <P> <H3> Flow-of-Control </H3> <DD>
+<DT> <P> <H3> Statements </H3> <DD>
 
 	<P>
 
 	Jam has several simple flow-of-control statements:
 
 	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
+
+	    <P> <DT> <CODE>
+	    
+		<I>rulename field1</I> : <I>field2</I> : <I>...</I> 
+	    	: <I>fieldN</I> ;
+
+	    </CODE>
+
+	    <P><DD> Invoke a rule.  A rule is invoked with values in
+	    <I>field1</I> through <I>fieldN</I> (9 max).  They may be
+	    referenced in the procedure's <I>statements</I> as $(1)
+	    through $(<I>N</I>).  $(&lt;) and $(&gt;) are synonymous
+	    with $(1) and $(2).
+
+	    <P>
+	    <i>rulename</i> undergoes <A HREF="#varexp"> variable
+	    expansion</A>.  If the resulting list is more than one value,
+	    each rule is invoked with the same arguments, and the result
+	    of the invocation is the concatenation of all the results.
+
+	    <P> <DT> <CODE>
+
+		actions [ <I>modifiers</I> ] <I>rulename</I> { <I>commands</I> }
+
+	    </CODE>
+
+	    <P><DD> Define a rule's updating actions, replacing any previous
+	    definition.  The first two arguments may be referenced in
+	    the action's <I>commands</I> as $(1) and $(2) or $(&lt;)
+	    and $(&gt;).
+
+	    <P>
+
+	    The following action <i>modifiers</i> are understood:
+
+	    <P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
+
+		<P><DT><CODE> actions bind <I>vars</I> </CODE>
+		<DD> $(vars) will be replaced with bound values.
+
+		<P><DT><CODE> actions existing </CODE>
+		<DD> $(>) includes only source targets currently existing.
+
+		<P><DT><CODE> actions ignore </CODE>
+		<DD> The return status of the <I>commands</I> is ignored.
+
+		<P><DT><CODE> actions piecemeal </CODE>
+		<DD> <I>commands</I>  are repeatedly invoked with a subset
+		of $(>) small enough to fit in the command buffer on this
+		OS.
+
+		<P><DT><CODE> actions quietly </CODE>
+		<DD> The action is not echoed to the standard output.
+
+		<P><DT><CODE> actions together </CODE>
+		<DD> The $(>) from multiple invocations of the same action
+		on the same built target are glommed together.
+
+		<P><DT><CODE> actions updated </CODE>
+		<DD> $(>) includes only source targets themselves marked
+		for updating.
+
+	    </DL></TABLE>
 
 	    <P><DT><CODE> 
 
@@ -767,6 +542,16 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	    initialized to <i>values</i> if present, or left uninitialized
 	    otherwise.
 
+	    <P> <DT> <CODE>
+	    
+		on <I>target</I> <I>rulename field1</I> : <I>field2</I> 
+		: <I>...</I> : <I>fieldN</I> ;
+
+	    </CODE>
+
+	    <P><DD> Invoke a rule under the influence of <I>target</I>'s
+	    target-specific variables.
+
 	    <P><DT> <CODE>
 
 		return <I>values</I> ; 
@@ -778,6 +563,15 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
             rule to return; a rule's value is actually the value of the
             last statement executed, so a return should be the
 	    last statement executed before the rule "naturally" returns.
+
+	    <P> <DT> <CODE>
+	    
+		rule <I>rulename</I> { <I>statements</I> }
+
+	    </CODE>
+
+	    <P><DD> Define a rule's procedure, replacing any previous
+	    definition.
 
 	    <P><DT> <CODE>
 
@@ -887,7 +681,9 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	the shell that executes the updating actions, but the updating
 	actions can reference <b>jam</b> variables with $(<I>variable</I>).
 
+	<A NAME="varexp">
 	<P> <H4> Variable Expansion </H4>
+	</A>
 
 	<P>
 
@@ -1032,6 +828,184 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	On VMS, $(var:P) is the parent directory of $(var:D); on Unix
 	and NT, $(var:P) and $(var:D) are the same.
 
+<DT> <P> <H3> Built-in Rules </H3> <DD>
+
+	<P>
+	<B>Jam</b> has twelve built-in rules, all of which are pure
+	procedure rules without updating actions.  They are in
+	three groups:  the first builds the dependency graph;
+	the second modifies it; and the third are just utility
+	rules.
+
+	<P> <H5> Dependency Building </H5> 
+
+	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
+
+	<P><DT><CODE> 
+	DEPENDS <I>targets1</I> : <I>targets2</I> ; 
+	</CODE>
+
+	<DD> Builds a direct dependency: makes each of <I>targets1</I>
+	depend on each of <I>targets2</I>.  Generally, <I>targets1</I>
+	will be rebuilt if <I>targets2</I> are themselves rebuilt are
+	or are newer than <I>targets1</I>.
+
+	<P><DT><CODE>
+	INCLUDES <I>targets1</I> : <I>targets2</I> ;
+	</CODE>
+
+	<DD> Builds a sibling dependency: makes any target that depends
+	on any of <I>targets1</I> also depend on each of <I>targets2</I>.
+	This reflects the dependencies that arise when one source file
+	includes another:  the object built from the source file depends
+	both on the original and included source file,  but the two
+	sources files don't depend on each other.  For example:
+
+	<CODE>
+	<P>DEPENDS foo.o : foo.c ;
+	<BR>INCLUDES foo.c : foo.h ;
+	</CODE>
+
+	<P>
+
+	"foo.o" depends on "foo.c" and "foo.h" in this example.
+
+	</DL></TABLE>
+
+	<A NAME="bindingmods">
+	<P> <H5> Modifying Binding </H5> 
+	</A>
+
+	<P>
+
+	The six rules ALWAYS, LEAVES, NOCARE, NOTFILE, NOUPDATE, and
+	TEMPORARY modify the dependency graph so that <b>jam</b> treats
+	the targets differently during its target binding phase.  See
+	<A HREF="#binding">Binding</A> above.  Normally, <b>jam</b>
+	updates a target if it is missing, if its filesystem modification
+	time is older than any of its dependencies (recursively), or if
+	any of its dependencies are being updated.  This basic behavior
+	can be changed by invoking the following rules:
+
+	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
+
+	<P><DT><CODE>
+	ALWAYS <I>targets</I> ;
+	</CODE>
+
+	<DD> Causes <I>targets</I> to be rebuilt regardless of whether
+	they are up-to-date (they must still be in the dependency graph).
+	This is used for the clean and uninstall targets, as they have
+	no dependencies and would otherwise appear never to need building.
+	It is best applied to targets that are also NOTFILE targets,
+	but it can also be used to force a real file to be updated as
+	well.
+
+	<P><DT><CODE>
+	LEAVES <I>targets</I> ;
+	</CODE>
+
+	<DD> Makes each of <I>targets</I> depend only on its leaf sources,
+	and not on any intermediate targets.  This makes it immune to
+	its dependencies being updated, as the "leaf" dependencies are
+	those without their own dependencies and without updating actions.
+	This allows a target to be updated only if original source files
+	change.
+
+	<P><DT><CODE>
+	NOCARE <I>targets</I> ;
+	</CODE>
+
+	<DD> Causes <b>jam</b> to ignore <I>targets</I> that neither
+	can be found nor have updating actions to build them.  Normally
+	for such targets <B>jam</B> issues a warning and then skips
+	other targets that depend on these missing targets.  The HdrRule
+	in Jambase uses NOCARE on the header file names found during
+	header file scanning, to let <b>jam</b> know that the included
+	files may not exist.   For example,  if a #include is within an
+	#ifdef, the included file may not actually be around.
+
+	<P><DT><CODE>
+	NOTFILE <I>targets</I> ;
+	</CODE>
+
+	<DD> Marks <I>targets</I> as pseudotargets and not real files.
+	No timestamp is checked, and so the actions on such a target
+	are only executed if the target's dependencies are updated, or
+	if the target is also marked with ALWAYS.  The default <b>jam</b>
+	target "all" is a pseudotarget. In Jambase, NOTFILE is used to
+	define several addition convenient pseudotargets.
+
+	<P><DT><CODE>
+	NOUPDATE <I>targets</I> ;
+	</CODE>
+
+	<DD> Causes the timestamps on <I>targets</I> to be ignored.
+	This has two effects:  first,  once the target has been created
+	it will never be updated; second, manually updating target will
+	not cause other targets to be updated.  In Jambase, for example,
+	this rule is applied to directories by the MkDir rule, because
+	MkDir only cares that the target directory exists, not when it
+	has last been updated.
+
+	<P><DT><CODE>
+	TEMPORARY <I>targets</I> ;
+	</CODE>
+
+	<DD> Marks <I>targets</I> as temporary, allowing them to be
+	removed after other targets that depend upon them have been
+	updated.  If a TEMPORARY target is missing, <b>jam</b> uses the
+	timestamp of the target's parent.  Jambase uses TEMPORARY to
+	mark object files that are archived in a library after they are
+	built, so that they can be deleted after they are archived.
+
+	</DL></TABLE>
+
+	<P> <H5> Utility Rules </H5> 
+
+	The remaining rules are utility rules without side effects.
+
+	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
+
+	<P><DT><CODE>
+	ECHO <i>args</I> ; <br>
+	Echo <i>args</I> ; <br>
+	echo <i>args</I> ;
+	</CODE>
+
+	<DD> Blurts out the message <i>args</I> to stdout.
+
+	<P><DT><CODE>
+	EXIT <i>args</I> ; <br>
+	Exit <i>args</I> ; <br>
+	exit <i>args</I> ;
+	</CODE>
+
+	<DD> Blurts out the message <i>args</I> to stdout and then exits
+	with a failure status.
+
+	<P><DT><CODE>
+	GLOB <i>directories</I> : <I>patterns</I> ;
+	</CODE>
+
+	<DD> Scans <i>directories</i> for files matching <i>patterns</i>,
+	returning the list of matching files (with directory prepended).
+	<i>patterns</i> uses the same syntax as in the <b>switch</b>
+	statement.  Only useful within the <tt>[ ]</tt> construct, to
+	change the result into a list.
+
+	<P><DT><CODE>
+	MATCH <i>regexps</I> : <I>list</I> ;
+	</CODE>
+
+	<DD> Matches the <b>egrep</b>(1) style regular expressions
+	<I>regexps</I> against the strings in <I>list</I>.  The result
+	is the concatenation of matching <tt>()</tt> subexpressions for
+	each string in <I>list</I>, and for each regular expression in
+	<I>regexps</I>.  Only useful within the <tt>[ ]</tt> construct,
+	to change the result into a list.
+
+	</DL></TABLE>
 <DT> <P> <H3> Built-in Variables </H3> <DD>
 
 	<P>
@@ -1341,7 +1315,7 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
         <BR>
         Comments to <A HREF="mailto:info@perforce.com">info@perforce.com</A>
         <BR>
-        Last updated: April 1, 2002
+        Last updated: May, 2002
 	<BR>
 	$Id$
 
