@@ -107,9 +107,9 @@ var_expand(
 	*out = '\0';
 
 	if( cancopyin )
-	    return list_new( l, copystr( inp ) );
+	    return list_new( l, inp, 1 );
 	else
-	    return list_new( l, newstr( out_buf ) );
+	    return list_new( l, out_buf, 0 );
 
     expand:
 	/*
@@ -258,7 +258,7 @@ var_expand(
 		/* Empty w/ :E=default? */
 
 		if( !value && colon && edits.empty.ptr )
-		    evalue = value = list_new( L0, newstr( edits.empty.ptr ) );
+		    evalue = value = list_new( L0, edits.empty.ptr, 0 );
 
 		/* For each variable value */
 
@@ -300,7 +300,7 @@ var_expand(
 
 		    if( in == end )
 		    {
-			l = list_new( l, newstr( out_buf ) );
+			l = list_new( l, out_buf, 0 );
 			continue;
 		    }
 
@@ -314,7 +314,7 @@ var_expand(
 		    for( rem = remainder; rem; rem = list_next( rem ) )
 		    {
 			strcpy( out1, rem->string );
-			l = list_new( l, newstr( out_buf ) );
+			l = list_new( l, out_buf, 0 );
 		    }
 		}
 

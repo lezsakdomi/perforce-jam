@@ -108,10 +108,10 @@ var_defines( char **e )
 		{
 		    strncpy( buf, pp, p - pp );
 		    buf[ p - pp ] = '\0';
-		    l = list_new( l, newstr( buf ) );
+		    l = list_new( l, buf, 0 );
 		}
 
-		l = list_new( l, newstr( pp ) );
+		l = list_new( l, pp, 0 );
 
 		/* Get name */
 

@@ -218,7 +218,7 @@ builtin_glob_back(
 	for( l = globbing->patterns; l; l = l->next )
 	    if( !glob( l->string, buf ) )
 	{
-	    globbing->results = list_new( globbing->results, newstr( file ) );
+	    globbing->results = list_new( globbing->results, file, 0 );
 	    break;
 	}
 }
@@ -282,7 +282,7 @@ builtin_match(
 		    int l = re->endp[i] - re->startp[i];
 		    memcpy( buf, re->startp[i], l );
 		    buf[ l ] = 0;
-		    result = list_new( result, newstr( buf ) );
+		    result = list_new( result, buf, 0 );
 		}
 	    }
 

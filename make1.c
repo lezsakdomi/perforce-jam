@@ -575,7 +575,7 @@ make1list(
 
 	/* Build new list */
 
-	l = list_new( l, copystr( t->boundname ) );
+	l = list_new( l, t->boundname, 1 );
     }
 
     return l;
@@ -607,7 +607,7 @@ make1settings( LIST *vars )
 
 		/* Build new list */
 
-		nl = list_new( nl, copystr( t->boundname ) );
+		nl = list_new( nl, t->boundname, 1 );
 	    }
 
 	    /* Add to settings chain */

@@ -195,7 +195,7 @@ compile_eval(
 	if( !status ) t = 0;
 	else if( ll ) t = ll, ll = 0;
 	else if( lr ) t = lr, lr = 0;
-	else t = list_new( L0, newstr( "1" ) );
+	else t = list_new( L0, "1", 0 );
 
 	if( ll ) list_free( ll );
 	if( lr ) list_free( lr );
@@ -225,7 +225,7 @@ compile_foreach(
 
 	for( l = nv; l; l = list_next( l ) )
 	{
-	    LIST *val = list_new( L0, copystr( l->string ) );
+	    LIST *val = list_new( L0, l->string, 1 );
 
 	    var_set( parse->string, val, VAR_SET );
 
@@ -629,7 +629,7 @@ compile_setcomp(
 	/* Build param list */
 
 	for( p = parse->left; p; p = p->left )
-	    params = list_new( params, p->string );
+	    params = list_new( params, p->string, 1 );
 
 	if( DEBUG_COMPILE )
 	{

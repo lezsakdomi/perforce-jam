@@ -61,12 +61,17 @@ list_append(
 LIST *
 list_new( 
 	LIST	*head,
-	char	*string )
+	char	*string,
+	int	copy )
 {
 	LIST *l;
 
 	if( DEBUG_LISTS )
 	    printf( "list > %s <\n", string );
+
+	/* Copy/newstr as needed */
+
+	string = copy ? copystr( string ) : newstr( string );
 
 	/* Get list struct from freelist, if one available.  */
 	/* Otherwise allocate. */
@@ -107,7 +112,7 @@ list_copy(
 	LIST 	*nl )
 {
 	for( ; nl; nl = list_next( nl ) )
-	    l = list_new( l, copystr( nl->string ) );
+	    l = list_new( l, nl->string, 1 );
 
 	return l;
 }
@@ -128,7 +133,7 @@ list_sublist(
 	    ;
 
 	for( ; l && count--; l = list_next( l ) )
-	    nl = list_new( nl, copystr( l->string ) );
+	    nl = list_new( nl, l->string, 1 );
 
 	return nl;
 }

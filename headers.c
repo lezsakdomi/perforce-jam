@@ -72,7 +72,7 @@ headers( TARGET *t )
 	/* Call headers1() to get LIST of included files. */
 
 	lol_init( &lol );
-	lol_add( &lol, list_new( L0, t->name ) );
+	lol_add( &lol, list_new( L0, t->name, 1 ) );
 	lol_add( &lol, headers1( headlist, t->boundname, rec, re ) );
 
 	if( lol_get( &lol, 1 ) )
@@ -114,7 +114,7 @@ headers1(
 		if( DEBUG_HEADER )
 		    printf( "header found: %s\n", re[i]->startp[1] );
 
-		l = list_new( l, newstr( re[i]->startp[1] ) );
+		l = list_new( l, re[i]->startp[1], 0 );
 	    }
 	}
 

@@ -277,7 +277,7 @@ main( int argc, char **argv, char **arg_environ )
 	    if( strlen( date ) == 25 )
 		date[ 24 ] = 0;
 
-	    var_set( "JAMDATE", list_new( L0, newstr( date ) ), VAR_SET );
+	    var_set( "JAMDATE", list_new( L0, date, 0 ), VAR_SET );
 	}
 
 	/* And JAMUNAME */
@@ -287,17 +287,13 @@ main( int argc, char **argv, char **arg_environ )
 
 	    if( uname( &u ) >= 0 )
 	    {
-		var_set( "JAMUNAME", 
-			list_new( 
-			list_new(
-			list_new(
-			list_new(
-			list_new( L0, 
-				newstr( u.sysname ) ),
-				newstr( u.nodename ) ),
-				newstr( u.release ) ),
-				newstr( u.version ) ),
-				newstr( u.machine ) ), VAR_SET );
+		LIST *l = L0;
+		l = list_new( l, u.machine, 0 );
+		l = list_new( l, u.version, 0 );
+		l = list_new( l, u.release, 0 );
+		l = list_new( l, u.nodename, 0 );
+		l = list_new( l, u.sysname, 0 );
+		var_set( "JAMUNAME", l, VAR_SET );
 	    }
 	}
 # endif /* unix */
