@@ -388,7 +388,7 @@ Release notes for Jam 2.3
 
 	The old mock functions like makeDirName, which assigned their
 	results to the variable named as their first argument, have
-	been replaced with real functions using the new [] synxtax.
+	been replaced with real functions using the new [] syntax.
 	E.g. "makeDirName foo : bar ola" is now "foo = [ fDirName bar ]"
 
 	Install now always does a cp/chmod/etc, rather than using
