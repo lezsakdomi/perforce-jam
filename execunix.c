@@ -224,19 +224,14 @@ execcmd(
 # else
 # ifdef NO_VFORK
 	if ((pid = fork()) == 0) 
-   	{
-	    execvp( argv[0], argv );
-	    _exit(127);
-	}
 # else
 	if ((pid = vfork()) == 0) 
+# endif
    	{
 	    /* hpux doesn't like const here */
 	    execvp( argv[0], (char **)argv );
 	    _exit(127);
 	}
-# endif
-
 	if( pid == -1 )
 	{
 	    perror( "vfork" );
