@@ -35,6 +35,7 @@
 # 04/30/95 (seiwald) - Use install -c flag so that it copies, not moves.
 # 07/10/95 (taylor) - Support for Microsoft C++.
 # 11/21/96 (peterk) - Support for BeOS
+# 07/19/99 (sickel) - Support for Mac OS X Server (and maybe client)
 
 # Special targets defined in this file:
 #
@@ -173,6 +174,10 @@ case IRIX :	RANLIB default = "" ;
 case MVS :	RANLIB default = "" ; 
 case NEXT :	AR default = libtool -o ;
 		RANLIB default = "" ;
+case MACOSX : AR default = libtool -o ;
+              RANLIB default = "" ;
+              C++ default = c++ ;
+              MANDIR default = /usr/local/share/man ;
 case NCR :	RANLIB default = "" ;
 		INSTALL default = "" ;
 case PTX :	RANLIB default = "" ;

@@ -19,6 +19,8 @@ Release notes for Jam/MR 2.2
 
 	$JAMUNAME is set on UNIX.  (Patchlevel 4).
 
+	Mac OS X Server support from Jeff_Sickel@sickel.com (Jeff Sickel)
+	(Patchlevel 5).
 
 1.  Release info:
 

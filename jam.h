@@ -23,6 +23,7 @@
  * 04/29/96 (seiwald) - AIX now has 31 and 42 OSVERs.
  * 11/21/96 (peterk)  - added BeOS with MW CW mwcc
  * 12/21/96 (seiwald) - OSPLAT now defined for NT.
+ * 07/19/99 (sickel)  - Mac OS X Server and Client support added
  */
 
 # ifdef VMS
@@ -137,8 +138,8 @@ int unlink( char *f ); 	/* In filevms.c */
 # include <stdio.h>
 # include <ctype.h>
 # if !defined(__bsdi__)&&!defined(__FreeBSD__)
-# if !defined(NeXT)&&!defined(__MACHTEN__)
-# if !defined(__MVS__)
+# if !defined(NeXT)&&!defined(__MACHTEN__)&&!defined(__APPLE__)
+# if !defined(MVS)
 # include <malloc.h>
 # endif
 # endif
@@ -211,6 +212,10 @@ int unlink( char *f ); 	/* In filevms.c */
 # define OSSYMS "UNIX=true","OS=NEXT"
 # endif
 # endif
+# ifdef __APPLE__
+# define unix
+# define OSSYMS "UNIX=true","OS=MACOSX"
+# endif
 # ifdef __osf__
 # define OSSYMS "UNIX=true","OS=OSF"
 # endif
@@ -263,7 +268,7 @@ int unlink( char *f ); 	/* In filevms.c */
 
 # define OSPLATSYM /**/
 
-# if defined( _M_PPC ) || defined( PPC )
+# if defined( _M_PPC ) || defined( PPC ) || defined( ppc )
 # undef OSPLATSYM
 # define OSPLATSYM ,"OSPLAT=PPC"
 # endif
