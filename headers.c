@@ -4,16 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "compile.h"
-# include "rules.h"
-# include "variable.h"
-# include "regexp.h"
-# include "headers.h"
-# include "newstr.h"
-
 /*
  * headers.c - handle #includes in source files
  *
@@ -33,7 +23,20 @@
  * 09/10/00 (seiwald) - replaced call to compile_rule with evaluate_rule,
  *		so that headers() doesn't have to mock up a parse structure
  *		just to invoke a rule.
+ * 03/02/02 (seiwald) - rules can be invoked via variable names
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "parse.h"
+# include "compile.h"
+# include "rules.h"
+# include "variable.h"
+# include "regexp.h"
+# include "headers.h"
+# include "newstr.h"
 
 static LIST *headers1( LIST *l, const char *file, int rec, regexp *re[] );
 

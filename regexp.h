@@ -3,7 +3,10 @@
  *
  * Caveat:  this is V8 regexp(3) [actually, a reimplementation thereof],
  * not the System V one.
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
 #define NSUBEXP  10
 typedef struct regexp {
 	const char *startp[NSUBEXP];

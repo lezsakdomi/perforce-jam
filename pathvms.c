@@ -4,13 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "pathsys.h"
-
-# ifdef OS_VMS
-
-# define DEBUG
-
 /*
  * pathvms.c - manipulate file names on VMS
  *
@@ -29,7 +22,15 @@
  *
  * 02/09/95 (seiwald) - bungled R=[xxx] - was using directory length!
  * 05/03/96 (seiwald) - split from filevms.c
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "pathsys.h"
+
+# ifdef OS_VMS
+
+# define DEBUG
 
 /*
  * path_parse() - split a file name into dir/base/suffix/member

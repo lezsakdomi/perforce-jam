@@ -4,12 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "filesys.h"
-# include "pathsys.h"
-
-# ifdef OS_VMS
-
 /*
  * filevms.c - scan directories and libaries on VMS
  *
@@ -27,7 +21,16 @@
  *
  * 02/09/95 (seiwald) - bungled R=[xxx] - was using directory length!
  * 05/03/96 (seiwald) - split into pathvms.c
+ * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
+ * 03/23/01 (seiwald) - VMS C++ changes.
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "filesys.h"
+# include "pathsys.h"
+
+# ifdef OS_VMS
 
 # include <rms.h>
 # include <iodef.h>

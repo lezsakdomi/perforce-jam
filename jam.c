@@ -94,6 +94,11 @@
  * 02/22/95 (seiwald) - -v for version info.
  * 09/11/00 (seiwald) - PATCHLEVEL folded into VERSION.
  * 01/10/01 (seiwald) - pathsys.h split from filesys.h
+ * 01/21/02 (seiwald) - new -q to quit quickly on build failure
+ * 03/16/02 (seiwald) - support for -g (reorder builds by source time)
+ * 09/19/02 (seiwald) - new -d displays
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 # include "jam.h"

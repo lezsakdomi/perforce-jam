@@ -4,14 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "scan.h"
-# include "jamgram.h"
-# include "jambase.h"
-# include "newstr.h"
-
 /*
  * scan.c - the jam yacc scanner
  *
@@ -23,7 +15,17 @@
  * 02/11/95 (seiwald) - honor only punctuation keywords if SCAN_PUNCT.
  * 07/27/95 (seiwald) - Include jamgram.h after scan.h, so that YYSTYPE is
  *			defined before Linux's yacc tries to redefine it.
+ * 01/10/01 (seiwald) - \ can now escape any whitespace char
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "parse.h"
+# include "scan.h"
+# include "jamgram.h"
+# include "jambase.h"
+# include "newstr.h"
 
 struct keyword {
 	const char *word;

@@ -6,6 +6,8 @@
 
 /*
  * newstr.h - string manipulation routines
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 const char *newstr( const char *string );

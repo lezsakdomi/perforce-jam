@@ -4,15 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "filesys.h"
-# include "pathsys.h"
-
-# ifdef OS_OS2
-
-# include <io.h>
-# include <dos.h>
-
 /*
  * fileos2.c - scan directories and archives on NT
  *
@@ -30,8 +21,20 @@
  *
  * 07/10/95 (taylor)  Findfirst() returns the first file on NT.
  * 05/03/96 (seiwald) split apart into pathnt.c
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
  * 09/22/00 (seiwald) handle \ and c:\ specially: don't add extra /
+ * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "filesys.h"
+# include "pathsys.h"
+
+# ifdef OS_OS2
+
+# include <io.h>
+# include <dos.h>
 
 /*
  * file_dirscan() - scan a directory for files

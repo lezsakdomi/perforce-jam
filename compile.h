@@ -6,6 +6,13 @@
 
 /*
  * compile.h - compile parsed jam statements
+ *
+ * 01/22/01 (seiwald) - replace evaluate_if() with compile_eval()
+ * 01/24/01 (seiwald) - 'while' statement
+ * 03/02/02 (seiwald) - rules can be invoked via variable names
+ * 02/28/02 (seiwald) - merge EXEC_xxx flags in with RULE_xxx 
+ * 10/22/02 (seiwald) - working return/break/continue statements
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 void compile_builtins();

@@ -6,6 +6,8 @@
 
 /*
  * variable.h - handle jam multi-element variables
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 void 	var_defines( const char **e );

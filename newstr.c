@@ -4,10 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "newstr.h"
-# include "hash.h"
-
 /*
  * newstr.c - string manipulation routines
  *
@@ -26,7 +22,13 @@
  * This implementation builds a hash table of all strings, so that multiple 
  * calls of newstr() on the same string allocate memory for the string once.
  * Strings are never actually freed.
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "newstr.h"
+# include "hash.h"
 
 typedef const char *STRING;
 

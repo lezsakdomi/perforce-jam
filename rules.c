@@ -4,14 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "rules.h"
-# include "newstr.h"
-# include "hash.h"
-
 /*
  * rules.c - access to RULEs, TARGETs, and ACTIONs
  *
@@ -32,7 +24,17 @@
  *
  * 04/12/94 (seiwald) - actionlist() now just appends a single action.
  * 08/23/94 (seiwald) - Support for '+=' (append to variable)
+ * 06/21/02 (seiwald) - support for named parameters
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "parse.h"
+# include "variable.h"
+# include "rules.h"
+# include "newstr.h"
+# include "hash.h"
 
 static struct hash *rulehash = 0;
 static struct hash *targethash = 0;

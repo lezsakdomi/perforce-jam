@@ -6,6 +6,9 @@
 
 /*
  * command.c - maintain lists of commands
+ *
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
+ * 09/08/00 (seiwald) - bulletproof PIECEMEAL size computation
  */
 
 # include "jam.h"

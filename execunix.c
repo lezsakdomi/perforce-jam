@@ -4,30 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "execcmd.h"
-# include <errno.h>
-
-# ifdef USE_EXECUNIX
-
-# ifdef NO_VFORK
-# define vfork() fork()
-# endif
-
-# if defined( OS_NT ) || defined( OS_OS2 )
-
-# define USE_EXECNT
-
-# include <process.h>
-
-# if !defined( __BORLANDC__ ) && !defined( OS_OS2 )
-# define wait my_wait
-static int my_wait( int *status );
-# endif
-
-# endif
-
 /*
  * execunix.c - execute a shell script on UNIX/WinNT/OS2/AmigaOS
  *
@@ -57,7 +33,33 @@ static int my_wait( int *status );
  * 05/04/94 (seiwald) - async multiprocess interface
  * 01/22/95 (seiwald) - $(JAMSHELL) support
  * 06/02/97 (gsar)    - full async multiprocess support for Win32
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "execcmd.h"
+# include <errno.h>
+
+# ifdef USE_EXECUNIX
+
+# ifdef NO_VFORK
+# define vfork() fork()
+# endif
+
+# if defined( OS_NT ) || defined( OS_OS2 )
+
+# define USE_EXECNT
+
+# include <process.h>
+
+# if !defined( __BORLANDC__ ) && !defined( OS_OS2 )
+# define wait my_wait
+static int my_wait( int *status );
+# endif
+
+# endif
 
 static int intr = 0;
 static int cmdsrunning = 0;

@@ -24,9 +24,18 @@
  * 11/21/96 (peterk)  - added BeOS with MW CW mwcc
  * 12/21/96 (seiwald) - OSPLAT now defined for NT.
  * 07/19/99 (sickel)  - Mac OS X Server and Client support added
+ * 02/22/01 (seiwald) - downshift paths on case-insensitive macintosh
+ * 03/23/01 (seiwald) - VMS C++ changes.
+ * 10/29/01 (brett) - More IA64 ifdefs for MS.
  * 02/18/00 (belmonte)- Support for Cygwin.
  * 09/12/00 (seiwald) - OSSYMS split to OSMAJOR/OSMINOR/OSPLAT
  * 12/29/00 (seiwald) - OSVER dropped.
+ * 01/21/02 (seiwald) - new -q to quit quickly on build failure
+ * 03/16/02 (seiwald) - support for -g (reorder builds by source time)
+ * 03/20/02 (seiwald) - MINGW porting from Max Blagai
+ * 08/16/02 (seiwald) - BEOS porting from Ingo Weinhold
+ * 09/19/02 (seiwald) - new -d displays
+ * 11/05/02 (seiwald) - OSPLAT now set to sparc on solaris.
  */
 
 /*

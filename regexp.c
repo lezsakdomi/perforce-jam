@@ -36,6 +36,8 @@
  *** happily defined in string.h).
  *** THIS IS AN ALTERED VERSION.  It was altered by Christopher Seiwald
  *** seiwald@perforce.com, on 20 January 2000, to use function prototypes.
+ *** THIS IS AN ALTERED VERSION.  It was altered by Christopher Seiwald
+ *** seiwald@perforce.com, on 05 November 2002, to const string literals.
  *
  * Beware that some of this code is subtly aware of the way operator
  * precedence is structured in regular expressions.  Serious changes in

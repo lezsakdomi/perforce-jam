@@ -22,6 +22,8 @@
  * Internal functions:
  *
  *	globchars() - build a bitlist to check for character group match
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 # include "jam.h"

@@ -4,18 +4,20 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
+/*
+ * timestamp.c - get the timestamp of a file or archive member
+ *
+ * 09/22/00 (seiwald) - downshift names on OS2, too
+ * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
+ * 11/04/02 (seiwald) - const-ing for string literals
+ */
+
 # include "jam.h"
 # include "hash.h"
 # include "filesys.h"
 # include "pathsys.h"
 # include "timestamp.h"
 # include "newstr.h"
-
-/*
- * timestamp.c - get the timestamp of a file or archive member
- *
- * 09/22/00 (seiwald) - downshift names on OS2, too
- */
 
 /*
  * BINDING - all known files

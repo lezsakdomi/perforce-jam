@@ -6,6 +6,9 @@
 
 /*
  * parse.h - make and destroy parse trees as driven by the parser
+ *
+ * 10/22/02 (seiwald) - working return/break/continue statements
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 /*

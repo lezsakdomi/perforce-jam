@@ -26,7 +26,7 @@
  *
  *	make1cmds() - turn ACTIONS into CMDs, grouping, splitting, etc
  *	make1list() - turn a list of targets into a LIST, for $(<) and $(>)
- * 	make1settings() - for vars that get bound values, build up replacement lists
+ * 	make1settings() - for vars that get bound, build up replacement lists
  * 	make1bind() - bind targets that weren't bound in dependency analysis
  *
  * 04/16/94 (seiwald) - Split from make.c.
@@ -38,6 +38,14 @@
  * 01/22/94 (seiwald) - pass per-target JAMSHELL down to execcmd().
  * 02/28/95 (seiwald) - Handle empty "existing" actions.
  * 03/10/95 (seiwald) - Fancy counts.
+ * 02/07/01 (seiwald) - Fix jam -d0 return status.
+ * 01/21/02 (seiwald) - new -q to quit quickly on build failure
+ * 02/28/02 (seiwald) - don't delete 'actions updated' targets on failure
+ * 02/28/02 (seiwald) - merge EXEC_xxx flags in with RULE_xxx 
+ * 07/17/02 (seiwald) - TEMPORARY sources for headers now get built
+ * 09/23/02 (seiwald) - "...using temp..." only displayed on -da now.
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 # include "jam.h"

@@ -18,6 +18,7 @@
  *
  * Handles \'s and "'s specially; knows to delete blank and comment lines.
  *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 # include <stdio.h>

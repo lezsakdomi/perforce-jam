@@ -27,6 +27,10 @@
  * 01/19/95 (seiwald) - split DONTKNOW into CANTFIND/CANTMAKE.
  * 02/02/95 (seiwald) - new LEAVES modifier on targets.
  * 02/14/95 (seiwald) - new NOUPDATE modifier on targets.
+ * 02/28/02 (seiwald) - merge EXEC_xxx flags in with RULE_xxx 
+ * 06/21/02 (seiwald) - support for named parameters
+ * 07/17/02 (seiwald) - TEMPORARY sources for headers now get built
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 typedef struct _rule RULE;

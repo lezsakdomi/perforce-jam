@@ -4,14 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "expand.h"
-# include "hash.h"
-# include "newstr.h"
-
 /*
  * variable.c - handle jam multi-element variables
  *
@@ -34,7 +26,17 @@
  * 01/22/95 (seiwald) - split environment variables at blanks or :'s
  * 05/10/95 (seiwald) - split path variables at SPLITPATH (not :)
  * 09/11/00 (seiwald) - defunct var_list() removed
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "parse.h"
+# include "variable.h"
+# include "expand.h"
+# include "hash.h"
+# include "newstr.h"
 
 static struct hash *varhash = 0;
 

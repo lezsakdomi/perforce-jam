@@ -4,12 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "scan.h"
-# include "newstr.h"
-
 /*
  * parse.c - make and destroy parse trees as driven by the parser
  *
@@ -17,7 +11,15 @@
  *		as per Matt Armstrong.
  * 09/11/00 (seiwald) - structure reworked to reflect that (*func)()
  *		returns a LIST *.
+ * 10/22/02 (seiwald) - working return/break/continue statements
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "parse.h"
+# include "scan.h"
+# include "newstr.h"
 
 static PARSE *yypsave;
 

@@ -4,24 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "filesys.h"
-# include "pathsys.h"
-
-# ifdef OS_NT
-
-# ifdef __BORLANDC__
-# if __BORLANDC__ < 0x550
-# include <dir.h>
-# include <dos.h>
-# endif
-# undef PATHNAME	/* cpp namespace collision */
-# define _finddata_t ffblk
-# endif
-
-# include <io.h>
-# include <sys/stat.h>
-
 /*
  * filent.c - scan directories and archives on NT
  *
@@ -39,7 +21,29 @@
  *
  * 07/10/95 (taylor)  Findfirst() returns the first file on NT.
  * 05/03/96 (seiwald) split apart into pathnt.c
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
+ * 10/03/00 (anton) - Porting for Borland C++ 5.5
+ * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "filesys.h"
+# include "pathsys.h"
+
+# ifdef OS_NT
+
+# ifdef __BORLANDC__
+# if __BORLANDC__ < 0x550
+# include <dir.h>
+# include <dos.h>
+# endif
+# undef PATHNAME	/* cpp namespace collision */
+# define _finddata_t ffblk
+# endif
+
+# include <io.h>
+# include <sys/stat.h>
 
 /*
  * file_dirscan() - scan a directory for files

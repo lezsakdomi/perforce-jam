@@ -34,6 +34,8 @@
  *
  * 04/13/94 (seiwald) - added shorthand L0 for null list pointer
  * 08/23/94 (seiwald) - new list_append()
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 /*

@@ -9,6 +9,8 @@
  *
  * {o >o
  *  \ -) "Command line option."
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 typedef struct option

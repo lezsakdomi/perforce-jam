@@ -4,17 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-
-# include "lists.h"
-# include "parse.h"
-# include "compile.h"
-# include "variable.h"
-# include "expand.h"
-# include "rules.h"
-# include "newstr.h"
-# include "search.h"
-
 /*
  * compile.c - compile parsed jam statements
  *
@@ -56,14 +45,37 @@
  * 01/22/95 (seiwald) - Exit rule.
  * 02/02/95 (seiwald) - Always rule; LEAVES rule.
  * 02/14/95 (seiwald) - NoUpdate rule.
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
+ * 09/07/00 (seiwald) - stop crashing when a rule redefines itself
  * 09/11/00 (seiwald) - new evaluate_rule() for headers().
- * 09/11/00 (seiwald) - compile_xxx() now return LIST *.
- *			New compile_append() and compile_list() in
- *			support of building lists here, rather than
- *			in jamgram.yy.
- * 01/10/00 (seiwald) - built-ins split out to builtin.c.
- * 10/22/02 (seiwald) - support for break/continue/return.
+ * 09/11/00 (seiwald) - rules now return values, accessed via [ rule arg ... ]
+ * 09/12/00 (seiwald) - don't complain about rules invoked without targets
+ * 01/13/01 (seiwald) - fix case where rule is defined within another
+ * 01/10/01 (seiwald) - built-ins split out to builtin.c.
+ * 01/11/01 (seiwald) - optimize compile_rules() for tail recursion
+ * 01/21/01 (seiwald) - replace evaluate_if() with compile_eval()
+ * 01/24/01 (seiwald) - 'while' statement
+ * 03/23/01 (seiwald) - "[ on target rule ]" support
+ * 02/28/02 (seiwald) - merge EXEC_xxx flags in with RULE_xxx 
+ * 03/02/02 (seiwald) - rules can be invoked via variable names
+ * 03/12/02 (seiwald) - &&,&,||,|,in now short-circuit again
+ * 03/25/02 (seiwald) - if ( "" a b ) one again returns true
+ * 06/21/02 (seiwald) - support for named parameters
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 10/22/02 (seiwald) - working return/break/continue statements
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+
+# include "lists.h"
+# include "parse.h"
+# include "compile.h"
+# include "variable.h"
+# include "expand.h"
+# include "rules.h"
+# include "newstr.h"
+# include "search.h"
 
 static void debug_compile( int which, const char *s );
 int glob( const char *s, const char *c );

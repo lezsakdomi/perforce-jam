@@ -4,17 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-
-# include "lists.h"
-# include "parse.h"
-# include "builtins.h"
-# include "rules.h"
-# include "filesys.h"
-# include "newstr.h"
-# include "regexp.h"
-# include "pathsys.h"
-
 /*
  * builtins.c - builtin jam rules
  *
@@ -32,7 +21,24 @@
  *	builtin_match() - MATCH rule
  *
  * 01/10/01 (seiwald) - split from compile.c
+ * 01/08/01 (seiwald) - new 'Glob' (file expansion) builtin
+ * 03/02/02 (seiwald) - new 'Match' (regexp match) builtin
+ * 04/03/02 (seiwald) - Glob matches only filename, not directory
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 10/22/02 (seiwald) - working return/break/continue statements
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+
+# include "lists.h"
+# include "parse.h"
+# include "builtins.h"
+# include "rules.h"
+# include "filesys.h"
+# include "newstr.h"
+# include "regexp.h"
+# include "pathsys.h"
 
 /*
  * compile_builtin() - define builtin rules

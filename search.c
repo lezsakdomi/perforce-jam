@@ -4,6 +4,12 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
+/*
+ * search.c - find a target along $(SEARCH) or $(LOCATE) 
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
+ */
+
 # include "jam.h"
 # include "lists.h"
 # include "search.h"
@@ -11,10 +17,6 @@
 # include "pathsys.h"
 # include "variable.h"
 # include "newstr.h"
-
-/*
- * search.c - find a target along $(SEARCH) or $(LOCATE) 
- */
 
 const char *
 search( 

@@ -6,6 +6,8 @@
 
 /*
  * filesys.h - OS specific file routines 
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 typedef void (*scanback)( void *closure, const char *file, int found, time_t t );

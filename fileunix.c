@@ -4,6 +4,32 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
+/*
+ * fileunix.c - manipulate file names and scan directories on UNIX/AmigaOS
+ *
+ * External routines:
+ *
+ *	file_dirscan() - scan a directory for files
+ *	file_time() - get timestamp of file, if not done by file_dirscan()
+ *	file_archscan() - scan an archive for files
+ *
+ * File_dirscan() and file_archscan() call back a caller provided function
+ * for each file found.  A flag to this callback function lets file_dirscan()
+ * and file_archscan() indicate that a timestamp is being provided with the
+ * file.   If file_dirscan() or file_archscan() do not provide the file's
+ * timestamp, interested parties may later call file_time().
+ *
+ * 04/08/94 (seiwald) - Coherent/386 support added.
+ * 12/19/94 (mikem) - solaris string table insanity support
+ * 02/14/95 (seiwald) - parse and build /xxx properly
+ * 05/03/96 (seiwald) - split into pathunix.c
+ * 11/21/96 (peterk) - BEOS does not have Unix-style archives
+ * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
+ * 04/03/01 (seiwald) - AIX uses SARMAG
+ * 07/16/02 (seiwald) - Support BSD style long filename in archives.
+ * 11/04/02 (seiwald) - const-ing for string literals
+ */
+
 # include "jam.h"
 # include "filesys.h"
 # include "pathsys.h"
@@ -65,28 +91,6 @@ struct ar_hdr		/* archive file member header - printable ascii */
 # ifndef HAVE_AR
 # include <ar.h>
 # endif	
-
-/*
- * fileunix.c - manipulate file names and scan directories on UNIX/AmigaOS
- *
- * External routines:
- *
- *	file_dirscan() - scan a directory for files
- *	file_time() - get timestamp of file, if not done by file_dirscan()
- *	file_archscan() - scan an archive for files
- *
- * File_dirscan() and file_archscan() call back a caller provided function
- * for each file found.  A flag to this callback function lets file_dirscan()
- * and file_archscan() indicate that a timestamp is being provided with the
- * file.   If file_dirscan() or file_archscan() do not provide the file's
- * timestamp, interested parties may later call file_time().
- *
- * 04/08/94 (seiwald) - Coherent/386 support added.
- * 12/19/94 (mikem) - solaris string table insanity support
- * 02/14/95 (seiwald) - parse and build /xxx properly
- * 05/03/96 (seiwald) - split into pathunix.c
- * 11/21/96 (peterk) - BEOS does not have Unix-style archives
- */
 
 /*
  * file_dirscan() - scan a directory for files

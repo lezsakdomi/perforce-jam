@@ -21,6 +21,8 @@
  * handle action strings (look only for the closing }) and a mode to 
  * ignore most keywords when looking for a punctuation keyword.  This 
  * allows non-punctuation keywords to be used in lists without quoting.
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 /*

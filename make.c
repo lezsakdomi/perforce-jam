@@ -38,7 +38,11 @@
  * 03/02/01 (seiwald) - reverse NOCARE change.
  * 03/14/02 (seiwald) - TEMPORARY targets no longer take on parents age
  * 03/16/02 (seiwald) - support for -g (reorder builds by source time)
- * xx/xx/02 (seiwald) - TEMPORARY sources for headers now get built
+ * 07/17/02 (seiwald) - TEMPORARY sources for headers now get built
+ * 09/19/02 (seiwald) - new -d displays
+ * 09/23/02 (seiwald) - suppress "...using temp..." in default output
+ * 09/28/02 (seiwald) - make0() takes parent pointer; new -dc display
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 # include "jam.h"

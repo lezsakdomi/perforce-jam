@@ -4,13 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "pathsys.h"
-
-# ifdef OS_MAC
-
-# define DELIM ':'
-
 /*
  * pathunix.c - manipulate file names on UNIX, NT, OS2
  *
@@ -39,7 +32,15 @@
  * 01/10/01 (seiwald) - path_parse now strips the trailing : from the
  *			directory name, unless the directory name is all
  *			:'s, so that $(d:P) works.
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "pathsys.h"
+
+# ifdef OS_MAC
+
+# define DELIM ':'
 
 /*
  * path_parse() - split a file name into dir/base/suffix/member

@@ -4,13 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "variable.h"
-# include "expand.h"
-# include "pathsys.h"
-# include "newstr.h"
-
 /*
  * expand.c - expand a buffer, given variable values
  *
@@ -26,8 +19,21 @@
  *
  * 01/25/94 (seiwald) - $(X)$(UNDEF) was expanding like plain $(X)
  * 04/13/94 (seiwald) - added shorthand L0 for null list pointer
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
  * 01/11/01 (seiwald) - added support for :E=emptyvalue, :J=joinval
+ * 01/13/01 (seiwald) - :UDJE work on non-filename strings
+ * 02/19/01 (seiwald) - make $($(var):J=x) join multiple values of var
+ * 01/25/02 (seiwald) - fixed broken $(v[1-]), by ian godin
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "variable.h"
+# include "expand.h"
+# include "pathsys.h"
+# include "newstr.h"
 
 typedef struct {
 	PATHNAME	f;		/* :GDBSMR -- pieces */

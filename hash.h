@@ -6,6 +6,8 @@
 
 /*
  * hash.h - simple in-memory hashing routines 
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 typedef struct hashdata HASHDATA;

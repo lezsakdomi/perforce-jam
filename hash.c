@@ -4,9 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "hash.h"
-
 /* 
  * hash.c - simple in-memory hashing routines 
  *
@@ -21,7 +18,11 @@
  *     hashrehash() - resize and rebuild hp->tab, the hash table
  *
  * 4/29/93 - ensure ITEM's are aligned
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "hash.h"
 
 /* Header attached to all data items entered into a hash table. */
 

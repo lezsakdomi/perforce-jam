@@ -4,10 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "newstr.h"
-# include "lists.h"
-
 /*
  * lists.c - maintain lists of strings
  *
@@ -23,7 +19,13 @@
  *
  * 08/23/94 (seiwald) - new list_append()
  * 09/07/00 (seiwald) - documented lol_*() functions
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "newstr.h"
+# include "lists.h"
 
 static LIST *freelist = 0;	/* junkpile for list_free() */
 
