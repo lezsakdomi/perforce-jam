@@ -48,6 +48,7 @@
  * 01/03/03 (seiwald) - T_FATE_NEWER once again gets set with missing parent
  * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  * 04/04/03 (seiwald) - fix INTERNAL node binding to avoid T_BIND_PARENTS
+ * 12/15/03 (seiwald) - make circular dependency warning say t->name
  */
 
 # include "jam.h"
@@ -275,7 +276,7 @@ make0(
 	    if( c->target->fate == T_FATE_INIT )
 		make0( c->target, ptime, depth + 1, counts, anyhow );
 	    else if( c->target->fate == T_FATE_MAKING && !internal )
-		printf( "warning: %s depends on itself\n", c->target->name );
+		printf( "warning: %s depends on itself\n", t->name );
 	}
 
 	/* Step 3b: recursively make0() internal includes node */
