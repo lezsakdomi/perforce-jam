@@ -6,10 +6,12 @@ Jam/MR Language
 </HEAD>
 </BODY>
 <CENTER>
+<a href=http://www.perforce.com/jam/jam.html>
+Jam/MR
+</a>
 <A NAME="TOP">
 <H1> The Jam/MR Language
 </H1>
-Jam/MR 2.2
 </A>
 </CENTER>
 <P>
@@ -23,10 +25,12 @@ Jam/MR 2.2
 	<LI><A href="Jambase.html">Jambase Reference</A>
 	</UL>
 <P>
-	Also, the Jambase file provided in the Jam/MR distribution
+	Also, the 
+<A HREF=http://public.perforce.com/public/jam/src/Jambase>Jambase</a>
+	source file itself
 	is an excellent source of Jam/MR language examples.
-	Documentation and source are available from
-<A HREF=http://www.perforce.com/jam/jam.html>www.perforce.com/jam/jam.html</a>
+	Jam/MR documentation and source are available from the
+<A HREF=http://public.perforce.com/public/index.html>Perforce Public Depot</a>.
 <HR>
 <H3> Lexical Features
 </H3>
@@ -42,6 +46,24 @@ Jam/MR 2.2
        (;) tokens.  This is because <b>jam</b> runs  on  many  platforms
        and  no  characters,  save whitespace, are uncommon in the
        file names on all of those platforms.
+<p>
+<H4> Reserved Words
+</h4>
+<P>
+	Certain tokens are recognized as reserved words, and unless they
+	are used in expected context they will cause syntax errors.
+	You can quote reserved words to use them in other contexts. 
+	For example, "switch" is a reserved word, so:
+	<PRE>
+	Echo "switch" ;
+	</pre>
+	is allowed, but:
+	<PRE>
+	Echo switch ;
+	</PRE>
+	will get a syntax error.
+	Words likely to be reserved are any keywords used in
+	defining rules, flow of control, or variable definition.
 <P>
 <H3> Targets
 </H3>
@@ -747,6 +769,6 @@ Jam/MR 2.2
         <BR>
         Comments to <A HREF="mailto:info@perforce.com">info@perforce.com</A>
         <BR>
-        Last updated: Sep 24, 1998
+        Last updated: Jan 27, 1999
 </BODY>
 </HTML>     

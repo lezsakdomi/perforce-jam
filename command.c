@@ -36,12 +36,13 @@
  */
 
 CMD *
-cmd_new( chain, rule, targets, sources, shell )
+cmd_new( chain, rule, targets, sources, shell, chunk )
 CMD	*chain;
 RULE	*rule;
 LIST	*targets;
 LIST	*sources;
 LIST	*shell;
+int	chunk;
 {
 	int     len;
 
@@ -58,9 +59,13 @@ LIST	*shell;
 	
 	if( len < 0 )
 	{
-	    printf( "fatal error: %s command block too long (max %d)\n", 
-		rule->name, CMDBUF );
-	    exit( EXITBAD );
+	    if ( chunk == 1 ) {
+		printf( "fatal error: %s command block too long (max %d)\n", 
+			rule->name, CMDBUF );
+		exit( EXITBAD );
+	    }
+	    free( cmd );
+	    return NULL;
 	}
 
 	if( !chain ) chain = cmd;

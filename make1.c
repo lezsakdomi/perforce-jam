@@ -405,6 +405,7 @@ make1cmds( a0 )
 ACTIONS	*a0;
 {
 	CMD *cmds = 0;
+	CMD *cmdlast = 0;
 	LIST *shell = var_get( "JAMSHELL" );	/* shell is per-target */
 
 	/* Step through actions */
@@ -484,9 +485,20 @@ ACTIONS	*a0;
 		     somes = list_sublist( ns, start, chunk );
 		     start += chunk )
 		{
+		    cmdlast = cmds;
 		    cmds = cmd_new( cmds, rule, 
 				list_copy( L0, nt ), somes, 
-				list_copy( L0, shell ) );
+				list_copy( L0, shell ), chunk );
+		    if ( cmds == NULL ) {
+			cmds = cmdlast; /* remember where we were */
+			chunk = chunk >> 1; /* adjust chunk size */
+			if ( DEBUG_EXECCMD )
+			    printf( "warning: adjusted chunk size to %d\n",
+				    chunk );
+			if ( chunk == 0 )
+			    chunk = 1;
+			start -= chunk; /* back up */
+                    }
 		}
 
 		list_free( nt );
@@ -494,7 +506,7 @@ ACTIONS	*a0;
 	    }
 	    else
 	    {
-		cmds = cmd_new( cmds, rule, nt, ns, list_copy( L0, shell ) );
+		cmds = cmd_new( cmds, rule, nt, ns, list_copy( L0, shell ), 1 );
 	    }
 
 	    /* Free the variables whose values were bound by */

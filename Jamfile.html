@@ -4,11 +4,13 @@ Jamfiles and Jambase
 </TITLE>
 <BODY>
 <CENTER>
+<A HREF=http://www.perforce.com/jam/jam.html>
+Jam/MR
+</a>
 <A NAME="TOP">
 <H2>
 Using Jamfiles and Jambase
 </H2>
-Jam/MR 2.2
 </A>
 </CENTER>
 <P>
@@ -27,8 +29,8 @@ Related documents of interest are:
 	which explains the syntax used in Jambase
 </UL>
 <P>
-Jam/MR documentation and source are available at
-<A HREF=http://www.perforce.com/jam/jam.html>www.perforce.com/jam/jam.html</a>.
+Jam/MR documentation and source are available from the
+<A HREF=http://public.perforce.com/public/index.html>Perforce Public Depot</a>.
 <HR>
 <P>
 <H2>
@@ -156,6 +158,10 @@ build a subset of defined targets. For example:
 on Unix builds the libtree library and all the compiled objects
 that go in it.
 <P>
+<H4>
+Pseudotargets
+</H4>
+<P>
 Most Jambase rules that define file targets also define pseudotargets
 which are dependent on types of file targets.
 For example, Jambase defines a pseudotarget called "lib", which 
@@ -165,6 +171,30 @@ the command:
         jam lib
 </PRE> 
 used with the above example would cause the libtree library to be built.
+Also, there is one pseudotarget built into <b>jam</b> itself, called
+"all". Jambase sets "all" dependent on (almost) all other targets.
+<P>
+In the unfortunate case where you have a buildable target whose name
+is the same as one of the Jambase pseudotargets, you'll have problems
+with the conflicting target name.
+Your workaround choices are:
+<P>
+<ol>
+<lI>Change the name of your buildable file or directory that conflicts.
+<p>
+<li>Modify your Jambase and change the name of the conflicting pseudotarget.
+(Pseudotargets are defined in Jambase using the NOTFILE rule.)
+<p>
+<li>Use grist on the conflicting target name in your Jamfile. E.g., instead
+    of
+    <PRE>
+    File lib : libfoo.a ;
+    </PRE>
+    try
+    <PRE>
+    File &lt;dir&gt;lib : libfoo.a ;
+    </PRE>
+</ol>
 <P>
 
 <H4>
@@ -1415,6 +1445,6 @@ RmTemps Rule
         <BR>
         Comments to <A HREF="mailto:info@perforce.com">info@perforce.com</A>
         <BR>
-        Last updated: Oct 19, 1997
+        Last updated: Jan 27, 1999
 </BODY> 
 </HTML>

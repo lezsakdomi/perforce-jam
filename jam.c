@@ -190,7 +190,7 @@ char	**argv;
 	{
 	    printf( "Jam/MR  " );
 	    printf( "Version %s.%s.  ", VERSION, PATCHLEVEL );
-	    printf( "Copyright 1993, 1997 Christopher Seiwald.\n" );
+	    printf( "Copyright 1993, 1999 Christopher Seiwald.\n" );
 
 	    return EXITOK;
 	}
