@@ -103,6 +103,10 @@ Release notes for Jam/MR [UNRELEASED]
 
 4.  Fixed bugs
 
+	Missing TEMPORARY targets with multiple parents no longer spoil one
+	parent's time with another.  The parents' time is used for comparison
+	with dependents, but no longer taken on as the target's own time.
+
 	'actions updated', not 'actions together', now protects targets
 	from being deleted on failed/interrupted updates.
 

@@ -35,6 +35,7 @@
  * 08/22/95 (seiwald) - NOUPDATE targets immune to anyhow (-a) flag.
  * 09/06/00 (seiwald) - NOCARE affects targets with sources/actions.
  * 03/02/01 (seiwald) - reverse NOCARE change.
+ * 03/14/02 (seiwald) - TEMPORARY targets no longer take on parents age
  */
 
 # include "jam.h"
@@ -63,8 +64,8 @@ typedef struct {
 	int	made;
 } COUNTS ;
 
-static void make0( TARGET *t, int pbinding, time_t ptime, 
-		int depth, COUNTS *counts, int anyhow );
+static void make0( TARGET *t, time_t ptime, int depth, 
+		COUNTS *counts, int anyhow );
 
 static char *target_fate[] = 
 {
@@ -111,7 +112,7 @@ make(
 	{
 	    TARGET *t = bindtarget( targets[i] );
 
-	    make0( t, T_BIND_UNBOUND, (time_t)0, 0, counts, anyhow );
+	    make0( t, (time_t)0, 0, counts, anyhow );
 	}
 
 	if( DEBUG_MAKE )
@@ -146,7 +147,6 @@ make(
 static void
 make0( 
 	TARGET	*t,
-	int	pbinding,	/* parent target's binding */
 	time_t	ptime,		/* parent target's timestamp */
 	int	depth,		/* for display purposes */
 	COUNTS	*counts,	/* for reporting */
@@ -196,13 +196,10 @@ make0(
 	    t->binding = t->time ? T_BIND_EXISTS : T_BIND_MISSING;
 	}
 
-	/* If temp file doesn't exist, use parent */
+	/* If temp file doesn't exist but parent does, use parent */
 
 	if( t->binding == T_BIND_MISSING && t->flags & T_FLAG_TEMP && ptime )
-	{
-	    t->time = ptime;
-	    t->binding = t->time ? T_BIND_PARENTS : T_BIND_MISSING;
-	}
+	    t->binding = T_BIND_PARENTS;
 
 	/* Step 2c: If its a file, search for headers. */
 
@@ -251,7 +248,11 @@ make0(
 
 	for( c = t->deps[ T_DEPS_DEPENDS ]; c; c = c->next )
 	{
-	    make0( c->target, t->binding, t->time, depth + 1, counts, anyhow );
+	    /* Pass our time or our parent's time down. */
+
+	    int time = t->binding == T_BIND_PARENTS ? ptime : t->time;
+
+	    make0( c->target, time, depth + 1, counts, anyhow );
 	    leaf = max( leaf, c->target->leaf );
 	    leaf = max( leaf, c->target->hleaf );
 
@@ -293,10 +294,9 @@ make0(
 		If children changed, make target.
 		If target missing, make it.
 		If children newer, make target.
-		If temp's children newer, make temp.
+		If temp's children newer than parent, make temp.
 		If deliberately touched, make it.
 		If up-to-date temp file present, use it.
-		If target exists but parent not, mark target newer.
 		If target newer than parent, mark target newer.
 		Don't propagate child's "newer" status.
 	*/
@@ -317,7 +317,7 @@ make0(
 	{
 	    fate = T_FATE_OUTDATED;
 	}
-	else if( t->binding == T_BIND_PARENTS && last > t->time )
+	else if( t->binding == T_BIND_PARENTS && last > ptime )
 	{
 	    fate = T_FATE_OUTDATED;
 	}
@@ -333,11 +333,7 @@ make0(
 	{
 	    fate = T_FATE_ISTMP;
 	}
-	else if( t->binding == T_BIND_EXISTS && pbinding == T_BIND_MISSING )
-	{
-	    fate = T_FATE_NEWER;
-	}
-	else if( t->binding == T_BIND_EXISTS && ptime && t->time > ptime )
+	else if( t->binding == T_BIND_EXISTS && t->time > ptime )
 	{
 	    fate = T_FATE_NEWER;
 	}
@@ -387,7 +383,7 @@ make0(
 
 	for( c = t->deps[ T_DEPS_INCLUDES ]; c; c = c->next )
 	{
-	    make0( c->target, pbinding, ptime, depth + 1, counts, anyhow );
+	    make0( c->target, ptime, depth + 1, counts, anyhow );
 	    hlast = max( hlast, c->target->time );
 	    hlast = max( hlast, c->target->htime );
 	    hleaf = max( hleaf, c->target->leaf );
