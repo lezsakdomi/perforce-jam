@@ -241,44 +241,43 @@ builtin_match(
 	PARSE	*parse,
 	LOL	*args )
 {
-	LIST *l = lol_get( args, 0 );
-	LIST *r = lol_get( args, 1 );
+	LIST *l, *r;
 	LIST *result = 0;
-	regexp *re;
 
-	/* No pattern or string?  No results. */
+	/* For each pattern */
 
-	if( !l || !r )
-	    return L0;
-
-	/* Just use first arg of each list. */
-
-	re = regcomp( l->string );
-
-	if( regexec( re, r->string ) )
+	for( l = lol_get( args, 0 ); l; l = l->next )
 	{
-	    int i, top;
+	    regexp *re = regcomp( l->string );
 
-	    /* Find highest parameter */
+	    /* For each string to match against */
 
-	    for( top = NSUBEXP; top-- > 1; )
-		if( re->startp[top] != re->endp[top] )
-		    break;
-
-	    /* And add all parameters up to highest onto list. */
-	    /* Must have parameters to have results! */
-
-	    for( i = 1; i <= top; i++ )
+	    for( r = lol_get( args, 1 ); r; r = r->next )
+		if( regexec( re, r->string ) )
 	    {
-		char buf[ MAXSYM ];
-		int l = re->endp[i] - re->startp[i];
-		memcpy( buf, re->startp[i], l );
-		buf[ l ] = 0;
-		result = list_new( result, newstr( buf ) );
-	    }
-	}
+		int i, top;
 
-	free( (char *)re );
+		/* Find highest parameter */
+
+		for( top = NSUBEXP; top-- > 1; )
+		    if( re->startp[top] != re->endp[top] )
+			break;
+
+		/* And add all parameters up to highest onto list. */
+		/* Must have parameters to have results! */
+
+		for( i = 1; i <= top; i++ )
+		{
+		    char buf[ MAXSYM ];
+		    int l = re->endp[i] - re->startp[i];
+		    memcpy( buf, re->startp[i], l );
+		    buf[ l ] = 0;
+		    result = list_new( result, newstr( buf ) );
+		}
+	    }
+
+	    free( (char *)re );
+	}
 
 	return result;
 }
