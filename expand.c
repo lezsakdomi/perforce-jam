@@ -220,9 +220,12 @@ var_expand(
 
 		    sub1 = atoi( bracket + 1 ) - 1;
 
-		    if( !dash )		sub2 = 1;
-		    else if( !dash[1] )	sub2 = -1;
-		    else 		sub2 = atoi( dash + 1 ) - sub1;
+		    if( !dash )
+			sub2 = 1;
+		    else if( !dash[1] || dash[1] == MAGIC_RIGHT )
+			sub2 = -1;
+		    else
+			sub2 = atoi( dash + 1 ) - sub1;
 
 		    *bracket = '\0';
 		}

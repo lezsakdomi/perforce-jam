@@ -90,6 +90,9 @@ Release notes for Jam/MR [UNRELEASED]
 
 4.  Fixed bugs
 
+	Fixed broken $(v[1-]), which always returned an empty expansion.
+	Thanks to Ian Godin <ian@sgrail.com>.
+
 	Defining a rule within another rule, and invoking the enclosing
 	rule more than once, would result in giving the first rule a
 	null definition.  Fixed.
