@@ -7,8 +7,12 @@ Release notes for Jam/MR 2.2
 	Jam/MR 2.2
 	October 22, 1997
 	VERSION 2.2
-	PATCHLEVEL 0
+	PATCHLEVEL 1
 
+1.1 Bug fixes since 2.2 patchlevel 0
+
+	The NT handle leak in execunix.c has been fixed, thanks to
+	Gurusamy Sarathy.  (Patchlevel 1).
 
 2. Compatibility
 
@@ -31,7 +35,7 @@ Release notes for Jam/MR 2.2
 	Documentation rewritten; HTML versions supplied.
 
 
-3.1 Changes to Jam/MR Language (See jamMR.html)
+3.1 Changes to Jam/MR Language (See Jamlang.html)
 
 	Rules may now have more fields than just $(<) and $(>).
 
@@ -64,7 +68,7 @@ Release notes for Jam/MR 2.2
 	the entire action size is limited by CMDBUF.
 
 
-3.2 Jambase Changes (See Jamfile.5.html)
+3.2 Jambase Changes (See Jamfile.html)
 
 	Jambase has been reworked to incorporate new language features.
 
@@ -84,7 +88,7 @@ Release notes for Jam/MR 2.2
 	InstallFile, InstallLib, InstallMan, or InstallShell instead.
 
 
-3.3 'jam' Changes (See jam.1.html)
+3.3 'jam' Changes (See Jam.html)
 
 	'jam' can now be built as a stand-alone program, with Jambase 
 	compiled into the executable. An external or alternate Jambase can 
@@ -248,7 +252,7 @@ Release notes for Jam 2.1.
 	To handle Linux's wacko yacc, jamgram.h is now included after
 	scan.h so that YYSTYPE is define.
 
-3.  Jambase Changes (see Jamfile.5.html)
+3.  Jambase Changes (see Jamfile.html)
 
 	SubDir now computes the root directory for the source tree, if
 	the variable naming the root directory isn't set in the environment.
@@ -268,7 +272,7 @@ Release notes for Jam 2.1.
 	The File rule now calls the Clean rule, so that installed files
 	get cleaned.
 
-4.  Jam changes (see jam.1.html)
+4.  Jam changes (see Jam.html)
 
 	Variables may now be set on the command line with -svar=value.
 

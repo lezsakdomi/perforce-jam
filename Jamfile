@@ -3,14 +3,6 @@
 #
 # There are no user-serviceable parts in this file.
 #
-# Some sections have been hidden because their targets are in
-# managed files, and overwriting them unecessarily causes
-# problems. To reveal them:
-#
-#	- set DO_GRAMMAR if you want make new jamgram.* files
-#
-#	- set DO_JAMBASE if you want jam to make new jambase.c
-#
 # Put executables in platform-specific  subdirectory.
 # If $(OSVER) isn't set, second value is used.
 
@@ -37,8 +29,8 @@ else if $(VMS) 	{ code = execvms.c filevms.c pathvms.c ; }
 else if $(MAC)	{ code = execmac.c filemac.c pathmac.c ; }
 else 		{ code = execunix.c fileunix.c pathunix.c ; }
 
-if $(DO_GRAMMAR) { code += jamgram.y ; }
-else             { code += jamgram.c ; }
+if $(UNIX) 	{ code += jamgram.y ; }
+else            { code += jamgram.c ; }
 
 
 if $(OS) = NT { CCFLAGS += /DNT ; }
@@ -57,11 +49,7 @@ Main		mkjambase : mkjambase.c ;
 
 Main 		jam : jam.c jambase.c ;
 LinkLibraries 	jam : libjam.a ;
-
-if $(DO_JAMBASE)
-{
-    GenFile 	jambase.c : mkjambase Jambase ;
-}
+GenFile 	jambase.c : mkjambase Jambase ;
 
 Library         libjam.a : 
 		    command.c compile.c $(code) expand.c glob.c
@@ -80,7 +68,7 @@ if $(UNIX)
 
 #### --- cut
 
-if $(UNIX) && $(DO_GRAMMAR)
+if $(UNIX) 
 {
 	GenFile jamgram.y jamgramtab.h : yyacc jamgram.yy ;
 }
@@ -111,6 +99,9 @@ ALLSOURCE =
 
 rule Ball
 {
+	NotFile balls ;
+	Depends balls : $(<) ;
+
 	DEPENDS $(<) : $(>) ;
 
 	PreBall $(<) ;
@@ -147,7 +138,7 @@ actions Tar
 
 actions Shar
 {
-	shar -l97 -o $(<) $(>) 
+	shar $(>) > $(<)
 }
 
 actions Zip
@@ -155,9 +146,8 @@ actions Zip
 	zip $(<) $(>) 
 }
 
-Ball SHAR : $(ALLSOURCE) ;
+Ball $(VERSION).shar : $(ALLSOURCE) ;
 Ball $(VERSION).tar : $(ALLSOURCE) ;
-Depends TAR : $(VERSION).tar ;
-Ball ZIP : $(ALLSOURCE) ;
+Ball $(VERSION).zip : $(ALLSOURCE) ;
 
 

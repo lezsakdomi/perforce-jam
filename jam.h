@@ -41,9 +41,9 @@ int unlink( char *f ); 	/* In filevms.c */
 # include <unixlib.h>
 
 # ifdef __DECC
-# define OTHERSYMS "VMS=true","OS=OPENVMS"
+# define OSSYMS "VMS=true","OS=OPENVMS"
 # else
-# define OTHERSYMS "VMS=true","OS=VMS"
+# define OSSYMS "VMS=true","OS=VMS"
 # endif 
 
 # define MAXLINE 1024 /* longest 'together' actions */
@@ -65,16 +65,7 @@ int unlink( char *f ); 	/* In filevms.c */
 # include <string.h>
 # include <time.h>
 
-# ifdef _M_PPC
-# define OTHERSYMS "NT=true","OS=NT","OSPLAT=PPC"
-# else
-# ifdef _ALPHA_
-# define OTHERSYMS "NT=true","OS=NT","OSPLAT=ALPHA"
-# else 
-# define OTHERSYMS "NT=true","OS=NT","OSPLAT=X86"
-# endif /* _ALPHA_ */
-# endif /* _PPC_ */
-
+# define OSSYMS "NT=true","OS=NT"
 # define SPLITPATH ';'
 # define MAXLINE 996	/* longest 'together' actions */
 # define EXITOK 0
@@ -93,7 +84,7 @@ int unlink( char *f ); 	/* In filevms.c */
 # include <string.h>
 # include <time.h>
 
-# define OTHERSYMS "OS2=true","OS=OS2"
+# define OSSYMS "OS2=true","OS=OS2"
 # define SPLITPATH ';'
 # define MAXLINE 996	/* longest 'together' actions */
 # define EXITOK 0
@@ -114,7 +105,7 @@ int unlink( char *f ); 	/* In filevms.c */
 # include <string.h>
 # include <time.h>
 
-# define OTHERSYMS "UNIX=true","OS=QNX"
+# define OSSYMS "UNIX=true","OS=QNX"
 # define SPLITPATH ':'
 # define MAXLINE 996	/* longest 'together' actions */
 # define EXITOK 0
@@ -128,7 +119,7 @@ int unlink( char *f ); 	/* In filevms.c */
 # include <string.h>
 # include <stdio.h>
 
-# define OTHERSYMS "MAC=true","OS=MAC"
+# define OSSYMS "MAC=true","OS=MAC"
 # define SPLITPATH ','
 # define MAXLINE 1024	/* longest 'together' actions */
 # define EXITOK 0
@@ -160,81 +151,85 @@ int unlink( char *f ); 	/* In filevms.c */
 # ifdef _AIX
 # define unix
 # ifdef _AIX41
-# define OTHERSYMS "UNIX=true","OS=AIX","OSVER=41"
+# define OSSYMS "UNIX=true","OS=AIX","OSVER=41"
 # else
-# define OTHERSYMS "UNIX=true","OS=AIX","OSVER=32"
+# define OSSYMS "UNIX=true","OS=AIX","OSVER=32"
 # endif
 # endif
 
 # ifdef __BEOS__
-# define OTHERSYMS "UNIX=true","OS=BEOS"
+# define OSSYMS "UNIX=true","OS=BEOS"
 # define unix
 # endif
 
 # ifdef __bsdi__
-# define OTHERSYMS "UNIX=true","OS=BSDI"
+# define OSSYMS "UNIX=true","OS=BSDI"
 # endif
 # if defined (COHERENT) && defined (_I386)
-# define OTHERSYMS "UNIX=true","OS=COHERENT"
+# define OSSYMS "UNIX=true","OS=COHERENT"
 # endif
 # ifdef __FreeBSD__
-# define OTHERSYMS "UNIX=true","OS=FREEBSD"
+# define OSSYMS "UNIX=true","OS=FREEBSD"
 # endif
 # ifdef __DGUX__
-# define OTHERSYMS "UNIX=true","OS=DGUX"
+# define OSSYMS "UNIX=true","OS=DGUX"
 # endif
 # ifdef __hpux
-# define OTHERSYMS "UNIX=true","OS=HPUX"
+# define OSSYMS "UNIX=true","OS=HPUX"
 # endif
 # ifdef __sgi
-# define OTHERSYMS "UNIX=true","OS=IRIX"
+# define OSSYMS "UNIX=true","OS=IRIX"
 # endif
 # ifdef __ISC
-# define OTHERSYMS "UNIX=true","OS=ISC"
+# define OSSYMS "UNIX=true","OS=ISC"
 # endif
 # ifdef linux
-# define OTHERSYMS "UNIX=true","OS=LINUX"
+# define OSSYMS "UNIX=true","OS=LINUX"
+# endif
+# ifdef __Lynx__
+# define OSSYMS "UNIX=true","OS=LYNX"
+# define unix
 # endif
 # ifdef __MACHTEN__
-# define OTHERSYMS "UNIX=true","OS=MACHTEN"
+# define OSSYMS "UNIX=true","OS=MACHTEN"
 # endif
 # ifdef MVS
 # define unix
-# define OTHERSYMS "UNIX=true","OS=MVS"
+# define OSSYMS "UNIX=true","OS=MVS"
 # endif
 # ifdef _ATT4
-# define OTHERSYMS "UNIX=true","OS=NCR"
+# define OSSYMS "UNIX=true","OS=NCR"
 # endif
 # ifdef NeXT
-# define OTHERSYMS "UNIX=true","OS=NEXT"
+# define OSSYMS "UNIX=true","OS=NEXT"
 # endif
 # ifdef __osf__
-# define OTHERSYMS "UNIX=true","OS=OSF"
+# define OSSYMS "UNIX=true","OS=OSF"
 # endif
 # ifdef _SEQUENT_
-# define OTHERSYMS "UNIX=true","OS=PTX"
+# define OSSYMS "UNIX=true","OS=PTX"
 # endif
 # ifdef M_XENIX
-# define OTHERSYMS "UNIX=true","OS=SCO"
+# define OSSYMS "UNIX=true","OS=SCO"
 # endif
 # ifdef sinix
-# define OTHERSYMS "UNIX=true","OS=SINIX"
+# define OSSYMS "UNIX=true","OS=SINIX"
 # endif
 # ifdef sun
 # if defined(__svr4__) || defined(__SVR4)
-# define OTHERSYMS "UNIX=true","OS=SOLARIS"
+# define OSSYMS "UNIX=true","OS=SOLARIS"
 # else
-# define OTHERSYMS "UNIX=true","OS=SUNOS"
+# define OSSYMS "UNIX=true","OS=SUNOS"
 # endif
 # endif
 # ifdef ultrix
-# define OTHERSYMS "UNIX=true","OS=ULTRIX"
+# define OSSYMS "UNIX=true","OS=ULTRIX"
 # endif
 # if defined(__USLC__) && !defined(M_XENIX)
-# define OTHERSYMS "UNIX=true","OS=UNIXWARE"
+# define OSSYMS "UNIX=true","OS=UNIXWARE"
 # endif
-# ifndef OTHERSYMS
-# define OTHERSYMS "UNIX=true","OS=UNKNOWN"
+# ifndef OSSYMS
+# define OSSYMS "UNIX=true","OS=UNKNOWN"
 # endif
 
 # define MAXLINE 10240	/* longest 'together' actions' */
@@ -251,6 +246,30 @@ int unlink( char *f ); 	/* In filevms.c */
 # endif /* NT */
 
 # endif /* UNIX */
+
+/* OSPLAT definitions - note the leading , */
+
+# define OSPLATSYM /**/
+
+# ifdef _M_PPC
+# undef OSPLATSYM
+# define OSPLATSYM ,"OSPLAT=PPC"
+# endif
+
+# if defined( _ALPHA_ ) || defined( __alpha__ )
+# undef OSPLATSYM
+# define OSPLATSYM ,"OSPLAT=AXP"
+# endif
+
+# if defined( _i386_ ) || defined( __i386__ ) || defined( _M_IX86 )
+# undef OSPLATSYM
+# define OSPLATSYM ,"OSPLAT=X86"
+# endif 
+
+# ifdef __sparc__
+# undef OSPLATSYM
+# define OSPLATSYM ,"OSPLAT=SPARC"
+# endif
 
 /* You probably don't need to muck with these. */
 

@@ -64,10 +64,9 @@
 
 run	: block
 		{ 
-		    if( $1.parse.func == compile_null )
+		    if( $1.parse->func == compile_null )
 		    {
 			parse_free( $1.parse );
-			parse_save( P0 );
 		    }
 		    else
 		    {

@@ -130,7 +130,7 @@ struct globs globs = {
 
 /* Symbols to be defined as true for use in Jambase */
 
-static char *othersyms[] = { OTHERSYMS, JAMVERSYM, 0 } ;
+static char *othersyms[] = { OSSYMS OSPLATSYM, JAMVERSYM, 0 } ;
 
 # ifndef __WATCOM__
 # ifndef __OS2__
