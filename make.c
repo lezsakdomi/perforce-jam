@@ -273,6 +273,13 @@ int	anyhow;		/* forcibly touch all (real) targets */
 	{
 	    last = 0;
 	    t->time = 0;
+
+	    /*
+	     * Don't inherit our fate from our dependents.  Decide fate
+	     * based only upon other flags and our binding (done later).
+	     */
+
+	    fate = T_FATE_STABLE;
 	}
 
 	/* Step 3b: determine fate: rebuild target or what? */
