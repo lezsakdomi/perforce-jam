@@ -204,48 +204,72 @@ file_archscan(
 	    char    lar_name[256];
 	    long    lar_date;
 	    long    lar_size;
-	    long    lar_offset;
-	    char *c;
-	    char    *src, *dest;
 
-	    strncpy( lar_name, ar_hdr.ar_name, sizeof(ar_hdr.ar_name) );
+	    /* Get date & size */
 
 	    sscanf( ar_hdr.ar_date, "%ld", &lar_date );
 	    sscanf( ar_hdr.ar_size, "%ld", &lar_size );
 
-	    if (ar_hdr.ar_name[0] == '/')
-	    {
-		if (ar_hdr.ar_name[1] == '/')
-		{
-		    /* this is the "string table" entry of the symbol table,
-		    ** which holds strings of filenames that are longer than
-		    ** 15 characters (ie. don't fit into a ar_name
-		    */
+	    /* Handle solaris string table.
+	    ** The entry under the name // is the table,
+	    ** and entries with the name /nnnn refer to the table.
+	    */
 
-		    string_table = (char *)malloc(lar_size);
-		    lseek(fd, offset + SARHDR, 0);
-		    if (read(fd, string_table, lar_size) != lar_size)
-			printf("error reading string table\n");
-		}
-		else if (string_table && ar_hdr.ar_name[1] != ' ')
-		{
-		    /* Long filenames are recognized by "/nnnn" where nnnn is
-		    ** the offset of the string in the string table represented
-		    ** in ASCII decimals.
-		    */
-		    dest = lar_name;
-		    lar_offset = atoi(lar_name + 1);
-		    src = &string_table[lar_offset];
-		    while (*src != '/')
-			*dest++ = *src++;
-		    *dest = '/';
-		}
+	    if( ar_hdr.ar_name[0] != '/' )
+	    {
+		/* traditional archive entry names:
+		** ends at the first space, /, or null.
+		*/
+
+		char *src = ar_hdr.ar_name;
+		char *dst = lar_name;
+		const char *e = src + sizeof( ar_hdr.ar_name );
+
+		while( src < e && *src && *src != ' ' && *src != '/' )
+		    *dst++ = *src++;
+		*dst = 0;
+	    }
+	    else if( ar_hdr.ar_name[1] == '/' )
+	    {
+		/* this is the "string table" entry of the symbol table,
+		** which holds strings of filenames that are longer than
+		** 15 characters (ie. don't fit into a ar_name)
+		*/
+
+		string_table = (char *)malloc(lar_size);
+
+		lseek(fd, offset + SARHDR, 0);
+		if( read(fd, string_table, lar_size) != lar_size )
+		    printf( "error reading string table\n" );
+	    }
+	    else if( string_table && ar_hdr.ar_name[1] != ' ' )
+	    {
+		/* Long filenames are recognized by "/nnnn" where nnnn is
+		** the offset of the string in the string table represented
+		** in ASCII decimals.
+		*/
+
+		char *src = string_table + atoi( ar_hdr.ar_name + 1 );
+		char *dst = lar_name;
+
+		while( *src != '/' )
+		    *dst++ = *src++;
+		*dst = 0;
 	    }
 
-	    c = lar_name - 1;
-	    while( *++c != ' ' && *c != '/' )
-		;
-	    *c = '\0';
+	    /* Modern (BSD4.4) long names: if the name is "#1/nnnn", 
+	    ** then the actual name is the nnnn bytes after the header.  
+	    */
+
+	    if( !strcmp( lar_name, "#1" ) )
+	    {
+		int len = atoi( ar_hdr.ar_name + 3 );
+		if( read( fd, lar_name, len ) != len )
+		    printf("error reading archive entry\n");
+		lar_name[len] = 0;
+	    }
+
+	    /* Build name and pass it on.  */
 
 	    if ( DEBUG_BINDSCAN )
 		printf( "archive name %s found\n", lar_name );

@@ -447,10 +447,8 @@ else if $(UNIX)
 	RANLIB		?= "" ;
 
     case MACOSX :
-	AR		?= libtool -o ;
 	C++		?= c++ ;
 	MANDIR		?= /usr/local/share/man ;
-	RANLIB		?= "" ;
 
     case NCR :
 	RANLIB		?= "" ;
@@ -870,7 +868,7 @@ rule LibraryFromObjects
 
 	# If we can't scan the library, we have to leave the .o's around.
 
-	if ! ( $(NOARSCAN) || $(KEEPOBJS) ) { RmTemps $(_l) : $(_s) ; }
+	if ! ( $(NOARSCAN) || $(NOARUPDATE) ) { RmTemps $(_l) : $(_s) ; }
 }
 
 rule Link
