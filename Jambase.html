@@ -267,19 +267,19 @@ Jambase Rules
               Makes <I>target</I> a symbolic link to <I>source,</I> if it isn't one
               already. (Unix only.)
 </BLOCKQUOTE>
-	<B>SubDir</B> <I>VAR d1 ... dn</I> ;
+	<B>SubDir</B> <I>TOP d1 ... dn</I> ;
 <BLOCKQUOTE>
 		Sets up housekeeping for the source files located
-		in <I><CODE>$(VAR)/d1/.../dn</CODE></I>:
+		in <I><CODE>$(TOP)/d1/.../dn</CODE></I>:
 		<UL>
-		<LI>Reads in rules file associated with <I>VAR</I>,
+		<LI>Reads in rules file associated with <I>TOP</I>,
 		    if it hasn't already been read.
 		<LI>Initializes variables for search paths, 
 		    output directories, compiler
 		    flags, and grist, using <I>d1 ... dn</I> tokens.
 		</UL>
 		<P>
-		<I>VAR</I> is the name of a variable; 
+		<I>TOP</I> is the name of a variable; 
 		<I>d1</I> thru <I>dn</I> are elements
 		of a directory path.
 </BLOCKQUOTE>
