@@ -165,7 +165,7 @@ make0(
 {
 	TARGETS	*c, *d, *incs;
 	TARGET 	*ptime = t;
-	time_t	last, leaf;
+	time_t	last, leaf, hlast;
 	int	fate;
 	const char *flag = "";
 
@@ -313,6 +313,15 @@ make0(
 	    fate = max( fate, c->target->fate );
 	}
 
+	/* Step 4b: pick up included headers time */
+	/* If a header is newer than a temp source that */
+	/* includes it, the temp source needs building */
+
+	hlast = 0;
+
+	for( c = t->includes; c; c = c->next )
+	    hlast = max( hlast, c->target->time );
+
 	/* Step 4b: handle NOUPDATE oddity */
 
 	/*
@@ -365,6 +374,10 @@ make0(
 	    fate = T_FATE_OUTDATED;
 	}
 	else if( t->binding == T_BIND_PARENTS && last > p->time )
+	{
+	    fate = T_FATE_NEEDTMP;
+	}
+	else if( t->binding == T_BIND_PARENTS && hlast > p->time )
 	{
 	    fate = T_FATE_NEEDTMP;
 	}
