@@ -1182,7 +1182,7 @@ char *jambase[] = {
 "rule makeGrist { $(<) = [ FGrist $(>) ] ; }\n",
 "rule makeGristedName { $(<) = [ FGristSourceFiles $(>) ] ; }\n",
 "rule makeRelPath { $(<[1]) = [ FRelPath $(<[2-]) : $(>) ] ; }\n",
-"rule makeString { $(<) = [ FConcat $(>) ] ; }\n",
+"rule makeString { $(<) = $(>:J) ; }\n",
 "rule makeSubDir { $(<) = [ FSubDir $(>) ] ; }\n",
 "rule makeSuffixed { $(<[1]) = [ FAppendSuffix $(>) : $(<[2]) ] ; }\n",
 "include $(JAMFILE) ;\n",
