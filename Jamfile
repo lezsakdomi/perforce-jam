@@ -128,7 +128,7 @@ rule Ball
 	}
 }
 
-VERSION = jam-2.4rc2 ;
+VERSION = jam-2.4 ;
 
 actions Tar
 {
