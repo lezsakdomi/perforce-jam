@@ -239,7 +239,7 @@ main( int argc, char **argv, char **arg_environ )
 	    /* First -d, turn off defaults. */
 
 	    if( !n )
-		DEBUG_MAKE = 0;
+		DEBUG_MAKE = DEBUG_MAKEQ = DEBUG_EXEC = 0;
 
 	    /* n turns on levels 1-n */
 	    /* +n turns on level n */
