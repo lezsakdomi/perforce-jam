@@ -347,7 +347,10 @@ compile_include(
 	    t->boundname = search( t->name, &t->time );
 	    popsettings( t->settings );
 
-	    parse_file( t->boundname );
+	    /* Don't parse missing file if NOCARE set */
+
+	    if( t->time || !( t->flags & T_FLAG_NOCARE ) )
+		parse_file( t->boundname );
 	}
 
 	list_free( nt );

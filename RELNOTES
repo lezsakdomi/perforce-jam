@@ -126,6 +126,9 @@ Release notes for Jam 2.5
 	Makefile/Jambase: BEOS updates from "Ingo Weinhold"
 	<bonefish@cs.tu-berlin.de>.
 
+	The NoCare rule can be used to suppress error messages when
+	an 'include' file can't be found.
+
 ===============================================================================
 ===============================================================================
 

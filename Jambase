@@ -1210,7 +1210,8 @@ rule SubDir
 	    if $($(_top)RULES) { 
 		include $($(_top)RULES) ;
 	    } else { 
-		include [ Glob $($(_top)) : $(JAMRULES) ] ;
+		NoCare $(JAMRULES:R=$($(_top)):G=$(_top)) ;
+		include $(JAMRULES:R=$($(_top)):G=$(_top)) ;
 	    }
 	}
 

@@ -510,7 +510,9 @@ jam [ -a ] [ -g ] [ -n ] [ -q ] [ -v ]
 	    <P><DD> Causes <b>jam</b> to read the named <i>file</i>.
 	    The file is bound like a regular target (see <A
 	    HREF="#binding"> Binding</A> above) but unlike a regular
-	    target the include file cannot be built.
+	    target the include file cannot be built.  Marking an include
+	    file target with the <b>NOCARE</b> rule makes it optional:
+	    if it is missing, it causes no error.
 
 	    <P>
 
