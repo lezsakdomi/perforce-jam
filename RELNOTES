@@ -32,6 +32,8 @@ Release notes for Jam 2.5
 	only, as it does't work under MPW (or anything other than with
 	sh).
         
+	Porting change: Minor Cray porting: make hashitem()'s key
+	value unsigned so we're guaranteed no integer overflows.
 
 1.  Release info:
 
@@ -200,6 +202,9 @@ Release notes for Jam 2.5
 	issues, new paths in Jambase for libraries and includes, and
 	separate out GenFile1 that sets PATH for UNIX only, as it
 	does't work under MPW (or anything other than with sh).
+
+	Minor Cray porting: make hashitem()'s key value unsigned so
+	we're guaranteed no integer overflows.
 
 
 ===============================================================================
