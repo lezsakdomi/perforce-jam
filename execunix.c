@@ -94,11 +94,57 @@ onintr( int disp )
  * execmax() - max permitted string to execcmd()
  */
 
+# ifdef OS_NT
+
+int
+execmax()
+{
+	static int maxline = 0;
+	OSVERSIONINFO o;
+
+	if( maxline )
+	    return maxline;
+
+	/* Get from OS */
+
+	/* Beyond Win 2003?  (6+?) -- 8191 */
+	/* WinXP (5/0) or Win 2003 (5/1) -- 8191 */
+	/* Win 2k (5/0) or Win NT 4 (4/0) -- 2047 */
+	/* older -- 996 */
+
+	o.dwOSVersionInfoSize = sizeof( o );
+
+	if( !GetVersionEx( &o ) )
+	    maxline = MAXLINE;
+	else if( o.dwMajorVersion >= 6 )
+	    maxline = 8191;
+	else if( o.dwMajorVersion == 5 && o.dwMinorVersion >= 1 )
+	    maxline = 8191;
+	else if( o.dwMajorVersion == 5 && o.dwMinorVersion == 0 )
+	    maxline = 2047;
+	else if( o.dwMajorVersion == 4 && o.dwMinorVersion == 0 )
+	    maxline = 2047;
+	else							  
+	    maxline = MAXLINE;
+
+	if( DEBUG_EXECCMD )
+	    printf( "Windows %d/%d maxline %d\n",
+	    	o.dwMajorVersion,
+		o.dwMinorVersion,
+		maxline );
+
+	return maxline;
+}
+
+# else
+
 int
 execmax()
 {
 	return MAXLINE;
 }
+
+# endif
 
 /*
  * execcmd() - launch an async command execution
