@@ -64,7 +64,7 @@
 # define OSMINOR "OS=VMS"
 # define OSMAJOR "VMS=true"
 # define OS_VMS
-# define MAXLINE 1024 /* longest 'together' actions */
+# define MAXLINE 1024 /* longest execcmd() */
 # define SPLITPATH ','
 # define EXITOK 1
 # define EXITBAD 0
@@ -97,7 +97,7 @@
 # define OSMINOR "OS=NT"
 # define OS_NT
 # define SPLITPATH ';'
-# define MAXLINE 996	/* longest 'together' actions */
+# define MAXLINE 996	/* longest execcmd() */
 # define USE_EXECUNIX
 # define USE_PATHUNIX
 # define PATH_DELIM '\\'
@@ -135,7 +135,7 @@
 # define OSMINOR "OS=MINGW"
 # define OS_NT
 # define SPLITPATH ';'
-# define MAXLINE 996	/* longest 'together' actions */
+# define MAXLINE 996	/* longest execcmd() */
 # define USE_EXECUNIX
 # define USE_PATHUNIX
 # define PATH_DELIM '\\'
@@ -162,7 +162,7 @@
 # define OSMINOR "OS=OS2"
 # define OS_OS2
 # define SPLITPATH ';'
-# define MAXLINE 996	/* longest 'together' actions */
+# define MAXLINE 996	/* longest execcmd() */
 # define USE_EXECUNIX
 # define USE_PATHUNIX
 # define PATH_DELIM '\\'
@@ -487,7 +487,7 @@
  */
 
 # ifndef MAXLINE
-# define MAXLINE 10240	/* longest 'together' actions' */
+# define MAXLINE 10240	/* longest execcmd() */
 # endif
 
 # ifndef EXITOK
