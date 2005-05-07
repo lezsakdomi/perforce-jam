@@ -36,6 +36,7 @@
  * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/27/02 (seiwald) - grist .bat file with pid for system uniqueness
+ * 05/06/05 (seiwald) - new execmax() to return max command line len.
  */
 
 # include "jam.h"
@@ -87,6 +88,16 @@ onintr( int disp )
 {
 	intr++;
 	printf( "...interrupted\n" );
+}
+
+/*
+ * execmax() - max permitted string to execcmd()
+ */
+
+int
+execmax()
+{
+	return MAXLINE;
 }
 
 /*
