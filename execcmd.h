@@ -8,7 +8,10 @@
  * execcmd.h - execute a shell script
  *
  * 05/04/94 (seiwald) - async multiprocess interface
+ * 05/06/05 (seiwald) - new execmax() to return max command line len.
  */
+
+int execmax();
 
 void execcmd(
 	char *string,

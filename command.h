@@ -44,7 +44,7 @@ struct _cmd
 	RULE	*rule;		/* rule->actions contains shell script */
 	LIST	*shell;		/* $(SHELL) value */
 	LOL	args;		/* LISTs for $(<), $(>) */
-	char	buf[ MAXLINE ];	/* actual commands */
+	char	*buf;		/* actual commands */
 } ;
 
 CMD *cmd_new(

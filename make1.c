@@ -470,26 +470,27 @@ make1cmds( ACTIONS *a0 )
 	     * Build command, starting with all source args. 
 	     *
 	     * If cmd_new returns 0, it's because the resulting command
-	     * length is > MAXLINE.  In this case, we'll slowly reduce
+	     * length is > maxline.  In this case, we'll slowly reduce
 	     * the number of source arguments presented until it does
 	     * fit.  This only applies to actions that allow PIECEMEAL 
 	     * commands.
 	     *
 	     * While reducing slowly takes a bit of compute time to get
-	     * things just right, it's worth it to get as close to MAXLINE
+	     * things just right, it's worth it to get as close to maxline
 	     * as possible, because launching the commands we're executing 
 	     * is likely to be much more compute intensive!
 	     *
 	     * Note we loop through at least once, for sourceless actions.
 	     *
-	     * Max line length is the action specific maxline or, if not 
-	     * given or bigger than MAXLINE, MAXLINE.
+	     * Max line length is the smaller of the action specific
+	     * MAXLINE or what execcmd() can handle.
 	     */
 
 	    start = 0;
 	    chunk = length = list_length( ns );
+
 	    maxline = rule->flags / RULE_MAXLINE;
-	    maxline = maxline && maxline < MAXLINE ? maxline : MAXLINE;
+	    maxline = maxline && maxline < execmax() ? maxline : execmax();
 
 	    do
 	    {

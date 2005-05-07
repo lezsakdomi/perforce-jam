@@ -22,6 +22,7 @@
  * 12/20/96 (seiwald) - rewritten to handle multi-line commands well
  * 01/14/96 (seiwald) - don't put -'s between "'s
  * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
+ * 05/06/05 (seiwald) - new execmax() to return max command line len.
  */
 
 # include "jam.h"
@@ -46,6 +47,16 @@
 /* 1 for the @ and 4 for the .com */
 
 char tempnambuf[ L_tmpnam + 1 + 4 ] = {0};
+
+/*
+ * execmax() - max permitted string to execcmd()
+ */
+
+int
+execmax()
+{
+	return MAXLINE;
+}
 
 void
 execcmd( 

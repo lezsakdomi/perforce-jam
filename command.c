@@ -37,6 +37,7 @@ cmd_new(
 	cmd->rule = rule;
 	cmd->shell = shell;
 	cmd->next = 0;
+	cmd->buf = (char *)malloc( maxline );
 
 	lol_init( &cmd->args );
 	lol_add( &cmd->args, targets );
@@ -63,5 +64,6 @@ cmd_free( CMD *cmd )
 {
 	lol_free( &cmd->args );
 	list_free( cmd->shell );
+	free( (char *)cmd->buf );
 	free( (char *)cmd );
 }

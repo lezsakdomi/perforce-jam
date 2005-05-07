@@ -32,6 +32,7 @@
  * 05/04/94 (seiwald) - async multiprocess interface
  * 01/22/95 (seiwald) - $(JAMSHELL) support
  * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
+ * 05/06/05 (seiwald) - new execmax() to return max command line len.
  */
 
 # include "jam.h"
@@ -40,6 +41,16 @@
 # include <errno.h>
 
 # ifdef OS_MAC
+
+/*
+ * execmax() - max permitted string to execcmd()
+ */
+
+int
+execmax()
+{
+	return MAXLINE;
+}
 
 /*
  * execcmd() - launch an async command execution
