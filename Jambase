@@ -155,7 +155,7 @@
 
 # for perforce use -- jambase version
 
-JAMBASEDATE = 2002.05.09 ;
+JAMBASEDATE = 2005.05.05 ;
 
 # Initialize variables
 #
@@ -708,15 +708,23 @@ rule HdrRule
 	# care if we can't actually find the headers (they may have been
 	# within ifdefs),
 
+	# If the including file has a hard-coded directory path $(<:D),
+	# we need to add that, as a subdirectory of the existing header
+	# search path, to SEARCH/HDRSEARCH.
+
 	local s = $(>:G=$(HDRGRIST:E)) ;
+	local h = $(HDRSEARCH) ;
+	local d = $(<:D) ; 
+
+	if $(d) { h += $(d:R=$(h)) ; }
 
 	Includes $(<) : $(s) ;
-	SEARCH on $(s) = $(HDRSEARCH) ;
+	SEARCH on $(s) = $(h) ;
 	NoCare $(s) ;
 
 	# Propagate on $(<) to $(>)
 
-	HDRSEARCH on $(s) = $(HDRSEARCH) ;
+	HDRSEARCH on $(s) = $(h) ;
 	HDRSCAN on $(s) = $(HDRSCAN) ;
 	HDRRULE on $(s) = $(HDRRULE) ;
 	HDRGRIST on $(s) = $(HDRGRIST) ;
