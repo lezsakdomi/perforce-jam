@@ -50,9 +50,16 @@ TARGET = -o $(EXENAME)
 # QNX rtp (neutrino)
 #CC = gcc
 
+# AS400 - icc wrapper around ILE C compiler.
+# CC = icc 
+# CFLAGS = -DAS400 -qDUPPROC
+#
+# Can't use ./jam0 as EXENAME on AS/400. It confuses icc et al.
+# EXENAME = jam0  
+
 SOURCES = \
 	builtins.c \
-	command.c compile.c execunix.c execvms.c expand.c \
+	command.c compile.c execas400.c execunix.c execvms.c expand.c \
 	filent.c fileos2.c fileunix.c filevms.c glob.c hash.c \
 	headers.c jam.c jambase.c jamgram.c lists.c make.c make1.c \
 	newstr.c option.c parse.c pathunix.c pathvms.c regexp.c \

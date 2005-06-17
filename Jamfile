@@ -26,6 +26,7 @@ if $(NT) 	{ code = execunix.c filent.c pathunix.c ; }
 else if $(MINGW) { code = execunix.c filent.c pathunix.c ; } 
 else if $(OS2)	{ code = execunix.c fileos2.c pathunix.c ; } 
 else if $(VMS) 	{ code = execvms.c filevms.c pathvms.c ; } 
+else if $(AS400) { code = execas400.c fileunix.c pathunix.c ; }
 else if $(MAC)	{ code = execmac.c filemac.c pathmac.c ; }
 else 		{ code = execunix.c fileunix.c pathunix.c ; }
 
