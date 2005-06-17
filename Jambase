@@ -283,6 +283,22 @@ else if $(OS2)
 	UNDEFFLAG	?= "/u _" ;
 
 }
+else if $(AS400)
+{
+	C++		?= icc ;
+	C++FLAGS	?= -DAS400 ;
+	CC		?= icc ;
+	CCFLAGS		?= -DAS400 ;
+	LINK		?= icc ;
+	LINKFLAGS	?= -qDUPPROC ;
+	NOARSCAN	?= true ;
+	AR		?= qar -cru ;
+	RM		?= del ;
+	CRELIB		?= true ;
+
+	# QSYS Library to use for build output
+	QSYSLIB 	?= jam ;
+}
 else if $(VMS)
 {
 	C++		?= cxx ;
@@ -1876,6 +1892,49 @@ if $(UNIX)
 	PATH="$PATH:."
 	$(>[1]) $(<) $(>[2-])
 	}
+}
+
+if $(AS400)
+{
+	#
+	# AS/400's unix-style compiler, linker and archiver use the OUTPUTDIR
+	# environment variable to decide which QSYS library the output file
+	# should be placed in. These actions make sure that variable is
+	# set when the command is run.
+	#
+
+	actions updated piecemeal Archive
+	{
+	    OUTPUTDIR=$(QSYSLIB) $(AR) $(<) $(>)
+	}
+
+	actions Cc
+	{
+	    OUTPUTDIR=$(QSYSLIB) $(CC) -c -o $(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
+	}
+
+	actions C++
+	{
+	    OUTPUTDIR=$(QSYSLIB) $(C++) -c -o $(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
+	}
+
+	actions Link bind NEEDLIBS
+	{
+	    OUTPUTDIR=$(QSYSLIB) $(LINK) $(LINKFLAGS) -o $(<) $(UNDEFS) $(>) $(NEEDLIBS) $(LINKLIBS)
+	}
+
+	#
+	# On AS/400 we pre-create libraries by creating a symlink to a
+	# Bound Directory in the QSYS library where the output goes. This
+	# helps qar get the library name right.
+	#
+
+	actions CreLib 
+	{
+	    dest=`echo $(<) | sed -e 's#.*/\([^/]*\)\.a$#/qsys.lib/$(QSYSLIB).lib/\1.bnddir#'`
+	    [ -h $(<) ] || ln -s $dest $(<)
+	}
+
 }
 
 #
