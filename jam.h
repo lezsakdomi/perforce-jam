@@ -103,16 +103,6 @@
 # define PATH_DELIM '\\'
 # define DOWNSHIFT_PATHS
 
-/* AS400 cross-compile from NT */
-
-# ifdef AS400
-# undef OSMINOR
-# undef OSMAJOR
-# define OSMAJOR "AS400=true"
-# define OSMINOR "OS=AS400"
-# define OS_AS400
-# endif
-
 # endif
 
 /*
@@ -142,6 +132,33 @@
 # define DOWNSHIFT_PATHS
 
 # endif
+
+/*
+ * AS400 - mostly unix-like superficially.
+ */
+
+# ifdef AS400
+
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <sys/wait.h>
+# include <fcntl.h>
+# include <stdio.h>
+# include <ctype.h>
+# include <signal.h>
+# include <string.h>
+# include <time.h>
+# include <memory.h>
+# include <stdlib.h>
+
+# define OSMAJOR "AS400=true"
+# define OSMINOR "OS=AS400"
+# define OS_AS400
+# define USE_FILEUNIX
+# define USE_PATHUNIX
+# define PATH_DELIM '/'
+
+# endif 
 
 /*
  * OS2
