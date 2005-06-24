@@ -214,7 +214,7 @@ if $(NT)
 	AR		?= lib /MACHINE:X64 ;
 	AS		?= masm386 ;
 	CC		?= cl /nologo ;
-	CCFLAGS		?= /favor:AMD64 /MT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
+	CCFLAGS		?= /favor:AMD64 -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
 	C++		?= $(CC) ;
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
