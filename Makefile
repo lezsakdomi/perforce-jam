@@ -1,9 +1,9 @@
 # Makefile for jam
 
-CC = cc
-CFLAGS =
-EXENAME = ./jam0
-TARGET = -o $(EXENAME)
+#CC = cc
+#CFLAGS =
+#EXENAME = ./jam0
+#TARGET = -o $(EXENAME)
 
 # Special flavors - uncomment appropriate lines
 
@@ -25,10 +25,18 @@ TARGET = -o $(EXENAME)
 #LINKLIBS = $(Lib)/oldnames.lib $(Lib)/kernel32.lib $(Lib)/libc.lib
 #EXENAME = .\jam0.exe
 
+# .NET 2005, settings already in shell environment.
+# Turn off new CRT depreciation garb.
+CC = cl /nologo
+CFLAGS = /favor:AMD64 /MT -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996
+TARGET = /Fejam0
+LINKLIBS = oldnames.lib kernel32.lib libcmt.lib
+EXENAME = .\jam0.exe
+
 # NT (with Microsoft compiler)
 # People with DevStudio settings already in shell environment.
 #CC = cl /nologo
-#CFLAGS = -DNT 
+#CFLAGS = -DNT
 #TARGET = /Fejam0
 #EXENAME = .\jam0.exe
 
