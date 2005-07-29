@@ -491,8 +491,10 @@
 # define OSPLAT "OSPLAT=390"
 # endif
 
-# ifdef __amd64__
-# define OSPLAT "OSPLAT=AMD64"
+# if defined( __amd64__ ) || \
+     defined( __AMD64__ ) || \
+     defined( _M_AMD64 )
+# define OSPLAT "OSPLAT=X64"
 # endif
 
 # ifndef OSPLAT
