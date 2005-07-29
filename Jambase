@@ -207,7 +207,11 @@ if $(NT)
 	STDHDRS		?= $(MSVC)\\include ;
 	UNDEFFLAG	?= "/u _" ;
     }
-    else if $(MSVCVer) = x64
+    else if $(MSVCNT) && $(OSPLAT) = IA64
+    {
+    	# No settings yet for IA64 .NET 2005.
+    }
+    else if $(MSVCNT) && $(OSPLAT) = X64
     {
 	# .NET 2005
 
@@ -215,7 +219,7 @@ if $(NT)
 	AS		?= masm386 ;
 	CC		?= cl /nologo ;
 	
-	CCFLAGS		?= /favor:AMD64 -D_M_AMD64 -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
+	CCFLAGS		?= /favor:blend /MT -D_M_AMD64 -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
 	C++		?= $(CC) ;
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
