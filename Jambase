@@ -749,26 +749,48 @@ rule HdrRule
 	# care if we can't actually find the headers (they may have been
 	# within ifdefs),
 
-	# If the including file has a hard-coded directory path $(<:D),
-	# we need to add that, as a subdirectory of the existing header
-	# search path, to SEARCH/HDRSEARCH.
-
 	local s = $(>:G=$(HDRGRIST:E)) ;
-	local h = $(HDRSEARCH) ;
-	local d = $(<:D) ; 
-
-	if $(d) { h += $(d:R=$(h)) ; }
 
 	Includes $(<) : $(s) ;
-	SEARCH on $(s) = $(h) ;
 	NoCare $(s) ;
 
 	# Propagate on $(<) to $(>)
 
-	HDRSEARCH on $(s) = $(h) ;
 	HDRSCAN on $(s) = $(HDRSCAN) ;
 	HDRRULE on $(s) = $(HDRRULE) ;
 	HDRGRIST on $(s) = $(HDRGRIST) ;
+	HDRSEARCH on $(s) = $(HDRSEARCH) ;
+	SEARCH on $(s) = $(HDRSEARCH) ;
+
+	# If the including file has a hard-coded directory path $(<:D),
+	# we need to add that, as a subdirectory of the existing header
+	# search path, to SEARCH/HDRSEARCH.  We try to be careful not to
+	# add duplicates.
+
+	local d = $(<:D) ; 
+	local h ;
+
+	if $(d) 
+	{
+	    # Build unique list h = $(HDRSEARCH)/$(<:D)
+
+	    for i in $(d:R=$(HDRSEARCH)) 
+	    {
+	    	if ! $(i) in $(HDRSEARCH) $(h) { h += $(i) ; } 
+	    }
+
+	    # For each included file whose directory doesn't match the
+	    # including file, add new subdirectories h to the search.
+
+	    for i in $(s)
+	    {
+		if $(d) != $(i:D)
+		{
+		    HDRSEARCH on $(i) += $(h) ;
+		    SEARCH on $(i) += $(h) ;
+		}
+	    }
+	}
 }
 
 rule InstallInto
