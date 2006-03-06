@@ -193,7 +193,7 @@ file_archscan(
 # ifndef NO_AR
 	struct ar_hdr ar_hdr;
 	char buf[ MAXJPATH ];
-	long offset;
+	off_t offset;
 	char    *string_table = 0;
 	int fd;
 
@@ -331,7 +331,7 @@ file_archscan(
 	} ar_hdr ;
 
 	char buf[ MAXJPATH ];
-	long offset;
+	off_t offset;
 	int fd;
 
 	if( ( fd = open( archive, O_RDONLY, 0 ) ) < 0 )
