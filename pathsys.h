@@ -32,6 +32,7 @@ struct _pathpart {
 
 struct _pathname {
 	PATHPART	part[6];
+	char		delim;
 # ifdef OS_VMS
 	int		parent;
 # endif

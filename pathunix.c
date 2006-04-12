@@ -75,6 +75,7 @@ path_parse(
 
 	if( p )
 	{
+	    f->delim = *p;
 	    f->f_dir.ptr = file;
 	    f->f_dir.len = p - file;
 	
@@ -168,7 +169,7 @@ path_build(
 	{
 	    memcpy( file, f->f_root.ptr, f->f_root.len );
 	    file += f->f_root.len;
-	    *file++ = PATH_DELIM;
+	    *file++ = f->delim ? f->delim : PATH_DELIM;
 	}
 
 	if( f->f_dir.len )
@@ -189,7 +190,7 @@ path_build(
 	    if( !( f->f_dir.len == 3 && f->f_dir.ptr[1] == ':' ) )
 # endif
 		if( !( f->f_dir.len == 1 && f->f_dir.ptr[0] == PATH_DELIM ) )
-		    *file++ = PATH_DELIM;
+		    *file++ = f->delim ? f->delim : PATH_DELIM;
 	}
 
 	if( f->f_base.len )
