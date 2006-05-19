@@ -208,7 +208,8 @@ main( int argc, char **argv, char **arg_environ )
 	if( ( s = getoptval( optv, 'v', 0 ) ) )
 	{
 	    printf( "Jam %s. %s. ", VERSION, OSMINOR );
-	    printf( "Copyright 1993-2002 Christopher Seiwald.\n" );
+	    if( *OSPLAT ) printf( "%s. ", OSPLAT );
+	    printf( "Copyright 1993-2006 Christopher Seiwald.\n" );
 
 	    return EXITOK;
 	}
