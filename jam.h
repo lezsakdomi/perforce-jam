@@ -40,6 +40,7 @@
  * 05/06/04 (seiwald) - OSPLAT amd64.
  * 06/23/04 (seiwald) - Nonstop unix porting from Kim Hae-Joo.
  * 09/02/04 (tony)    - Zeta porting
+ * 05/18/06 (seiwald) - OSPLAT to X86_64 for non-Windows.
  */
 
 /*
@@ -458,11 +459,7 @@
 # if defined( _i386_ ) || \
      defined( __i386__ ) || \
      defined( _M_IX86 )
-# if !defined( OS_FREEBSD ) && \
-     !defined( OS_OS2 ) && \
-     !defined( OS_AS400 )
 # define OSPLAT "OSPLAT=X86"
-# endif
 # endif 
 
 # ifdef __sparc__
@@ -494,7 +491,11 @@
 # if defined( __amd64__ ) || \
      defined( __AMD64__ ) || \
      defined( _M_AMD64 )
-# define OSPLAT "OSPLAT=X64"
+# ifdef OS_NT
+# define OSPLAT "OSPLAT=X64"		/* bless bill */
+# else
+# define OSPLAT "OSPLAT=X86_64"		/* curse linus */
+# endif
 # endif
 
 # ifndef OSPLAT
