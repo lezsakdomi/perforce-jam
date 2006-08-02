@@ -27,6 +27,7 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  * 01/23/03 (seiwald) - long long handles for NT IA64
  * 08/18/03 (seiwald) - GHS librarian names, from Jeff Nicholson
+ * 08/01/06 (seiwald) - use PATH_DELIM not / in header names, from Craig Allsop
  */
 
 # include "jam.h"
@@ -88,7 +89,7 @@ file_dirscan(
 
 	/* Now enter contents of directory */
 
-	sprintf( filespec, "%s/*", dir );
+	sprintf( filespec, "%s%c*", dir, PATH_DELIM );
 
 	if( DEBUG_BINDSCAN )
 	    printf( "scan directory %s\n", dir );
