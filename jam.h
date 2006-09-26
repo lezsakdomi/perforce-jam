@@ -74,7 +74,7 @@
 /* Do any of these work? */
 # if defined( VAX ) || defined( __VAX ) || defined( vax )
 # define OSPLAT "OSPLAT=VAX"
-# endif 
+# endif
 
 # endif
 
@@ -159,7 +159,7 @@
 # define USE_PATHUNIX
 # define PATH_DELIM '/'
 
-# endif 
+# endif
 
 /*
  * OS2
@@ -436,9 +436,9 @@
 # include <malloc.h>
 # endif
 
-# endif 
+# endif
 
-/* 
+/*
  * OSPLAT definitions - suppressed when it's a one-of-a-kind
  */
 
@@ -460,11 +460,16 @@
      defined( __i386__ ) || \
      defined( _M_IX86 )
 # define OSPLAT "OSPLAT=X86"
-# endif 
+# endif
 
-# ifdef __sparc__
+# if defined (__sparc__)
+# if defined( __sparcv9 ) || \
+     defined( __sparc64__ )
+# define OSPLAT "OSPLAT=SPARC64"
+# else
 # if !defined( OS_SUNOS )
 # define OSPLAT "OSPLAT=SPARC"
+# endif
 # endif
 # endif
 
@@ -565,4 +570,3 @@ extern struct globs globs;
 # define DEBUG_EXEC	( globs.debug[ 12 ] )	/* -dx show text of actions */
 # define DEBUG_DEPENDS	( globs.debug[ 13 ] )	/* -dd show dependency graph */
 # define DEBUG_CAUSES	( globs.debug[ 14 ] )	/* -dc show dependency graph */
-
