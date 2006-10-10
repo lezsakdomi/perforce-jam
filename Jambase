@@ -353,11 +353,6 @@ else if $(VMS)
 	SUFLIB		?= .olb ;
 	SUFOBJ		?= .obj ;
 
-	switch $(OS) 
-	{
-	case OPENVMS : CCFLAGS ?= /stand=vaxc ;
-	case VMS     : LINKLIBS ?= sys$library:vaxcrtl.olb/lib ;
-	}
 }
 else if $(MAC)
 {
