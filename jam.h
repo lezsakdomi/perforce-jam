@@ -65,7 +65,7 @@
 # define OSMINOR "OS=VMS"
 # define OSMAJOR "VMS=true"
 # define OS_VMS
-# define MAXLINE 1024 /* longest execcmd() */
+# define MAXLINE 2048 /* longest execcmd() */
 # define SPLITPATH ','
 # define EXITOK 1
 # define EXITBAD 0
