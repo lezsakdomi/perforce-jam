@@ -264,6 +264,7 @@ main( int argc, char **argv, char **arg_environ )
 	    case 'c': DEBUG_CAUSES = 1; break;
 	    case 'd': DEBUG_DEPENDS = 1; break;
 	    case 'm': DEBUG_MAKEPROG = 1; break;
+	    case 'r': DEBUG_COMPILE = 1; break;
 	    case 'x': DEBUG_EXEC = 1; break;
 	    case '0': break;
 	    default: printf( "Invalid debug flag '%c'.\n", s[-1] );
