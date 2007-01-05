@@ -547,12 +547,12 @@ struct globs {
 
 extern struct globs globs;
 
-# define DEBUG_MAKE	( globs.debug[ 1 ] )	/* -da show actions when executed */
+# define DEBUG_MAKE	( globs.debug[ 1 ] )	/* -da show executed actions */
 # define DEBUG_MAKEPROG	( globs.debug[ 3 ] )	/* -dm show progress of make0 */
 
 # define DEBUG_EXECCMD	( globs.debug[ 4 ] )	/* show execcmds()'s work */
 
-# define DEBUG_COMPILE	( globs.debug[ 5 ] )	/* show rule invocations */
+# define DEBUG_COMPILE	( globs.debug[ 5 ] )	/* -dr show rule invocations */
 
 # define DEBUG_HEADER	( globs.debug[ 6 ] )	/* show result of header scan */
 # define DEBUG_BINDSCAN	( globs.debug[ 6 ] )	/* show result of dir scan */
@@ -566,7 +566,7 @@ extern struct globs globs;
 # define DEBUG_SCAN	( globs.debug[ 9 ] )	/* show scanner tokens */
 # define DEBUG_MEM	( globs.debug[ 9 ] )	/* show memory use */
 
-# define DEBUG_MAKEQ	( globs.debug[ 11 ] )	/* -da show even quiet actions */
+# define DEBUG_MAKEQ	( globs.debug[ 11 ] )	/* -da show quiet actions */
 # define DEBUG_EXEC	( globs.debug[ 12 ] )	/* -dx show text of actions */
 # define DEBUG_DEPENDS	( globs.debug[ 13 ] )	/* -dd show dependency graph */
 # define DEBUG_CAUSES	( globs.debug[ 14 ] )	/* -dc show dependency graph */
