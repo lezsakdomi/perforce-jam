@@ -9,6 +9,7 @@
  *
  * 10/22/02 (seiwald) - working return/break/continue statements
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 01/05/07 (seiwald) - new yyfname/yylineno for DEBUG_COMPILE
  */
 
 /*
@@ -26,6 +27,11 @@ struct _PARSE {
 	const char	*string1;
 	int		num;
 	int		refs;
+
+	/* For DEBUG_COMPILE */
+
+	const char	*yyfname;
+	int		yylineno;
 } ;
 
 void 	parse_file( const char *f );

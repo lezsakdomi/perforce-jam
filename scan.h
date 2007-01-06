@@ -23,6 +23,7 @@
  * allows non-punctuation keywords to be used in lists without quoting.
  *
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 01/05/07 (seiwald) - new yyfname/yylineno for DEBUG_COMPILE
  */
 
 /*
@@ -48,6 +49,8 @@ void yyfparse( const char *s );
 int yyline();
 int yylex();
 int yyparse();
+const char *yyfname();
+const int yylineo();
 
 # define SCAN_NORMAL	0	/* normal parsing */
 # define SCAN_STRING	1	/* look only for matching } */

@@ -17,6 +17,7 @@
  *			defined before Linux's yacc tries to redefine it.
  * 01/10/01 (seiwald) - \ can now escape any whitespace char
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 01/05/07 (seiwald) - new yyfname/yylineno for DEBUG_COMPILE
  */
 
 # include "jam.h"
@@ -78,6 +79,18 @@ int
 yyanyerrors()
 {
 	return anyerrors != 0;
+}
+
+const char *
+yyfname()
+{
+	return incp ? copystr( incp->fname ) : 0;
+}
+
+const int
+yylineno()
+{
+	return incp ? incp->line : 0;
 }
 
 void

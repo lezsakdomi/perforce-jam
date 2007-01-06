@@ -29,6 +29,7 @@
  *
  * Internal routines:
  *
+ *	debug_level() - set indentation level for debug_compile()
  *	debug_compile() - printf with indent to show rule expansion.
  *	evaluate_rule() - execute a rule invocation
  *
@@ -66,6 +67,7 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  * 11/18/02 (seiwald) - remove bogus search() in 'on' statement.
  * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
+ * 01/05/07 (seiwald) - debug_compile() now reports file/line
  */
 
 # include "jam.h"
@@ -80,7 +82,8 @@
 # include "search.h"
 
 static const char *set_names[] = { "=", "+=", "?=" };
-static void debug_compile( int which, const char *s );
+static void debug_level( int which );
+static void debug_compile( const char *s, PARSE *p );
 int glob( const char *s, const char *c );
 
 
@@ -218,7 +221,7 @@ compile_eval(
 
 	if( DEBUG_IF )
 	{
-	    debug_compile( 0, "if" );
+	    debug_compile( "if", parse );
 	    list_print( ll );
 	    printf( "(%d) ", status );
 	    list_print( lr );
@@ -259,6 +262,13 @@ compile_foreach(
 	LIST	*nv = (*p->left->func)( p->left, args, jmp );
 	LIST	*result = 0;
 	LIST	*l;
+
+	if( DEBUG_COMPILE )
+	{
+	    debug_compile( "foreach", p );
+	    list_print( nv );
+	    printf( "\n" );
+	}
 
 	/* for each value for var */
 
@@ -307,6 +317,13 @@ compile_if(
 {
 	LIST *l = (*p->left->func)( p->left, args, jmp );
 
+	if( DEBUG_COMPILE )
+	{
+	    debug_compile( "if", p );
+	    list_print( l );
+	    printf( "\n" );
+	}
+
 	p = l ? p->right : p->third;
 
 	list_free( l );
@@ -330,7 +347,7 @@ compile_include(
 
 	if( DEBUG_COMPILE )
 	{
-	    debug_compile( 0, "include" );
+	    debug_compile( "include", parse );
 	    list_print( nt );
 	    printf( "\n" );
 	}
@@ -398,7 +415,7 @@ compile_local(
 
 	if( DEBUG_COMPILE )
 	{
-	    debug_compile( 0, "local" );
+	    debug_compile( "local", parse );
 	    list_print( nt );
 	    printf( " = " );
 	    list_print( ns );
@@ -455,7 +472,7 @@ compile_on(
 
 	if( DEBUG_COMPILE )
 	{
-	    debug_compile( 0, "on" );
+	    debug_compile( "on", parse );
 	    list_print( nt );
 	    printf( "\n" );
 	}
@@ -515,7 +532,7 @@ compile_rule(
 	/* Run rules, appending results from each */
 
 	for( l = ll; l; l = list_next( l ) )
-	    result = evaluate_rule( l->string, nargs, result );
+	    result = evaluate_rule( parse->right, l->string, nargs, result );
 
 	list_free( ll );
 	lol_free( nargs );
@@ -529,6 +546,7 @@ compile_rule(
 
 LIST *
 evaluate_rule(
+	PARSE	*parse,
 	const char *rulename,
 	LOL	*args, 
 	LIST	*result )
@@ -537,9 +555,10 @@ evaluate_rule(
 
 	if( DEBUG_COMPILE )
 	{
-	    debug_compile( 1, rulename );
+	    debug_compile( rulename, parse );
 	    lol_print( args );
 	    printf( "\n" );
+	    debug_level( 1 );
 	}
 
 	/* Check traditional targets $(<) and sources $(>) */
@@ -601,7 +620,7 @@ evaluate_rule(
 	}
 
 	if( DEBUG_COMPILE )
-	    debug_compile( -1, 0 );
+	    debug_level( -1 );
 
 	return result;
 }
@@ -660,7 +679,7 @@ compile_set(
 
 	if( DEBUG_COMPILE )
 	{
-	    debug_compile( 0, "set" );
+	    debug_compile( "set", parse );
 	    list_print( nt );
 	    printf( " %s ", set_names[ parse->num ] );
 	    list_print( ns );
@@ -703,7 +722,7 @@ compile_setcomp(
 
 	if( DEBUG_COMPILE )
 	{
-	    debug_compile( 0, "rule" );
+	    debug_compile( "rule", parse );
 	    printf( "%s ", parse->string );
 	    list_print( params );
 	    printf( "\n" );
@@ -786,7 +805,7 @@ compile_settings(
 
 	if( DEBUG_COMPILE )
 	{
-	    debug_compile( 0, "set" );
+	    debug_compile( "set", parse );
 	    list_print( nt );
 	    printf( "on " );
 	    list_print( targets );
@@ -839,7 +858,7 @@ compile_switch(
 
 	if( DEBUG_COMPILE )
 	{
-	    debug_compile( 0, "switch" );
+	    debug_compile( "switch", parse );
 	    list_print( nt );
 	    printf( "\n" );
 	}
@@ -912,18 +931,35 @@ compile_while(
  * debug_compile() - printf with indent to show rule expansion.
  */
 
+static int level = 0;
+
 static void
-debug_compile( int which, const char *s )
+debug_level( int which )
 {
-	static int level = 0;
+	level += which;
+}
+
+static void
+debug_compile( const char *s, PARSE *p )
+{
 	static char indent[36] = ">>>>|>>>>|>>>>|>>>>|>>>>|>>>>|>>>>|";
 	int i = ((1+level) * 2) % 35;
 
-	if( which >= 0 )
-	    printf( "%*.*s ", i, i, indent );
+	/* Report file/line of the leftmost node in the tree. */
+
+	if( p )
+	{
+	    while( p->left || p->right )
+		p = p->left ? p->left : p->right;
+
+	    if( p->yyfname )
+		printf( "%8s: %6d ", p->yyfname, p->yylineno );
+	}
+
+	/* Display indentation markers */
+
+	printf( "%*.*s ", i, i, indent );
 
 	if( s )
 	    printf( "%s ", s );
-
-	level += which;
 }

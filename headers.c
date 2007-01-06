@@ -27,6 +27,7 @@
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/09/02 (seiwald) - push regexp creation down to headers1().
+ * 01/05/07 (seiwald) - evaluate_rule takes PARSE for debugging.
  */
 
 # include "jam.h"
@@ -71,7 +72,7 @@ headers( TARGET *t )
 	lol_add( &lol, headers1( t->boundname, hdrscan ) );
 
 	if( lol_get( &lol, 1 ) )
-	    list_free( evaluate_rule( hdrrule->string, &lol, L0 ) );
+	    list_free( evaluate_rule( 0, hdrrule->string, &lol, L0 ) );
 
 	/* Clean up */
 

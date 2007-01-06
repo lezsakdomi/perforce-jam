@@ -13,6 +13,7 @@
  * 02/28/02 (seiwald) - merge EXEC_xxx flags in with RULE_xxx 
  * 10/22/02 (seiwald) - working return/break/continue statements
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 01/05/07 (seiwald) - evaluate_rule takes PARSE for debugging.
  */
 
 void compile_builtins();
@@ -36,7 +37,7 @@ LIST *compile_settings( PARSE *parse, LOL *args, int *jmp );
 LIST *compile_switch( PARSE *parse, LOL *args, int *jmp );
 LIST *compile_while( PARSE *parse, LOL *args, int *jmp );
 
-LIST *evaluate_rule( const char *rulename, LOL *args, LIST *result );
+LIST *evaluate_rule( PARSE *p, const char *rule, LOL *args, LIST *result );
 
 /* Conditions for compile_if() */
 

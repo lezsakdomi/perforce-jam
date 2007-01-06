@@ -13,6 +13,7 @@
  *		returns a LIST *.
  * 10/22/02 (seiwald) - working return/break/continue statements
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 01/05/07 (seiwald) - new yyfname/yylineno for DEBUG_COMPILE
  */
 
 # include "jam.h"
@@ -88,6 +89,18 @@ parse_make(
 	p->string1 = string1;
 	p->num = num;
 	p->refs = 1;
+	p->yyfname = 0;
+	p->yylineno = 0;
+
+	/* Only worth it for debugging. */
+	/* Don't label intermediate nodes. */
+	/* debug_compile() finds first labelled node. */
+
+	if( DEBUG_COMPILE && !p->left && !p->right )
+	{
+	    p->yyfname = yyfname();
+	    p->yylineno = yylineno();
+	}
 
 	return p;
 }
@@ -114,6 +127,8 @@ parse_free( PARSE *p )
 	    parse_free( p->right );
 	if( p->third )
 	    parse_free( p->third );
+	if( p->yyfname )
+	    freestr( p->yyfname );
 	
 	free( (char *)p );
 }
