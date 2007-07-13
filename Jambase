@@ -198,13 +198,13 @@ if $(NT)
 	LINK		?= $(CC) ;
 	LINKFLAGS	?= $(CCFLAGS) ;
 	LINKLIBS	?= 
-				$(MSVC)\\lib\\mlibce.lib
-				$(MSVC)\\lib\\oldnames.lib
+				$(MSVC:J=" ")\\lib\\mlibce.lib
+				$(MSVC:J=" ")\\lib\\oldnames.lib
 				;
 	LINKLIBS	?= ;
 	NOARSCAN	?= true ;
 	OPTIM		?=  ;
-	STDHDRS		?= $(MSVC)\\include ;
+	STDHDRS		?= $(MSVC:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
     }
     else if $(MSVCNT) && $(OSPLAT) = IA64
@@ -225,11 +225,11 @@ if $(NT)
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= /MACHINE:X64 /NODEFAULTLIB:libc.lib ;
 	LINKLIBS	?= 
-				$(MSVCNT)\\lib\\$(I)libcmt.lib
-				$(MSVCNT)\\lib\\$(I)oldnames.lib
-				$(MSVCNT)\\lib\\$(I)kernel32.lib ;
+				$(MSVCNT:J=" ")\\lib\\$(I)libcmt.lib
+				$(MSVCNT:J=" ")\\lib\\$(I)oldnames.lib
+				$(MSVCNT:J=" ")\\lib\\$(I)kernel32.lib ;
 	OPTIM		?= "" ;
-	STDHDRS		?= $(MSVCNT)\\include ;
+	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
     }
     else if $(MSVCNT) || $(MSVCDIR)
@@ -251,11 +251,11 @@ if $(NT)
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= "" ;
 	LINKLIBS	?= 
-				$(MSVCNT)\\lib\\$(I)libc.lib
-				$(MSVCNT)\\lib\\$(I)oldnames.lib
-				$(MSVCNT)\\lib\\$(I)kernel32.lib ;
+				$(MSVCNT:J=" ")\\lib\\$(I)libc.lib
+				$(MSVCNT:J=" ")\\lib\\$(I)oldnames.lib
+				$(MSVCNT:J=" ")\\lib\\$(I)kernel32.lib ;
 	OPTIM		?= "" ;
-	STDHDRS		?= $(MSVCNT)\\include ;
+	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
     }
     else
@@ -1998,17 +1998,17 @@ if $(NT) && $(MSVCNT)
 
 	actions Cc
 	{
-	$(CC) /c /Fo$(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) /I$(STDHDRS) $(>)
+	$(CC) /c /Fo$(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) /I"$(STDHDRS)" $(>)
 	}
 
 	actions C++
 	{
-	$(C++) /c /Fo$(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) /I$(STDHDRS) /Tp$(>)
+	$(C++) /c /Fo$(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) /I"$(STDHDRS)" /Tp$(>)
 	}
 
 	actions Link bind NEEDLIBS
 	{
-	$(LINK) $(LINKFLAGS) /out:$(<) $(UNDEFS) $(>) $(NEEDLIBS) $(LINKLIBS)
+	$(LINK) $(LINKFLAGS) /out:$(<) $(UNDEFS) $(>) $(NEEDLIBS) "$(LINKLIBS)"
 	}
 }
 else if $(NT) && $(MSVC)
@@ -2030,7 +2030,7 @@ else if $(NT) && $(MSVC)
 
 	actions Link bind NEEDLIBS
 	{
-	$(LINK) $(LINKFLAGS) /out:$(<) $(UNDEFS) $(>) $(NEEDLIBS) $(LINKLIBS)
+	$(LINK) $(LINKFLAGS) /out:$(<) $(UNDEFS) $(>) $(NEEDLIBS) "$(LINKLIBS)"
 	}
 }
 else if $(NT) && $(BCCROOT)
