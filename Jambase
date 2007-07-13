@@ -155,7 +155,7 @@
 
 # for perforce use -- jambase version
 
-JAMBASEDATE = 2005.05.05 ;
+JAMBASEDATE = 2007.07.12  ;
 
 # Initialize variables
 #
