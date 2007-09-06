@@ -213,17 +213,38 @@ if $(NT)
     }
     else if $(MSVCNT) && $(OSPLAT) = X64
     {
-	# .NET 2005
+	# X64 .NET 2005
 
 	AR		?= lib /MACHINE:X64 ;
 	AS		?= masm386 ;
 	CC		?= cl /nologo ;
 	
-	CCFLAGS		?= /favor:blend -D_M_AMD64 -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
+	CCFLAGS		?= /favor:blend -D_M_AMD64 /MT -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
 	C++		?= $(CC) ;
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
-	LINKFLAGS	?= /MACHINE:X64 /NODEFAULTLIB:libc.lib ;
+	LINKFLAGS	?= /MACHINE:X64 ;
+	LINKLIBS	?= 
+				$(MSVCNT:J=" ")\\lib\\$(I)libcmt.lib
+				$(MSVCNT:J=" ")\\lib\\$(I)oldnames.lib
+				$(MSVCNT:J=" ")\\lib\\$(I)kernel32.lib ;
+	OPTIM		?= "" ;
+	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
+	UNDEFFLAG	?= "/u _" ;
+    }
+    else if $(MSVCNT) && $(OSPLAT) = X86
+    {
+	# X86 .NET 2005
+
+	AR		?= lib /MACHINE:X86 ;
+	AS		?= masm386 ;
+	CC		?= cl /nologo ;
+	
+	CCFLAGS		?= /MT -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
+	C++		?= $(CC) ;
+	C++FLAGS	?= $(CCFLAGS) ;
+	LINK		?= link /nologo ;
+	LINKFLAGS	?= /MACHINE:X86 ;
 	LINKLIBS	?= 
 				$(MSVCNT:J=" ")\\lib\\$(I)libcmt.lib
 				$(MSVCNT:J=" ")\\lib\\$(I)oldnames.lib
