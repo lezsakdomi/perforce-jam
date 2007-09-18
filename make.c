@@ -121,15 +121,24 @@ make(
 	int i;
 	COUNTS counts[1];
 	int status = 0;		/* 1 if anything fails */
+	TARGET *t;
 
 	memset( (char *)counts, 0, sizeof( *counts ) );
 
-	for( i = 0; i < n_targets; i++ )
-	{
-	    TARGET *t = bindtarget( targets[i] );
+	/* make a single target with args as dependencies */
 
-	    make0( t, 0, 0, counts, anyhow );
-	}
+	t = bindtarget( "<all>all" );
+
+	for( i = 0; i < n_targets; i++ )
+	    t->depends = targetentry( t->depends, bindtarget( targets[ i ] ) );
+
+	/* Bind and scan */
+
+	make0( t, 0, 0, counts, anyhow );
+
+	status = counts->cantfind || counts->cantmake;
+
+	/* Harmless debugging */
 
 	if( DEBUG_MAKE )
 	{
@@ -145,10 +154,9 @@ make(
 		printf( "...can't make %d target(s)...\n", counts->cantmake );
 	}
 
-	status = counts->cantfind || counts->cantmake;
+	/* Build */
 
-	for( i = 0; i < n_targets; i++ )
-	    status |= make1( bindtarget( targets[i] ) );
+	status |= make1( t );
 
 	return status;
 }
