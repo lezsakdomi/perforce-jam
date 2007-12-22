@@ -155,7 +155,7 @@
 
 # for perforce use -- jambase version
 
-JAMBASEDATE = 2007.07.12  ;
+JAMBASEDATE = 2007.12.21  ;
 
 # Initialize variables
 #
@@ -174,6 +174,11 @@ if $(NT)
     	SUFLIB		?= .lib ;
     	SUFOBJ		?= .obj ;
     	SUFEXE		?= .exe ;
+
+    if $(MSVCDir)
+    {
+	MSVCDIR		?= $(MSVCDir) ;
+    }
      
     if $(BCCROOT)
     {
@@ -232,28 +237,7 @@ if $(NT)
 	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
     }
-    else if $(MSVCNT) && $(OSPLAT) = X86
-    {
-	# X86 .NET 2005
-
-	AR		?= lib /MACHINE:X86 ;
-	AS		?= masm386 ;
-	CC		?= cl /nologo ;
-	
-	CCFLAGS		?= -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
-	C++		?= $(CC) ;
-	C++FLAGS	?= $(CCFLAGS) ;
-	LINK		?= link /nologo ;
-	LINKFLAGS	?= /MACHINE:X86 ;
-	LINKLIBS	?= 
-				$(MSVCNT:J=" ")\\lib\\$(I)libcmt.lib
-				$(MSVCNT:J=" ")\\lib\\$(I)oldnames.lib
-				$(MSVCNT:J=" ")\\lib\\$(I)kernel32.lib ;
-	OPTIM		?= "" ;
-	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
-	UNDEFFLAG	?= "/u _" ;
-    }
-    else if $(MSVCNT) || $(MSVCDIR)
+    else if $(MSVCDIR) && $(OSPLAT) = X86
     {
 	# Visual C++ 6.0 and .NET 2003 uses MSVCDIR
 
@@ -273,6 +257,27 @@ if $(NT)
 	LINKFLAGS	?= "" ;
 	LINKLIBS	?= 
 				$(MSVCNT:J=" ")\\lib\\$(I)libc.lib
+				$(MSVCNT:J=" ")\\lib\\$(I)oldnames.lib
+				$(MSVCNT:J=" ")\\lib\\$(I)kernel32.lib ;
+	OPTIM		?= "" ;
+	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
+	UNDEFFLAG	?= "/u _" ;
+    }
+    else if $(MSVCNT) && $(OSPLAT) = X86
+    {
+	# X86 .NET 2005
+
+	AR		?= lib /MACHINE:X86 ;
+	AS		?= masm386 ;
+	CC		?= cl /nologo ;
+	
+	CCFLAGS		?= -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
+	C++		?= $(CC) ;
+	C++FLAGS	?= $(CCFLAGS) ;
+	LINK		?= link /nologo ;
+	LINKFLAGS	?= /MACHINE:X86 ;
+	LINKLIBS	?= 
+				$(MSVCNT:J=" ")\\lib\\$(I)libcmt.lib
 				$(MSVCNT:J=" ")\\lib\\$(I)oldnames.lib
 				$(MSVCNT:J=" ")\\lib\\$(I)kernel32.lib ;
 	OPTIM		?= "" ;
