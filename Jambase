@@ -155,7 +155,7 @@
 
 # for perforce use -- jambase version
 
-JAMBASEDATE = 2007.12.21  ;
+JAMBASEDATE = 2008.01.31  ;
 
 # Initialize variables
 #
@@ -182,6 +182,8 @@ if $(NT)
      
     if $(BCCROOT)
     {
+	# Borland
+
 	AR		?= tlib /C /P64 ;
 	CC		?= bcc32 ;
 	CCFLAGS		?= -v -w- -q -DWIN -tWR -tWM -tWC ;
@@ -214,7 +216,23 @@ if $(NT)
     }
     else if $(MSVCNT) && $(OSPLAT) = IA64
     {
-    	# No settings yet for IA64 .NET 2005.
+    	# IA64 .NET 2005
+
+	AR		?= lib /MACHINE:IA64 ;
+	AS		?= ias ;
+	CC		?= cl /nologo ;
+	CCFLAGS		?= -D_M_IA64 -DNT -D_CRT_SECURE_NO_DEPRECATE /MT /wd4996 ;
+	C++		?= $(CC) ;
+	C++FLAGS	?= $(CCFLAGS) ;
+	LINK		?= link /nologo ;
+	LINKFLAGS	?= /MACHINE:IA64 ;
+	LINKLIBS	?= 
+				$(MSVCNT:J=" ")\\lib\\libcmt.lib
+				$(MSVCNT:J=" ")\\lib\\oldnames.lib
+				$(MSVCNT:J=" ")\\lib\\kernel32.lib ;
+	OPTIM		?= "" ;
+	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
+	UNDEFFLAG	?= "/u _" ;
     }
     else if $(MSVCNT) && $(OSPLAT) = X64
     {
@@ -224,15 +242,15 @@ if $(NT)
 	AS		?= masm386 ;
 	CC		?= cl /nologo ;
 	
-	CCFLAGS		?= /favor:blend -D_M_AMD64 -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
+	CCFLAGS		?= /favor:blend -D_M_AMD64 -DNT -D_CRT_SECURE_NO_DEPRECATE /MT /wd4996 ;
 	C++		?= $(CC) ;
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= /MACHINE:X64 ;
 	LINKLIBS	?= 
-				$(MSVCNT:J=" ")\\lib\\$(I)libcmt.lib
-				$(MSVCNT:J=" ")\\lib\\$(I)oldnames.lib
-				$(MSVCNT:J=" ")\\lib\\$(I)kernel32.lib ;
+				$(MSVCNT:J=" ")\\lib\\libcmt.lib
+				$(MSVCNT:J=" ")\\lib\\oldnames.lib
+				$(MSVCNT:J=" ")\\lib\\kernel32.lib ;
 	OPTIM		?= "" ;
 	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
@@ -243,10 +261,6 @@ if $(NT)
 
 	MSVCNT		?= $(MSVCDIR) ;	
 
-	# bury IA64 in the path for the SDK
-
-	local I ; if $(OSPLAT) = IA64 { I = ia64\\ ; } else { I = "" ; }
-
 	AR		?= lib ;
 	AS		?= masm386 ;
 	CC		?= cl /nologo ;
@@ -256,9 +270,9 @@ if $(NT)
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= "" ;
 	LINKLIBS	?= 
-				$(MSVCNT:J=" ")\\lib\\$(I)libc.lib
-				$(MSVCNT:J=" ")\\lib\\$(I)oldnames.lib
-				$(MSVCNT:J=" ")\\lib\\$(I)kernel32.lib ;
+				$(MSVCNT:J=" ")\\lib\\libc.lib
+				$(MSVCNT:J=" ")\\lib\\oldnames.lib
+				$(MSVCNT:J=" ")\\lib\\kernel32.lib ;
 	OPTIM		?= "" ;
 	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
@@ -271,15 +285,15 @@ if $(NT)
 	AS		?= masm386 ;
 	CC		?= cl /nologo ;
 	
-	CCFLAGS		?= -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
+	CCFLAGS		?= -DNT -D_CRT_SECURE_NO_DEPRECATE /MT /wd4996 ;
 	C++		?= $(CC) ;
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= /MACHINE:X86 ;
 	LINKLIBS	?= 
-				$(MSVCNT:J=" ")\\lib\\$(I)libcmt.lib
-				$(MSVCNT:J=" ")\\lib\\$(I)oldnames.lib
-				$(MSVCNT:J=" ")\\lib\\$(I)kernel32.lib ;
+				$(MSVCNT:J=" ")\\lib\\libcmt.lib
+				$(MSVCNT:J=" ")\\lib\\oldnames.lib
+				$(MSVCNT:J=" ")\\lib\\kernel32.lib ;
 	OPTIM		?= "" ;
 	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
