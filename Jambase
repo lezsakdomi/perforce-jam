@@ -226,10 +226,7 @@ if $(NT)
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= /MACHINE:IA64 ;
-	LINKLIBS	?= 
-				$(MSVCNT:J=" ")\\lib\\libcmt.lib
-				$(MSVCNT:J=" ")\\lib\\oldnames.lib
-				$(MSVCNT:J=" ")\\lib\\kernel32.lib ;
+	LINKLIBS	?= libcmt.lib kernel32.lib bufferoverflowU.lib ;
 	OPTIM		?= "" ;
 	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
