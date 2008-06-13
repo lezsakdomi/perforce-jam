@@ -216,12 +216,12 @@ if $(NT)
     }
     else if $(MSVCNT) && $(OSPLAT) = IA64
     {
-    	# IA64 .NET 2005
+    	# IA64 SDK based on VS8 (but not 100% compatible)
 
 	AR		?= lib /MACHINE:IA64 ;
 	AS		?= ias ;
 	CC		?= cl /nologo ;
-	CCFLAGS		?= -D_M_IA64 -DNT -D_CRT_SECURE_NO_DEPRECATE /MT /wd4996 ;
+	CCFLAGS		?= -D_M_IA64 -DNT /MT /wd4996 ;
 	C++		?= $(CC) ;
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
