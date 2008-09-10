@@ -534,7 +534,8 @@ else if $(UNIX)
 
     case MVS :
 	RANLIB		?= "" ; 
-
+	YACC		?= "" ;
+	
     case NEXT :
 	AR		?= libtool -o ;
 	RANLIB		?= "" ;
