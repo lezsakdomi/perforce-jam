@@ -50,7 +50,7 @@ int yyline();
 int yylex();
 int yyparse();
 const char *yyfname();
-const int yylineo();
+int yylineo();
 
 # define SCAN_NORMAL	0	/* normal parsing */
 # define SCAN_STRING	1	/* look only for matching } */

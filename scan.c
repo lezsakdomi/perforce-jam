@@ -87,7 +87,7 @@ yyfname()
 	return incp ? copystr( incp->fname ) : 0;
 }
 
-const int
+int
 yylineno()
 {
 	return incp ? incp->line : 0;
