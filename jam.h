@@ -489,8 +489,12 @@
 # define OSPLAT "OSPLAT=IA64"
 # endif
 
+# ifdef __s390x__
+# define OSPLAT "OSPLAT=s390x"
+# else
 # ifdef __s390__
 # define OSPLAT "OSPLAT=390"
+# endif
 # endif
 
 # if defined( __amd64__ ) || \
