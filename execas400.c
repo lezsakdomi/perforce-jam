@@ -40,6 +40,7 @@
 # endif
 
 extern char **environ;
+static int intr = 0;
 
 # ifdef AS400_EXEC_SPAWN
 
