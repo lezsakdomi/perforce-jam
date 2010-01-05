@@ -1178,6 +1178,8 @@ rule Object
 	    case .f :	Fortran $(<) : $(>) ;
 	    case .l :	Cc $(<) : $(<:S=.c) ;
 			Lex $(<:S=.c) : $(>) ;
+	    case .m :	Cc $(<) : $(>) ;
+	    case .mm :	Cc $(<) : $(>) ;
 	    case .s :	As $(<) : $(>) ;
 	    case .y :	Cc $(<) : $(<:S=$(YACCGEN)) ;
 			Yacc $(<:S=$(YACCGEN)) : $(>) ;
