@@ -209,7 +209,7 @@ main( int argc, char **argv, char **arg_environ )
 	{
 	    printf( "Jam %s. %s. ", VERSION, OSMINOR );
 	    if( *OSPLAT ) printf( "%s. ", OSPLAT );
-	    printf( "Copyright 1993-2006 Christopher Seiwald.\n" );
+	    printf( "Copyright 1993-2010 Christopher Seiwald.\n" );
 
 	    return EXITOK;
 	}
