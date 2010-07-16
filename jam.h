@@ -41,6 +41,7 @@
  * 06/23/04 (seiwald) - Nonstop unix porting from Kim Hae-Joo.
  * 09/02/04 (tony)    - Zeta porting
  * 05/18/06 (seiwald) - OSPLAT to X86_64 for non-Windows.
+ * 07/15/10 (noahf)   - increase generic execcmd buffer to 20kib.
  */
 
 /*
@@ -516,7 +517,7 @@
  */
 
 # ifndef MAXLINE
-# define MAXLINE 10240	/* longest execcmd() */
+# define MAXLINE 20480	/* longest execcmd() */
 # endif
 
 # ifndef EXITOK
