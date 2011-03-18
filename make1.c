@@ -7,7 +7,7 @@
 /*
  * make1.c - execute command to bring targets up to date
  *
- * This module contains make1(), the entry point called by make() to 
+ * This module contains make1(), the entry point called by make() to
  * recursively decend the dependency graph executing update actions as
  * marked by make0().
  *
@@ -41,7 +41,7 @@
  * 02/07/01 (seiwald) - Fix jam -d0 return status.
  * 01/21/02 (seiwald) - new -q to quit quickly on build failure
  * 02/28/02 (seiwald) - don't delete 'actions updated' targets on failure
- * 02/28/02 (seiwald) - merge EXEC_xxx flags in with RULE_xxx 
+ * 02/28/02 (seiwald) - merge EXEC_xxx flags in with RULE_xxx
  * 07/17/02 (seiwald) - TEMPORARY sources for headers now get built
  * 09/23/02 (seiwald) - "...using temp..." only displayed on -da now.
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
@@ -120,7 +120,7 @@ make1( TARGET *t )
  */
 
 static void
-make1a( 
+make1a(
 	TARGET	*t,
 	TARGET	*parent )
 {
@@ -162,7 +162,7 @@ make1a(
 	t->progress = T_MAKE_ACTIVE;
 
 	/* Now that all dependents have bumped asynccnt, we now allow */
-	/* decrement our reference to asynccnt. */ 
+	/* decrement our reference to asynccnt. */
 
 	make1b( t );
 }
@@ -271,7 +271,7 @@ make1c( TARGET *t )
 	/* If there are (more) commands to run to build this target */
 	/* (and we haven't hit an error running earlier comands) we */
 	/* launch the command with execcmd(). */
-	
+
 	/* If there are no more commands to run, we collect the status */
 	/* from all the actions then report our completion to all the */
 	/* parents. */
@@ -295,7 +295,7 @@ make1c( TARGET *t )
 	    if( globs.noexec )
 	    {
 		make1d( t, EXEC_CMD_OK );
-	    } 
+	    }
 	    else
 	    {
 		fflush( stdout );
@@ -344,7 +344,7 @@ make1c( TARGET *t )
  */
 
 static void
-make1d( 
+make1d(
 	void	*closure,
 	int	status )
 {
@@ -363,18 +363,21 @@ make1d(
 	if( status == EXEC_CMD_INTR )
 	    ++intr;
 
-	if( status == EXEC_CMD_FAIL && DEBUG_MAKE )
+	if( status == EXEC_CMD_FAIL )
 	{
-	    /* Print command text on failure */
-
-	    if( !DEBUG_EXEC )
-		printf( "%s\n", cmd->buf );
-
-	    printf( "...failed %s ", cmd->rule->name );
-	    list_print( lol_get( &cmd->args, 0 ) );
-	    printf( "...\n" );
-
 	    if( globs.quitquick ) ++intr;
+
+	    if( globs.quitquick || DEBUG_MAKE )
+	    {
+                /* Print command text on failure */
+
+                if( !DEBUG_EXEC )
+		    printf( "%s\n", cmd->buf );
+
+	        printf( "...failed %s ", cmd->rule->name );
+	        list_print( lol_get( &cmd->args, 0 ) );
+	        printf( "...\n" );
+	    }
 	}
 
 	/* If the command was interrupted or failed and the target */
@@ -403,7 +406,7 @@ make1d(
 /*
  * make1cmds() - turn ACTIONS into CMDs, grouping, splitting, etc
  *
- * Essentially copies a chain of ACTIONs to a chain of CMDs, 
+ * Essentially copies a chain of ACTIONs to a chain of CMDs,
  * grouping RULE_TOGETHER actions, splitting RULE_PIECEMEAL actions,
  * and handling RULE_UPDATED actions.  The result is a chain of
  * CMDs which can be expanded by var_string() and executed with
@@ -436,7 +439,7 @@ make1cmds( ACTIONS *a0 )
 		continue;
 
 	    a0->action->running = 1;
-	    
+
 	    /* Make LISTS of targets and sources */
 	    /* If `execute together` has been specified for this rule, tack */
 	    /* on sources from each instance of this rule for this target. */
@@ -467,17 +470,17 @@ make1cmds( ACTIONS *a0 )
 	    pushsettings( boundvars );
 
 	    /*
-	     * Build command, starting with all source args. 
+	     * Build command, starting with all source args.
 	     *
 	     * If cmd_new returns 0, it's because the resulting command
 	     * length is > maxline.  In this case, we'll slowly reduce
 	     * the number of source arguments presented until it does
-	     * fit.  This only applies to actions that allow PIECEMEAL 
+	     * fit.  This only applies to actions that allow PIECEMEAL
 	     * commands.
 	     *
 	     * While reducing slowly takes a bit of compute time to get
 	     * things just right, it's worth it to get as close to maxline
-	     * as possible, because launching the commands we're executing 
+	     * as possible, because launching the commands we're executing
 	     * is likely to be much more compute intensive!
 	     *
 	     * Note we loop through at least once, for sourceless actions.
@@ -496,8 +499,8 @@ make1cmds( ACTIONS *a0 )
 	    {
 		/* Build cmd: cmd_new consumes its lists. */
 
-		CMD *cmd = cmd_new( rule, 
-			list_copy( L0, nt ), 
+		CMD *cmd = cmd_new( rule,
+			list_copy( L0, nt ),
 			list_sublist( ns, start, chunk ),
 			list_copy( L0, shell ),
 			maxline );
@@ -521,7 +524,7 @@ make1cmds( ACTIONS *a0 )
 		{
 		    /* Too long and not splittable. */
 
-		    printf( "%s actions too long (max %d)!\n", 
+		    printf( "%s actions too long (max %d)!\n",
 			rule->name, maxline );
 		    exit( EXITBAD );
 		}
@@ -548,7 +551,7 @@ make1cmds( ACTIONS *a0 )
  */
 
 static LIST *
-make1list( 
+make1list(
 	LIST	*l,
 	TARGETS	*targets,
 	int	flags )
@@ -607,7 +610,7 @@ make1settings( LIST *vars )
 	    LIST *l = var_get( vars->string );
 	    LIST *nl = 0;
 
-	    for( ; l; l = list_next( l ) ) 
+	    for( ; l; l = list_next( l ) )
 	    {
 		TARGET *t = bindtarget( l->string );
 
@@ -633,12 +636,12 @@ make1settings( LIST *vars )
 /*
  * make1bind() - bind targets that weren't bound in dependency analysis
  *
- * Spot the kludge!  If a target is not in the dependency tree, it didn't 
+ * Spot the kludge!  If a target is not in the dependency tree, it didn't
  * get bound by make0(), so we have to do it here.  Ugly.
  */
 
 static void
-make1bind( 
+make1bind(
 	TARGET	*t,
 	int	warn )
 {
