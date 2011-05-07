@@ -695,8 +695,20 @@ rule Bulk
 	}
 }
 
+
+rule GetTargetVar
+{
+	on $(<) { return $($(>)) ; }
+}
+
 rule Cc
 {
+	local _s ;
+	local _o ;
+
+	_s = [ GetTargetVar $(<) : SUBDIRCCFLAGS ] ;
+	_o = [ GetTargetVar $(<) : OPTIM ] ;
+
 	Depends $(<) : $(>) ;
 
 	# If the compiler's -o flag doesn't work, relocate the .o
@@ -711,7 +723,7 @@ rule Cc
 	# CCHDRS and CCDEFS must be reformatted each time for some
 	# compiles (VMS, NT) that malign multiple -D or -I flags.
 
-	CCFLAGS on $(<) += $(CCFLAGS) $(SUBDIRCCFLAGS) $(OPTIM) ;
+	CCFLAGS on $(<) += $(CCFLAGS) $(_s) $(_o) ;
 
 	CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
 	CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
@@ -719,6 +731,12 @@ rule Cc
 
 rule C++
 {
+	local _s ;
+	local _o ;
+
+	_s = [ GetTargetVar $(<) : SUBDIRC++FLAGS ] ;
+	_o = [ GetTargetVar $(<) : OPTIM ] ;
+
 	Depends $(<) : $(>) ;
 
 	if $(RELOCATE)
@@ -726,7 +744,7 @@ rule C++
 	    CcMv $(<) : $(>) ;
 	}
 
-	C++FLAGS on $(<) += $(C++FLAGS) $(SUBDIRC++FLAGS) $(OPTIM) ;
+	C++FLAGS on $(<) += $(C++FLAGS) $(_s) $(_o) ;
 
 	CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
 	CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
