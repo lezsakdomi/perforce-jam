@@ -32,7 +32,7 @@ TARGET = -o $(EXENAME)
 #LINKLIBS = $(Lib)/oldnames.lib $(Lib)/kernel32.lib $(Lib)/libc.lib
 #EXENAME = .\jam0.exe
 
-# X64 NET 2005, settings already in shell environment.
+# X64 NET 2005/2008/2010, settings already in environment.
 # Turn off new CRT depreciation garb.
 #CC = cl /nologo
 #CFLAGS = /favor:blend /MT -D_M_AMD64 -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996
@@ -40,7 +40,7 @@ TARGET = -o $(EXENAME)
 #LINKLIBS = oldnames.lib kernel32.lib libcmt.lib
 #EXENAME = .\jam0.exe
 
-# X86 NET 2005, settings already in shell environment.
+# X86 NET 2005/2008/2010, settings already in environment.
 # Turn off new CRT depreciation garb.
 #CC = cl /nologo
 #CFLAGS = /MT -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996
