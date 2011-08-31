@@ -244,10 +244,7 @@ if $(NT)
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= /MACHINE:X64 ;
-	LINKLIBS	?= 
-				$(MSVCNT:J=" ")\\lib\\libcmt.lib
-				$(MSVCNT:J=" ")\\lib\\oldnames.lib
-				$(MSVCNT:J=" ")\\lib\\kernel32.lib ;
+	LINKLIBS	?= libcmt.lib oldnames.lib kernel32.lib ;
 	OPTIM		?= "" ;
 	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
@@ -266,10 +263,7 @@ if $(NT)
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= "" ;
-	LINKLIBS	?= 
-				$(MSVCNT:J=" ")\\lib\\libc.lib
-				$(MSVCNT:J=" ")\\lib\\oldnames.lib
-				$(MSVCNT:J=" ")\\lib\\kernel32.lib ;
+	LINKLIBS	?= libc.lib oldnames.lib kernel32.lib ;
 	OPTIM		?= "" ;
 	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
@@ -287,10 +281,7 @@ if $(NT)
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= /MACHINE:X86 ;
-	LINKLIBS	?= 
-				$(MSVCNT:J=" ")\\lib\\libcmt.lib
-				$(MSVCNT:J=" ")\\lib\\oldnames.lib
-				$(MSVCNT:J=" ")\\lib\\kernel32.lib ;
+	LINKLIBS	?= libcmt.lib oldnames.lib kernel32.lib ;
 	OPTIM		?= "" ;
 	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
 	UNDEFFLAG	?= "/u _" ;
