@@ -48,7 +48,10 @@ if $(DEBUG)
 
 # We have to signal jam.h for these
 
-if $(OS) = NT 			{ CCFLAGS += /MT /DNT ; }
+if $(OS) = NT
+{
+	CCFLAGS += /MT ;
+}
 
 # Do we know yacc?
 
