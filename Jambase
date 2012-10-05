@@ -26,7 +26,7 @@
 # 01/08/95 (seiwald) - Shell now handled with awk, not sed
 # 01/09/95 (seiwald) - Install* now take dest directory as target
 # 01/10/95 (seiwald) - All entries sorted.
-# 01/10/95 (seiwald) - NT support moved in, with LauraW's help.  
+# 01/10/95 (seiwald) - NT support moved in, with LauraW's help.
 # 01/10/95 (seiwald) - VMS support moved in.
 # 02/06/95 (seiwald) - ObjectC++Flags and SubDirC++Flags added.
 # 02/07/95 (seiwald) - Iron out when HDRSEARCH uses "" or SEARCH_SOURCE.
@@ -43,14 +43,14 @@
 #
 # all		- parent of first, shell, files, lib, exe
 # first		- first dependent of 'all', for potential initialization
-# shell		- parent of all Shell targets 
+# shell		- parent of all Shell targets
 # files		- parent of all File targets
 # lib		- parent of all Library targets
 # exe		- parent of all Main targets
 # dirs		- parent of all MkDir targets
 # clean		- removes all Shell, File, Library, and Main targets
 # uninstall	- removes all Install targets
-#	
+#
 
 # Rules defined by this file:
 #
@@ -103,7 +103,7 @@
 # FGristFiles value ;			return $(value:G=$(SOURCE_GRIST))
 # FGristSourceFiles value ;		return $(value:G=$(SOURCE_GRIST))
 # FStripCommon v1 : v2 ; 		strip common initial parts of v1 v2
-# FReverse a1 a2 ... ;			return ... a2 a1 
+# FReverse a1 a2 ... ;			return ... a2 a1
 # FRelPath d1 : d2 ;			return rel path from d1 to d2
 # FSubDir d1 d2 ... ;			return path to root
 #
@@ -132,7 +132,7 @@
 #	Exit - blurt out targets and exit
 #	Includes - marks sources as headers for target (a codependency)
 #	NoCare - don't panic if the target can't be built
-#	NoUpdate - create the target if needed but never update it 
+#	NoUpdate - create the target if needed but never update it
 #	NotFile - ignore the timestamp of the target (it's not a file)
 #	Temporary - target need not be present if sources haven't changed
 #
@@ -166,148 +166,51 @@ JAMBASEDATE = 2012.10.04  ;
 
 if $(NT)
 {
-    	MV		?= move /y ;
-    	CP		?= copy ;
-    	RM		?= del /f/q ;
+	MV			?= move /y ;
+	CP			?= copy ;
+	RM			?= del /f/q ;
 	RMDIR		?= rmdir /s/q ;
-    	SLASH		?= \\ ;
-    	SUFLIB		?= .lib ;
-    	SUFOBJ		?= .obj ;
-    	SUFEXE		?= .exe ;
+	SLASH		?= \\ ;
+	SUFLIB		?= .lib ;
+	SUFOBJ		?= .obj ;
+	SUFEXE		?= .exe ;
 
-    if $(MSVCDir)
-    {
-	MSVCDIR		?= $(MSVCDir) ;
-    }
-     
-    if $(BCCROOT)
-    {
-	# Borland
+	if $(BCCROOT)	# Borland
+	{
+		AR			?= tlib /C /P64 ;
+		CC			?= bcc32 ;
+		CCFLAGS		?= -v -w- -q -DWIN -tWR -tWM -tWC ;
+		C++			?= $(CC) ;
+		C++FLAGS	?= $(CCFLAGS) -P ;
+		LINK		?= $(CC) ;
+		LINKFLAGS	?= $(CCFLAGS) ;
+		STDLIBPATH	?= $(BCCROOT)\\lib ;
+		STDHDRS		?= $(BCCROOT)\\include ;
+		NOARSCAN	?= true ;
+	}
+	else			# Visual Studio 8 or later
+	{
+		local mflags ;
+		switch $(OSPLAT)
+		{
+		case X86  :	AS ?= ml     ;
+		case X64  :	AS ?= ml64   ;	mflags = -D_M_AMD64 /favor:blend ;
+		case IA64 :	AS ?= ias    ;	mflags = -D_M_IA64 ;
+		case ARM  :	AS ?= armasm ;  mflags = -D_M_ARM -D_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE ;
+		}
 
-	AR		?= tlib /C /P64 ;
-	CC		?= bcc32 ;
-	CCFLAGS		?= -v -w- -q -DWIN -tWR -tWM -tWC ;
-	C++		?= $(CC) ;
-	C++FLAGS	?= $(CCFLAGS) -P ;
-	LINK		?= $(CC) ;
-	LINKFLAGS	?= $(CCFLAGS) ;
-	STDLIBPATH	?= $(BCCROOT)\\lib ;
-	STDHDRS		?= $(BCCROOT)\\include ;
-	NOARSCAN	?= true ;
-    }
-    else if $(MSVC)
-    {
-	AR		?= lib /nologo ;
-	CC		?= cl /nologo ;
-	CCFLAGS		?= /D \"WIN\" ;
-	C++		?= $(CC) ;
-	C++FLAGS	?= $(CCFLAGS) ;
-	LINK		?= $(CC) ;
-	LINKFLAGS	?= $(CCFLAGS) ;
-	LINKLIBS	?= 
-				$(MSVC:J=" ")\\lib\\mlibce.lib
-				$(MSVC:J=" ")\\lib\\oldnames.lib
-				;
-	LINKLIBS	?= ;
-	NOARSCAN	?= true ;
-	OPTIM		?=  ;
-	STDHDRS		?= $(MSVC:J=" ")\\include ;
-	UNDEFFLAG	?= "/u _" ;
-    }
-    else if $(MSVCNT) && $(OSPLAT) = IA64
-    {
-    	# IA64 SDK based on VS8 (but not 100% compatible)
-
-	AR		?= lib /MACHINE:IA64 ;
-	AS		?= ias ;
-	CC		?= cl /nologo ;
-	CCFLAGS		?= -D_M_IA64 -DNT /wd4996 ;
-	C++		?= $(CC) ;
-	C++FLAGS	?= $(CCFLAGS) ;
-	LINK		?= link /nologo ;
-	LINKFLAGS	?= /MACHINE:IA64 ;
-	LINKLIBS	?= libcmt.lib kernel32.lib bufferoverflowU.lib ;
-	OPTIM		?= "" ;
-	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
-	UNDEFFLAG	?= "/u _" ;
-    }
-    else if $(MSVCNT) && $(OSPLAT) = X64
-    {
-	# X64 .NET 2005
-
-	AR		?= lib /MACHINE:X64 ;
-	AS		?= masm386 ;
-	CC		?= cl /nologo ;
-	
-	CCFLAGS		?= /favor:blend -D_M_AMD64 -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
-	C++		?= $(CC) ;
-	C++FLAGS	?= $(CCFLAGS) ;
-	LINK		?= link /nologo ;
-	LINKFLAGS	?= /MACHINE:X64 ;
-	LINKLIBS	?= libcmt.lib oldnames.lib kernel32.lib ;
-	OPTIM		?= "" ;
-	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
-	UNDEFFLAG	?= "/u _" ;
-    }
-    else if $(MSVCNT) && $(OSPLAT) = ARM
-    {
-	AR		?= lib /MACHINE:ARM ;
-	AS		?= armasm ;
-	CC		?= cl /nologo ;
-	
-	CCFLAGS		?= -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
-	C++		?= $(CC) ;
-	C++FLAGS	?= $(CCFLAGS) ;
-	LINK		?= link /nologo ;
-	LINKFLAGS	?= /MACHINE:ARM ;
-	LINKLIBS	?= libcmt.lib oldnames.lib kernel32.lib ;
-	OPTIM		?= "" ;
-	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
-	UNDEFFLAG	?= "/u _" ;
-    }
-    else if $(MSVCDIR) && $(OSPLAT) = X86
-    {
-	# Visual C++ 6.0 and .NET 2003 uses MSVCDIR
-
-	MSVCNT		?= $(MSVCDIR) ;	
-
-	AR		?= lib ;
-	AS		?= masm386 ;
-	CC		?= cl /nologo ;
-	CCFLAGS		?= "" ;
-	C++		?= $(CC) ;
-	C++FLAGS	?= $(CCFLAGS) ;
-	LINK		?= link /nologo ;
-	LINKFLAGS	?= "" ;
-	LINKLIBS	?= libc.lib oldnames.lib kernel32.lib ;
-	OPTIM		?= "" ;
-	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
-	UNDEFFLAG	?= "/u _" ;
-    }
-    else if $(MSVCNT) && $(OSPLAT) = X86
-    {
-	# X86 .NET 2005
-
-	AR		?= lib /MACHINE:X86 ;
-	AS		?= masm386 ;
-	CC		?= cl /nologo ;
-	
-	CCFLAGS		?= -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
-	C++		?= $(CC) ;
-	C++FLAGS	?= $(CCFLAGS) ;
-	LINK		?= link /nologo ;
-	LINKFLAGS	?= /MACHINE:X86 ;
-	LINKLIBS	?= libcmt.lib oldnames.lib kernel32.lib ;
-	OPTIM		?= "" ;
-	STDHDRS		?= $(MSVCNT:J=" ")\\include ;
-	UNDEFFLAG	?= "/u _" ;
-    }
-    else
-    {
-	EXIT On NT, set BCCROOT, MSVCDIR, MSVCNT, or MSVC to the root
-		of the Borland or Microsoft directories. ;
-    }
-
+		AR			?= lib /MACHINE:$(OSPLAT) ;
+		CC			?= cl /nologo ;
+		CCFLAGS		?= $(mflags) -DNT -D_CRT_SECURE_NO_DEPRECATE /wd4996 ;
+		C++			?= $(CC) ;
+		C++FLAGS	?= $(CCFLAGS) ;
+		OPTIM		?= "" ;
+		LINK		?= link /nologo ;
+		LINKFLAGS	?= /MACHINE:$(OSPLAT) ;
+		LINKLIBS	?= libcmt.lib oldnames.lib kernel32.lib ;
+		STDHDRS     ?= ;
+		UNDEFFLAG	?= "/u _" ;
+	}
 }
 else if $(MINGW)
 {
@@ -317,38 +220,38 @@ else if $(MINGW)
 	CCFLAGS 	+= -DMINGW ;
 	RANLIB		?= ranlib ;
 
-   	MV			?= move /y ;
-   	CP			?= copy ;
-   	RM			?= del /f/q ;
+	MV			?= move /y ;
+	CP			?= copy ;
+	RM			?= del /f/q ;
 	RMDIR		?= rmdir /s/q ;
-   	SLASH		?= \\ ;
-   	SUFEXE		?= .exe ;
+	SLASH		?= \\ ;
+	SUFEXE		?= .exe ;
 }
 else if $(OS2)
 {
 	WATCOM		?= $(watcom) ;
-	 
+
 	if ! $(WATCOM)
 	{
 	    Exit On OS2, set WATCOM to the root of the Watcom directory. ;
 	}
 
-	AR		?= wlib ;
+	AR			?= wlib ;
 	BINDIR		?= \\os2\\apps ;
-	CC		?= wcc386 ;
+	CC			?= wcc386 ;
 	CCFLAGS		?= /zq /DOS2 /I$(WATCOM)\\h ; # zq=quiet
-	C++		?= wpp386 ;
+	C++			?= wpp386 ;
 	C++FLAGS	?= $(CCFLAGS) ;
-	CP		?= copy ;
-	DOT		?= . ;
+	CP			?= copy ;
+	DOT			?= . ;
 	DOTDOT		?= .. ;
 	LINK		?= wcl386 ;
 	LINKFLAGS	?= /zq ; # zq=quiet
 	LINKLIBS	?= ;
-	MV		?= move ;
+	MV			?= move ;
 	NOARSCAN	?= true ;
 	OPTIM		?= ;
-	RM		?= del /f ;
+	RM			?= del /f ;
 	SLASH		?= \\ ;
 	STDHDRS		?= $(WATCOM)\\h ;
 	SUFEXE		?= .exe ;
@@ -359,15 +262,15 @@ else if $(OS2)
 }
 else if $(AS400)
 {
-	C++		?= icc ;
+	C++			?= icc ;
 	C++FLAGS	?= -DAS400 ;
-	CC		?= icc ;
+	CC			?= icc ;
 	CCFLAGS		?= -DAS400 ;
 	LINK		?= icc ;
 	LINKFLAGS	?= -qDUPPROC ;
 	NOARSCAN	?= true ;
-	AR		?= qar -cru ;
-	RM		?= del ;
+	AR			?= qar -cru ;
+	RM			?= del ;
 	CRELIB		?= true ;
 
 	# QSYS Library to use for build output
@@ -375,14 +278,14 @@ else if $(AS400)
 }
 else if $(VMS)
 {
-	C++		?= cxx ;
+	C++			?= cxx ;
 	C++FLAGS	?= ;
-	CC		?= cc ;
+	CC			?= cc ;
 	CCFLAGS		?= ;
 	CHMOD		?= set file/prot= ;
-	CP		?= copy/replace ;
+	CP			?= copy/replace ;
 	CRELIB		?= true ;
-	DOT		?= [] ;
+	DOT			?= [] ;
 	DOTDOT		?= [-] ;
 	EXEMODE		?= (w:e) ;
 	FILEMODE	?= (w:r) ;
@@ -391,9 +294,9 @@ else if $(VMS)
 	LINKFLAGS	?= "" ;
 	LINKLIBS	?= ;
 	MKDIR		?= create/dir ;
-	MV		?= rename ;
+	MV			?= rename ;
 	OPTIM		?= "" ;
-	RM		?= delete ;
+	RM			?= delete ;
 	RUNVMS		?= mcr ;
 	SHELLMODE	?= (w:er) ;
 	SLASH		?= . ;
@@ -406,7 +309,7 @@ else if $(VMS)
 else if $(MAC)
 {
 	local OPT ;
-	
+
 	CW	?= "{CW}" ;
 
 	MACHDRS ?=
@@ -418,55 +321,55 @@ else if $(MAC)
 		"$(CW):MacOS Support:Universal:Libraries:StubLibraries:Interfacelib"
 		"$(CW):MacOS Support:Universal:Libraries:StubLibraries:Mathlib" ;
 
-	MPWLIBS ?= 
+	MPWLIBS ?=
 		"$(CW):MacOS Support:Libraries:Runtime:Libs:MSL_MPWCRuntime_PPC.lib"
 		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_C_PPC_MPW.Lib" ;
 
-	MPWNLLIBS ?= 
+	MPWNLLIBS ?=
 		"$(CW):MacOS Support:Libraries:Runtime:Libs:MSL_MPWCRuntime_PPC.lib"
 		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_C_PPC_MPW(NL).Lib" ;
-		
+
 	SIOUXHDRS ?= ;
-	
-	SIOUXLIBS ?= 
+
+	SIOUXLIBS ?=
 		"$(CW):MacOS Support:Libraries:Runtime:Libs:MSL_Runtime_PPC.lib"
-		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_SIOUX_PPC.Lib" 
+		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_SIOUX_PPC.Lib"
 		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_C_PPC.Lib" ;
 
-	C++		?= mwcppc ;
+	C++			?= mwcppc ;
 	C++FLAGS	?= -w off ;
-	CC		?= mwcppc ;
+	CC			?= mwcppc ;
 	CCFLAGS		?= -w off ;
-	CP		?= duplicate -y ;
-	DOT		?= ":" ;
+	CP			?= duplicate -y ;
+	DOT			?= ":" ;
 	DOTDOT		?= "::" ;
 	HDRS 		?= $(MACHDRS) $(MPWHDRS) ;
 	LINK		?= mwlinkppc ;
-	LINKFLAGS	?= -mpwtool -warn ;				
-	LINKLIBS 	?= $(MACLIBS) $(MPWLIBS) ;				
+	LINKFLAGS	?= -mpwtool -warn ;
+	LINKLIBS 	?= $(MACLIBS) $(MPWLIBS) ;
 	MKDIR		?= newfolder ;
-	MV		?= rename -y ;
+	MV			?= rename -y ;
 	NOARSCAN	?= true ;
 	OPTIM		?= ;
-	RM		?= delete -y ;
+	RM			?= delete -y ;
 	SLASH		?= ":" ;
-	STDHDRS		?= ; 
+	STDHDRS		?= ;
 	SUFLIB		?= .lib ;
 	SUFOBJ		?= .o ;
 }
 else if $(OS) = BEOS && $(OSPLAT) = PPC
 {
-	AR		?= mwld -xml -o ;
+	AR			?= mwld -xml -o ;
 	BINDIR		?= /boot/home/config/bin ;
-	CC		?= mwcc ;
+	CC			?= mwcc ;
 	CCFLAGS		?= -nosyspath ;
-	C++		?= $(CC) ;
+	C++			?= $(CC) ;
 	C++FLAGS	?= -nosyspath ;
 	CHMOD		?= chmod ;
 	CHGRP		?= chgrp ;
 	CHOWN		?= chown ;
 	FORTRAN		?= "" ;
-	LEX		?= flex ;
+	LEX			?= flex ;
 	LIBDIR		?= /boot/home/config/lib ;
 	LINK		?= mwld ;
 	LINKFLAGS	?= "" ;
@@ -479,16 +382,16 @@ else if $(OS) = BEOS && $(OSPLAT) = PPC
 	YACCFILES	?= y.tab ;
 	YACCFLAGS	?= -d ;
 }
-else if $(OS) = BEOS 
+else if $(OS) = BEOS
 {
 	BINDIR		?= /boot/home/config/bin ;
-	CC		?= gcc ;
-	C++		?= $(CC) ;
+	CC			?= gcc ;
+	C++			?= $(CC) ;
 	CHMOD		?= chmod ;
 	CHGRP		?= chgrp ;
 	CHOWN		?= chown ;
 	FORTRAN		?= "" ;
-	LEX		?= flex ;
+	LEX			?= flex ;
 	LIBDIR		?= /boot/home/config/lib ;
 	LINK		?= gcc ;
 	MANDIR		?= /boot/home/config/man ;
@@ -502,96 +405,96 @@ else if $(OS) = BEOS
 }
 else if $(UNIX)
 {
-    switch $(OS)
-    {
-    case AIX :
+	switch $(OS)
+	{
+	case AIX :
 	LINKLIBS	?= -lbsd ;
 
-    case AMIGA :
-	CC		?= gcc ;
+	case AMIGA :
+	CC			?= gcc ;
 	YACC		?= bison -y ;
 
-    case CYGWIN :	
-	CC		?= gcc ;
+	case CYGWIN :
+	CC			?= gcc ;
 	CCFLAGS 	+= -D__cygwin__ ;
-	LEX		?= flex ;
+	LEX			?= flex ;
 	JAMSHELL	?= sh -c ;
 	RANLIB		?= "" ;
 	SUFEXE		?= .exe ;
 	YACC		?= bison -y ;
 
-    case DGUX :
+	case DGUX :
 	RANLIB		?= "" ;
 	RELOCATE 	?= true ;
 
-    case HPUX :
+	case HPUX :
 	RANLIB		?= "" ;
 
-    case INTERIX :
-	CC		?= gcc ;
+	case INTERIX :
+	CC			?= gcc ;
 	JAMSHELL	?= sh -c ;
 	RANLIB		?= "" ;
 
-    case IRIX :
+	case IRIX :
 	RANLIB		?= "" ;
 
-    case MPEIX :
-	CC		?= gcc ;
-	C++		?= gcc ;
+	case MPEIX :
+	CC			?= gcc ;
+	C++			?= gcc ;
 	CCFLAGS		+= -D_POSIX_SOURCE ;
 	HDRS		+= /usr/include ;
-	RANLIB		?= "" ; 
+	RANLIB		?= "" ;
 	NOARSCAN	?= true ;
 	NOARUPDATE	?= true ;
 
-    case MVS :
-	RANLIB		?= "" ; 
+	case MVS :
+	RANLIB		?= "" ;
 	YACC		?= "" ;
-	
-    case NEXT :
+
+	case NEXT :
 	AR		?= libtool -o ;
 	RANLIB		?= "" ;
 
-    case MACOSX :
-	C++		?= c++ ;
+	case MACOSX :
+	C++			?= c++ ;
 	MANDIR		?= /usr/local/share/man ;
 
-    case NCR :
+	case NCR :
 	RANLIB		?= "" ;
 
-    case PTX :
+	case PTX :
 	RANLIB		?= "" ;
 
-    case QNX :
-	AR		?= wlib ;
-	CC		?= cc ;
+	case QNX :
+	AR			?= wlib ;
+	CC			?= cc ;
 	CCFLAGS		?= -Q ;	# quiet
-	C++		?= $(CC) ;
+	C++			?= $(CC) ;
 	C++FLAGS	?= -Q ;	# quiet
 	LINK		?= $(CC) ;
 	LINKFLAGS	?= -Q ;	# quiet
 	NOARSCAN	?= true ;
 	RANLIB		?= "" ;
 
-    case SCO :
+	case SCO :
 	RANLIB		?= "" ;
 	RELOCATE 	?= true ;
 
-    case SINIX :
+	case SINIX :
 	RANLIB		?= "" ;
 
-    case SOLARIS :
+	case SOLARIS :
 	RANLIB		?= "" ;
-	AR		?= "/usr/ccs/bin/ar ru" ;
+	AR			?= /usr/ccs/bin/ar ru ;
 
-    case UNICOS :
+	case UNICOS :
 	NOARSCAN 	?= true ;
 	OPTIM 		?= -O0 ;
 
-    case UNIXWARE :
+	case UNIXWARE :
 	RANLIB		?= "" ;
 	RELOCATE 	?= true ;
-    }
+	}
 
 	# UNIX defaults
 
@@ -600,7 +503,7 @@ else if $(UNIX)
 	CHMOD		?= chmod ;
 	CHGRP		?= chgrp ;
 	CHOWN		?= chown ;
-	LEX		?= lex ;
+	LEX			?= lex ;
 	LINKFLAGS	?= $(CCFLAGS) ;
 	LINKLIBS	?= ;
 	OPTIM		?= -O ;
@@ -615,18 +518,18 @@ else if $(UNIX)
 # General defaults; a lot like UNIX
 #
 
-	AR		?= ar ru ;
-	AS		?= as ;
+	AR			?= ar ru ;
+	AS			?= as ;
 	ASFLAGS		?= ;
-	AWK		?= awk ;
+	AWK			?= awk ;
 	BINDIR		?= /usr/local/bin ;
-	C++		?= cc ;
+	C++			?= cc ;
 	C++FLAGS	?= ;
-	CC		?= cc ;
+	CC			?= cc ;
 	CCFLAGS		?= ;
-	CP		?= cp -f ;
+	CP			?= cp -f ;
 	CRELIB		?= ;
-	DOT		?= . ;
+	DOT			?= . ;
 	DOTDOT		?= .. ;
 	EXEMODE		?= 711 ;
 	FILEMODE	?= 644 ;
@@ -636,27 +539,27 @@ else if $(UNIX)
 	INSTALLGRIST	?= installed ;
 	JAMFILE		?= Jamfile ;
 	JAMRULES	?= Jamrules ;
-	LEX		?= ;
+	LEX			?= ;
 	LIBDIR		?= /usr/local/lib ;
 	LINK		?= $(CC) ;
 	LINKFLAGS	?= ;
 	LINKLIBS	?= ;
-	LN		?= ln ;
+	LN			?= ln ;
 	MANDIR		?= /usr/local/man ;
 	MKDIR		?= mkdir ;
-	MV		?= mv -f ;
+	MV			?= mv -f ;
 	OPTIM		?= ;
-	RCP		?= rcp ;
-	RM		?= rm -f ;
+	RCP			?= rcp ;
+	RM			?= rm -f ;
 	RMDIR		?= $(RM) ;
-	RSH		?= rsh ;
-	SED		?= sed ;
+	RSH			?= rsh ;
+	SED			?= sed ;
 	SHELLHEADER	?= "#!/bin/sh" ;
 	SHELLMODE	?= 755 ;
 	SLASH		?= / ;
-	STDHDRS		?= /usr/include ;
-	SUBDIRRULES 	?= ;
-	SUBDIRRESET 	?= ASFLAGS HDRS C++FLAGS CCFLAGS ;
+	STDHDRS		?= ;
+	SUBDIRRULES ?= ;
+	SUBDIRRESET ?= ASFLAGS HDRS C++FLAGS CCFLAGS ;
 	SUFEXE		?= "" ;
 	SUFLIB		?= .a ;
 	SUFOBJ		?= .o ;
@@ -666,7 +569,7 @@ else if $(UNIX)
 	YACCFILES	?= ;
 	YACCFLAGS	?= ;
 
-	HDRPATTERN = 
+	HDRPATTERN =
 	    	"^[ 	]*#[ 	]*include[ 	]*[<\"]([^\">]*)[\">].*$" ;
 
 	OSFULL = $(OS)$(OSVER)$(OSPLAT) $(OS)$(OSPLAT) $(OS)$(OSVER) $(OS) ;
@@ -776,7 +679,7 @@ rule Fortran
 	Depends $(<) : $(>) ;
 }
 
-rule GenFile 
+rule GenFile
 {
 	local _t = [ FGristSourceFiles $(<) ] ;
 	local _s = [ FAppendSuffix $(>[1]) : $(SUFEXE) ] ;
@@ -830,16 +733,16 @@ rule HdrRule
 	# search path, to SEARCH/HDRSEARCH.  We try to be careful not to
 	# add duplicates.
 
-	local d = $(<:D) ; 
+	local d = $(<:D) ;
 	local h ;
 
-	if $(d) 
+	if $(d)
 	{
 	    # Build unique list h = $(HDRSEARCH)/$(<:D)
 
-	    for i in $(d:R=$(HDRSEARCH)) 
+	    for i in $(d:R=$(HDRSEARCH))
 	    {
-	    	if ! $(i) in $(HDRSEARCH) $(h) { h += $(i) ; } 
+	    	if ! $(i) in $(HDRSEARCH) $(h) { h += $(i) ; }
 	    }
 
 	    # For each included file whose directory doesn't match the
@@ -885,14 +788,14 @@ rule InstallInto
 	    Install $(tt) : $(i) ;
 	    Chmod $(tt) ;
 
-	    if $(OWNER) && $(CHOWN) 
-	    { 
+	    if $(OWNER) && $(CHOWN)
+	    {
 		Chown $(tt) ;
 		OWNER on $(tt) = $(OWNER) ;
 	    }
 
-	    if $(GROUP) && $(CHGRP) 
-	    { 
+	    if $(GROUP) && $(CHGRP)
+	    {
 		Chgrp $(tt) ;
 		GROUP on $(tt) = $(GROUP) ;
 	    }
@@ -993,11 +896,11 @@ rule LibraryFromObjects
 	    MakeLocate $(_l) $(_l)($(_s:BS)) : $(LOCATE_TARGET) ;
 	}
 
-	if $(NOARSCAN) 
-	{ 
+	if $(NOARSCAN)
+	{
 	    # If we can't scan the library to timestamp its contents,
 	    # we have to just make the library depend directly on the
-	    # on-disk object files.  
+	    # on-disk object files.
 
 	    Depends $(_l) : $(_s) ;
 	}
@@ -1105,18 +1008,18 @@ rule MkDir
 
 	# Make a directory and all its parent directories.
 
-	# Ignore timestamps on directories: we only care if they 
+	# Ignore timestamps on directories: we only care if they
 	# exist.
 
 	NoUpdate $(<) ;
 
 	# Don't create . or any directory already created.
 
-	if $(<:G=) != $(DOT) && ! $($(<)-mkdir) 
+	if $(<:G=) != $(DOT) && ! $($(<)-mkdir)
 	{
 	    # Cheesy gate to prevent multiple invocations on same dir
 	    # Arrange for jam dirs
-	    # MkDir1 has the actions 
+	    # MkDir1 has the actions
 
 	    $(<)-mkdir = true ;
 	    Depends dirs : $(<) ;
@@ -1177,17 +1080,17 @@ rule Object
 	# the regexp pattern $(HDRSCAN) and then invokes $(HDRRULE)
 	# with the scanned file as the target and the found headers
 	# as the sources.  HDRSEARCH is the value of SEARCH used for
-	# the found header files.  Finally, if jam must deal with 
+	# the found header files.  Finally, if jam must deal with
 	# header files of the same name in different directories,
 	# they can be distinguished with HDRGRIST.
 
-	# $(SEARCH_SOURCE:E) is where cc first looks for #include 
-	# "foo.h" files.  If the source file is in a distant directory, 
+	# $(SEARCH_SOURCE:E) is where cc first looks for #include
+	# "foo.h" files.  If the source file is in a distant directory,
 	# look there.  Else, look in "" (the current directory).
 
 	HDRRULE on $(>) = HdrRule ;
 	HDRSCAN on $(>) = $(HDRPATTERN) ;
-	HDRSEARCH on $(>) = 
+	HDRSEARCH on $(>) =
 		$(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
 
 	HDRGRIST on $(>) = $(HDRGRIST) ;
@@ -1207,12 +1110,12 @@ rule Object
 	    case .cpp : C++ $(<) : $(>) ;
 	    case .f :	Fortran $(<) : $(>) ;
 	    case .l :	Cc $(<) : $(<:S=.c) ;
-			Lex $(<:S=.c) : $(>) ;
+		            Lex $(<:S=.c) : $(>) ;
 	    case .m :	Cc $(<) : $(>) ;
 	    case .mm :	Cc $(<) : $(>) ;
 	    case .s :	As $(<) : $(>) ;
 	    case .y :	Cc $(<) : $(<:S=$(YACCGEN)) ;
-			Yacc $(<:S=$(YACCGEN)) : $(>) ;
+		            Yacc $(<:S=$(YACCGEN)) : $(>) ;
 	    case * :	UserObject $(<) : $(>) ;
 	}
 }
@@ -1306,7 +1209,7 @@ rule SubDir
 	# computes TOP as the path up from the current directory; the
 	# path contains one ../ for each of d1 d2 ...
 	#
-	# SubDir reads once the project-specific rules file Jamrules 
+	# SubDir reads once the project-specific rules file Jamrules
 	# in the TOP directory, if present.  This can be overridden
 	# with the variable TOPRULES.
 	#
@@ -1323,7 +1226,7 @@ rule SubDir
 	#	$(SEARCH_SOURCE) = $(SUBDIR)
 	#	$(LOCATE_SOURCE) = $(ALL_LOCATE_TARGET) $(SUBDIR)
 	#	$(LOCATE_TARGET) = $(ALL_LOCATE_TARGET) $(SUBDIR)
-	#	$(SOURCE_GRIST) = $(SUBDIR_TOKENS) with !'s 
+	#	$(SOURCE_GRIST) = $(SUBDIR_TOKENS) with !'s
 	#
 
 	local _top = $(<[1]) ;
@@ -1372,11 +1275,11 @@ rule SubDir
 		# merely a certain number of directories down from
 		# the current directory, and FSubDirPath will set
 		# TOP to a path consisting of ../ for each of the
-		# elements of _tokens, because that represents how 
+		# elements of _tokens, because that represents how
 		# far below TOP the current directory sits.
 		#
 		# In the more complicated case, the starting directory
-		# isn't the directory of jam's invocation but an 
+		# isn't the directory of jam's invocation but an
 		# location established by previous SubDir call.  The
 		# starting directory is SUBDIR_UP directories up from
 		# SUBDIR_ROOT, and then SUBDIR_DOWN directories down
@@ -1384,7 +1287,7 @@ rule SubDir
 		# SUBDIR_DOWN and SUBDIR_UP represent the path from
 		# the directory of jam's invocation.
 		#
-		# In the most complicated case, the _tokens also 
+		# In the most complicated case, the _tokens also
 		# represents directories down, because TOP is being
 		# estalished in a directory other than TOP's root.
 		# Hopefully, _tokens and SUBDIR_DOWN represent the
@@ -1410,9 +1313,9 @@ rule SubDir
 		SUBDIR_DOWN = [ FReverse $(SUBDIR_DOWN) ] ;
 		_tokens = [ FReverse $(_tokens) ] ;
 
-		if $(SUBDIR_DOWN) && $(_tokens) 
-		{ 
-		    Echo Warning: SubDir $(<) misplaced! ; 
+		if $(SUBDIR_DOWN) && $(_tokens)
+		{
+		    Echo Warning: SubDir $(<) misplaced! ;
 		}
 
 		# We'll remember the relative (UP/DOWN) path that
@@ -1440,9 +1343,9 @@ rule SubDir
 	    # Include $(TOPRULES) if set.
 	    # Otherwise include $(TOP)/Jamrules if present.
 
-	    if $($(_top)RULES) { 
+	    if $($(_top)RULES) {
 		include $($(_top)RULES) ;
-	    } else { 
+	    } else {
 		NoCare $(JAMRULES:R=$($(_top)):G=$(_top)) ;
 		include $(JAMRULES:R=$($(_top)):G=$(_top)) ;
 	    }
@@ -1452,9 +1355,9 @@ rule SubDir
 	# Save dir tokens for other potential uses.
 
 	SUBDIR_UP = $($(_top)-UP) ;
-        SUBDIR_DOWN = $($(_top)-DOWN) $(_tokens) ;
+	SUBDIR_DOWN = $($(_top)-DOWN) $(_tokens) ;
 	SUBDIR_ROOT = $($(_top)-ROOT) ;
-        SUBDIR_TOKENS = $(SUBDIR_DOWN) ;
+	SUBDIR_TOKENS = $(SUBDIR_DOWN) ;
 
 	SUBDIR = [ FSubDirPath $(<) ] ;
 
@@ -1489,9 +1392,9 @@ rule FSubDirPath
 
 	# If jam is invoked in a subdirectory of the TOP, then we
 	# need to prepend a ../ for every level we must climb up
-	# (TOP-UP), and then append the directory names we must 
+	# (TOP-UP), and then append the directory names we must
 	# climb down (TOP-DOWN), plus the named directories d1 ...
-	# If TOP was set externally, or computed from another TOP 
+	# If TOP was set externally, or computed from another TOP
 	# that was, we'll have to reroot the whole thing at TOP-ROOT.
 
 	local _r = [ FRelPath $($(<[1])-UP) : $($(<[1])-DOWN) $(<[2-]) ] ;
@@ -1607,14 +1510,14 @@ rule FGrist
 
 }
 
-rule FGristFiles 
+rule FGristFiles
 {
 	return $(<:G=$(SOURCE_GRIST:E)) ;
 }
 
 rule FGristSourceFiles
 {
-	# Produce source file name name with grist in it, 
+	# Produce source file name name with grist in it,
 	# if SOURCE_GRIST is set.
 
 	# Leave header files alone, because they have a global
@@ -1624,7 +1527,7 @@ rule FGristSourceFiles
 	{
 	    return $(<) ;
 	}
-	else 
+	else
 	{
 	    local _i _o ;
 
@@ -1641,7 +1544,7 @@ rule FGristSourceFiles
 	}
 }
 
-rule FReverse 
+rule FReverse
 {
 	# FReverse a1 a2 a3 ... ;
 	# return ... a3 a2 a1 ;
@@ -1655,10 +1558,10 @@ rule FSubDir
 	# path (using ../../ etc) back to that root directory.
 	# Sets result in $(<)
 
-	if ! $(<[1]) 
+	if ! $(<[1])
 	{
 	    return $(DOT) ;
-	} 
+	}
 	else
 	{
 	    local _i _d ;
@@ -1718,9 +1621,9 @@ rule FRelPath
 
 rule FAppendSuffix
 {
-       # E.g., "FAppendSuffix yacc lex foo.bat : $(SUFEXE) ;"
-       # returns (yacc,lex,foo.bat) on Unix and 
-       # (yacc.exe,lex.exe,foo.bat) on NT.
+	# E.g., "FAppendSuffix yacc lex foo.bat : $(SUFEXE) ;"
+	# returns (yacc,lex,foo.bat) on Unix and
+	# (yacc.exe,lex.exe,foo.bat) on NT.
 
 	if $(>)
 	{
@@ -1804,7 +1707,7 @@ else if $(VMS)
 		{
 		    _s = $(DOT) ;
 		}
-		else 
+		else
 		{
 		    # This handles the following cases:
 		    # 	a -> [.a]
@@ -1900,7 +1803,7 @@ actions HardLink
 
 actions Install
 {
-	$(CP) $(>) $(<) 
+	$(CP) $(>) $(<)
 }
 
 actions Lex
@@ -1915,7 +1818,7 @@ actions LexMv
 
 actions Link bind NEEDLIBS
 {
-	$(LINK) $(LINKFLAGS) -o $(<) $(UNDEFS) $(>) $(NEEDLIBS) $(LINKLIBS) 
+	$(LINK) $(LINKFLAGS) -o $(<) $(UNDEFS) $(>) $(NEEDLIBS) $(LINKLIBS)
 }
 
 actions MkDir1
@@ -2041,7 +1944,7 @@ if $(AS400)
 	# helps qar get the library name right.
 	#
 
-	actions CreLib 
+	actions CreLib
 	{
 	    dest=`echo $(<) | sed -e 's#.*/\([^/]*\)\.a$#/qsys.lib/$(QSYSLIB).lib/\1.bnddir#'`
 	    [ -h $(<) ] || ln -s $dest $(<)
@@ -2053,7 +1956,29 @@ if $(AS400)
 # NT specific actions
 #
 
-if $(NT) && $(MSVCNT)
+if $(NT) && $(BCCROOT)
+{
+	actions updated together piecemeal Archive
+	{
+	$(AR) $(<) -+$(>)
+	}
+
+	actions Link bind NEEDLIBS
+	{
+	$(LINK) -e$(<) $(LINKFLAGS) $(UNDEFS) -L$(LINKLIBS) $(NEEDLIBS) $(>)
+	}
+
+	actions C++
+	{
+	$(C++) -c -o$(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
+	}
+
+	actions Cc
+	{
+	$(CC) -c -o$(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
+	}
+}
+else if $(NT)
 {
 	actions updated together piecemeal Archive
 	{
@@ -2081,50 +2006,6 @@ if $(NT) && $(MSVCNT)
 	$(LINK) $(LINKFLAGS) /out:$(<) $(UNDEFS) $(>) $(NEEDLIBS) "$(LINKLIBS)"
 	}
 }
-else if $(NT) && $(MSVC)
-{
-	actions updated together piecemeal Archive
-	{
-	$(AR) $(<) -+$(>)
-	}
-
-	actions Cc
-	{
-	$(CC) /c /Fo$(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
-	}
-
-	actions C++
-	{
-	$(C++) /c /Fo$(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) /Tp$(>)
-	}
-
-	actions Link bind NEEDLIBS
-	{
-	$(LINK) $(LINKFLAGS) /out:$(<) $(UNDEFS) $(>) $(NEEDLIBS) "$(LINKLIBS)"
-	}
-}
-else if $(NT) && $(BCCROOT)
-{
-	actions updated together piecemeal Archive
-	{
-	$(AR) $(<) -+$(>)
-	}
-
-	actions Link bind NEEDLIBS
-	{
-	$(LINK) -e$(<) $(LINKFLAGS) $(UNDEFS) -L$(LINKLIBS) $(NEEDLIBS) $(>)
-	}
-
-	actions C++
-	{
-	$(C++) -c -o$(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
-	}
-
-	actions Cc
-	{
-	$(CC) -c -o$(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
-	}
-}
 
 #
 # OS2 specific actions
@@ -2134,7 +2015,7 @@ else if $(OS2) && $(WATCOM)
 {
 	actions together piecemeal Archive
 	{
-	$(AR) $(<) +-$(>) 
+	$(AR) $(<) +-$(>)
 	}
 
 	actions Cc
@@ -2164,50 +2045,50 @@ else if $(OS2) && $(WATCOM)
 
 else if $(VMS)
 {
-    actions updated together piecemeal Archive 
-    {
+	actions updated together piecemeal Archive
+	{
 	lib/replace $(<) $(>[1]) ,$(>[2-])
-    }
+	}
 
-    actions Cc
-    { 
-	$(CC)/obj=$(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) $(>) 
-    }
+	actions Cc
+	{
+	$(CC)/obj=$(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
+	}
 
-    actions C++
-    { 
-	$(C++)/obj=$(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) $(>) 
-    }
+	actions C++
+	{
+	$(C++)/obj=$(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
+	}
 
-    actions piecemeal together existing Clean
-    {
+	actions piecemeal together existing Clean
+	{
 	$(RM) $(>[1]);* ,$(>[2-]);*
-    }
+	}
 
-    actions together quietly CreLib
-    {
+	actions together quietly CreLib
+	{
 	if f$search("$(<)") .eqs. "" then lib/create $(<)
-    }
+	}
 
-    actions GenFile1
-    {
+	actions GenFile1
+	{
 	mcr $(>[1]) $(<) $(>[2-])
-    }
+	}
 
-    actions Link bind NEEDLIBS
-    {
+	actions Link bind NEEDLIBS
+	{
 	$(LINK)/exe=$(<) $(LINKFLAGS) $(>:J=,) ,$(NEEDLIBS)/lib ,$(LINKLIBS)
-    }
+	}
 
-    actions quietly updated piecemeal together RmTemps
-    {
+	actions quietly updated piecemeal together RmTemps
+	{
 	$(RM) $(>[1]);* ,$(>[2-]);*
-    }
+	}
 
-    actions Shell
-    {
+	actions Shell
+	{
 	$(CP) $(>) $(<)
-    }
+	}
 }
 
 #
@@ -2216,52 +2097,52 @@ else if $(VMS)
 
 else if $(MAC)
 {
-    actions together Archive 
-    {
+	actions together Archive
+	{
 	$(LINK) -library -o $(<) $(>)
-    }
+	}
 
-    actions Cc
-    {
+	actions Cc
+	{
 	set -e MWCincludes $(CCHDRS)
-	$(CC) -o $(<) $(CCFLAGS) $(CCDEFS) $(>) 
-    }
+	$(CC) -o $(<) $(CCFLAGS) $(CCDEFS) $(>)
+	}
 
-    actions C++
-    {
+	actions C++
+	{
 	set -e MWCincludes $(CCHDRS)
-	$(CC) -o $(<) $(C++FLAGS) $(CCDEFS) $(>) 
-    }
+	$(CC) -o $(<) $(C++FLAGS) $(CCDEFS) $(>)
+	}
 
-    actions Link bind NEEDLIBS
-    {
+	actions Link bind NEEDLIBS
+	{
 	$(LINK) -o $(<) $(LINKFLAGS) $(>) $(NEEDLIBS) "$(LINKLIBS)"
-    }
+	}
 }
 
 if $(WIN98)
 {
-    actions existing Clean
-    {
+	actions existing Clean
+	{
 	del $(>)
-    }
+	}
 }
 
 #
 # Backwards compatibility with jam 1, where rules were uppercased.
 #
 
-rule BULK { Bulk $(<) : $(>) ; }
-rule FILE { File $(<) : $(>) ; }
-rule HDRRULE { HdrRule $(<) : $(>) ; }
-rule INSTALL { Install $(<) : $(>) ; }
-rule LIBRARY { Library $(<) : $(>) ; }
-rule LIBS { LinkLibraries $(<) : $(>) ; }
-rule LINK { Link $(<) : $(>) ; }
-rule MAIN { Main $(<) : $(>) ; }
-rule SETUID { Setuid $(<) ; }
-rule SHELL { Shell $(<) : $(>) ; }
-rule UNDEFINES { Undefines $(<) : $(>) ; }
+rule BULK      { Bulk          $(<) : $(>) ; }
+rule FILE      { File          $(<) : $(>) ; }
+rule HDRRULE   { HdrRule       $(<) : $(>) ; }
+rule INSTALL   { Install       $(<) : $(>) ; }
+rule LIBRARY   { Library       $(<) : $(>) ; }
+rule LIBS      { LinkLibraries $(<) : $(>) ; }
+rule LINK      { Link          $(<) : $(>) ; }
+rule MAIN      { Main          $(<) : $(>) ; }
+rule SETUID    { Setuid        $(<) ; }
+rule SHELL     { Shell         $(<) : $(>) ; }
+rule UNDEFINES { Undefines     $(<) : $(>) ; }
 
 # Old INSTALL* didn't take dest directory.
 
@@ -2271,16 +2152,16 @@ rule INSTALLMAN { InstallMan $(MANDIR) : $(<) ; }
 
 # Compatibility with jam 2.2.
 
-rule addDirName { $(<) += [ FDirName $(>) ] ; }
-rule makeCommon { FStripCommon $(<) : $(>) ; }
-rule _makeCommon { FStripCommon $(<) : $(>) ; }
-rule makeDirName { $(<) = [ FDirName $(>) ] ; }
-rule makeGrist { $(<) = [ FGrist $(>) ] ; }
+rule addDirName      { $(<) += [ FDirName $(>) ] ; }
+rule makeCommon      { FStripCommon $(<) : $(>) ; }
+rule _makeCommon     { FStripCommon $(<) : $(>) ; }
+rule makeDirName     { $(<) = [ FDirName $(>) ] ; }
+rule makeGrist       { $(<) = [ FGrist $(>) ] ; }
 rule makeGristedName { $(<) = [ FGristSourceFiles $(>) ] ; }
-rule makeRelPath { $(<[1]) = [ FRelPath $(<[2-]) : $(>) ] ; }
-rule makeString { $(<) = $(>:J) ; }
-rule makeSubDir { $(<) = [ FSubDir $(>) ] ; }
-rule makeSuffixed { $(<[1]) = [ FAppendSuffix $(>) : $(<[2]) ] ; }
+rule makeRelPath     { $(<[1]) = [ FRelPath $(<[2-]) : $(>) ] ; }
+rule makeString      { $(<) = $(>:J) ; }
+rule makeSubDir      { $(<) = [ FSubDir $(>) ] ; }
+rule makeSuffixed    { $(<[1]) = [ FAppendSuffix $(>) : $(<[2]) ] ; }
 
 #
 # Now include the user's Jamfile.
