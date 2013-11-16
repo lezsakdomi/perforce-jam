@@ -408,6 +408,9 @@ else if $(UNIX)
 	switch $(OS)
 	{
 	case AIX :
+	C++			?= g++ ;
+	CC			?= gcc ;
+	CCFLAGS 	+= -D_AIX ;
 	LINKLIBS	?= -lbsd ;
 
 	case AMIGA :
