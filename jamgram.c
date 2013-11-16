@@ -1,8 +1,11 @@
-#ifndef lint
-static char const 
-yyrcsid[] = "$FreeBSD: src/usr.bin/yacc/skeleton.c,v 1.28 2000/01/17 02:04:06 bde Exp $";
-#endif
 #include <stdlib.h>
+#ifndef lint
+#ifdef __unused
+__unused
+#endif
+static char const 
+yyrcsid[] = "$FreeBSD: src/usr.bin/yacc/skeleton.c,v 1.37 2003/02/12 18:03:55 davidc Exp $";
+#endif
 #define YYBYACC 1
 #define YYMAJOR 1
 #define YYMINOR 9
@@ -11,7 +14,11 @@ yyrcsid[] = "$FreeBSD: src/usr.bin/yacc/skeleton.c,v 1.28 2000/01/17 02:04:06 bd
 #define yyclearin (yychar=(YYEMPTY))
 #define yyerrok (yyerrflag=0)
 #define YYRECOVERING() (yyerrflag!=0)
+#if defined(__cplusplus) || __STDC__
+static int yygrowstack(void);
+#else
 static int yygrowstack();
+#endif
 #define YYPREFIX "yy"
 #line 85 "jamgram.y"
 #include "jam.h"
@@ -52,7 +59,7 @@ static int yygrowstack();
 # define pnode( l,r )    	parse_make( F0,l,r,P0,S0,S0,0 )
 # define psnode( s,l )     	parse_make( F0,l,P0,P0,s,S0,0 )
 
-#line 56 "y.tab.c"
+#line 63 "y.tab.c"
 #define YYERRCODE 256
 #define _BANG_t 257
 #define _BANG_EQUALS_t 258
@@ -452,9 +459,9 @@ int
 yyparse (YYPARSE_PARAM_ARG)
     YYPARSE_PARAM_DECL
 {
-    register int yym, yyn, yystate;
+    int yym, yyn, yystate;
 #if YYDEBUG
-    register const char *yys;
+    const char *yys;
 
     if ((yys = getenv("YYDEBUG")))
     {
@@ -869,7 +876,7 @@ case 72:
 #line 352 "jamgram.y"
 { yyval.parse = yyvsp[0].parse; }
 break;
-#line 873 "y.tab.c"
+#line 880 "y.tab.c"
     }
     yyssp -= yym;
     yystate = *yyssp;
