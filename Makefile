@@ -9,8 +9,12 @@ TARGET = -o $(EXENAME)
 
 # AIX needs -lbsd, and has no identifying cpp symbol
 # Use _AIX41 if you're not on 3.2 anymore.
-#LINKLIBS = -lbsd
+# Also supports AIX53
+#CC = gcc
 #CFLAGS = -D_AIX
+#LINKLIBS = -lbsd
+#EXENAME = ./jam0
+#TARGET = -o $(EXENAME)
 
 # Cygwin - gcc & cygwin
 #CC = gcc
