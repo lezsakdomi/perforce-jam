@@ -38,6 +38,7 @@
 # 07/19/99 (sickel) - Support for Mac OS X Server (and maybe client)
 # 02/18/00 (belmonte)- Support for Cygwin.
 # 12/08/03 (seiwald) - New YaccHdr to attribute #includes to generated .c.
+# 11/22/13 (brett)   - Support for Darwin.
 
 # Special targets defined in this file:
 #
@@ -460,6 +461,13 @@ else if $(UNIX)
 
 	case MACOSX :
 	C++			?= c++ ;
+	MANDIR		?= /usr/local/share/man ;
+
+	case DARWIN :
+	C++			?= g++ ;
+	CC			?= gcc ;
+	CCFLAGS		+= -D__DARWIN__ ;
+	C++FLAGS		+= -D__DARWIN__ ;
 	MANDIR		?= /usr/local/share/man ;
 
 	case NCR :
