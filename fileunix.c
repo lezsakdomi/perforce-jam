@@ -48,6 +48,7 @@
 # endif
 
 # if defined( OS_RHAPSODY ) || \
+     defined( OS_DARWIN ) || \
      defined( OS_MACOSX ) || \
      defined( OS_NEXT )
 /* need unistd for rhapsody's proper lseek */
