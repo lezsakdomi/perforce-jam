@@ -16,6 +16,13 @@ TARGET = -o $(EXENAME)
 #EXENAME = ./jam0
 #TARGET = -o $(EXENAME)
 
+# Darwin 90
+# use gcc-4.2, gcc is linked to gcc-4.2
+#CC = gcc$(COMPILER_SUFFIX)
+#CFLAGS = -D__DARWIN__
+#EXENAME = ./jam0
+#TARGET = -o $(EXENAME)
+
 # Cygwin - gcc & cygwin
 #CC = gcc
 #CFLAGS = -D__cygwin__
