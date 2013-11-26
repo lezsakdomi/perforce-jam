@@ -26,7 +26,7 @@
  * 07/19/99 (sickel)  - Mac OS X Server and Client support added
  * 02/22/01 (seiwald) - downshift paths on case-insensitive macintosh
  * 03/23/01 (seiwald) - VMS C++ changes.
- * 10/29/01 (brett) - More IA64 ifdefs for MS.
+ * 10/29/01 (brett)   - More IA64 ifdefs for MS.
  * 02/18/00 (belmonte)- Support for Cygwin.
  * 09/12/00 (seiwald) - OSSYMS split to OSMAJOR/OSMINOR/OSPLAT
  * 12/29/00 (seiwald) - OSVER dropped.
@@ -42,6 +42,7 @@
  * 09/02/04 (tony)    - Zeta porting
  * 05/18/06 (seiwald) - OSPLAT to X86_64 for non-Windows.
  * 07/15/10 (noahf)   - increase generic execcmd buffer to 20kib.
+ * 11/22/13 (brett)   - Darwin 9.0 support.
  */
 
 /*
@@ -347,9 +348,15 @@
 # endif
 # endif
 # ifdef __APPLE__
+# ifdef __DARWIN__
+# define unix
+# define OSMINOR "OS=DARWIN"
+# define OS_DARWIN
+# else
 # define unix
 # define OSMINOR "OS=MACOSX"
 # define OS_MACOSX
+# endif
 # endif
 # ifdef __osf__
 # define OSMINOR "OS=OSF"
@@ -431,6 +438,7 @@
      !defined(OS_NEXT) && \
      !defined(OS_MACHTEN) && \
      !defined(OS_MACOSX) && \
+     !defined(OS_DARWIN) && \
      !defined(OS_RHAPSODY) && \
      !defined(OS_MVS) && \
      !defined(OS_OPENBSD)
