@@ -51,6 +51,10 @@
 # include <process.h>
 # endif
 
+# ifdef OS_MACOSX
+# include <unistd.h>
+# endif
+
 # ifdef OS_NT 
 # define USE_EXECNT
 # include <process.h>
