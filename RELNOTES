@@ -2,6 +2,26 @@
 ===============================================================================
 
 
+Release notes for Jam 2.6
+(aka Jam - make(1) redux)
+
+1.  Release info:
+
+	Jam 2.6
+	August 7, 2014
+	VERSION 2.6
+
+	n.b. Jam 2.6 was updated from changes in our production jam which were
+             transferred over to the workshop jam using the ptransfer.py tool.
+             Since p4transfer.py retains the original change date/time, the new 
+             changes are identified as those in the range of 9855 through 9953.
+
+2.  More info TBD
+
+===============================================================================
+===============================================================================
+
+
 Release notes for Jam 2.5
 (aka Jam - make(1) redux)
 
