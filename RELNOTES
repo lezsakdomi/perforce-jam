@@ -16,7 +16,757 @@ Release notes for Jam 2.6
              Since p4transfer.py retains the original change date/time, the new 
              changes are identified as those in the range of 9855 through 9953.
 
-2.  More info TBD
+2.  Changes since 2.5
+
+Change 9953 2003/06/11 
+
+	var_string memory leak fix by Matt Armstrong.
+	
+	Bug fix to be documented in RELNOTES.
+	
+Change 9952 2006/04/11 
+
+	Path handling fix for NT: use the delimiter (/ or \) that was found
+	in the path to rebuild the path, rather than parsing at / and rebuilding
+	at \.
+	
+Change 9951 2007/09/17 
+
+	jam -j now builds all command line arguments concurrently,
+	rather than doing one at a time.  From Craig Allsop.
+	
+Change 9950 2003/12/15 
+
+	Jam's message "warning: foo depends on itself" now uses the
+	current target name (t->name) rather than the target it is
+	considering recursing towards (c->target->name).  This just gets
+	the end of the loop rather than the beginning, which in the
+	tricky case of loops caused by HdrRule's include file scanning,
+	can be more accurate.  
+	
+Change 9949 2013/11/25 
+
+	Build rules for jam on Darwin 9.0.
+	
+Change 9948 2013/11/15 
+
+	Update build rules for AIX53.
+	
+Change 9947 2011/09/14 
+
+	On a Windows debug build the /MT flag was used in addition to
+	the /MTd flag.  Basically harmless except the compiler issued
+	a warning for every file compiled.
+	
+	Removed the use of the /MT flag in the jambase arena.  This
+	allows the Jamrules to properly set this flag as required.
+	
+	Also when doing a Smart Heap debug build, duplicate symbols
+	in the Smart Heap library conflicted with the standard
+	Windows CRT library.  Adding a /FORCE to the link line solves
+	this problem.  This is a very narrow case and should not effect
+	builds without Smart Heap.
+	
+	Jam must be rebuilt to remove the /MT and /MTd warning.
+	
+Change 9946 2011/08/30 
+
+	Remove hard coded paths to the Visual Studio SDK libraries.
+	
+	As of Visual Studio 2008 and including 2010 the SDK libraries,
+	like kernel32.lib, have been moved out of the VC directory
+	structure.  These hard coded paths prevented jam from building.
+	
+	Test built jam with VS2005 x64 and x86, VS2010 x64 and x86
+	with these new settings.
+	
+	Test built main/p4 in these combinations as well.
+
+Change 9944 2007/09/06 
+
+	Move the /MT flag for NET 2005 into jam's Jamfile and out
+	of the Jambase file.  This removes the conflict with the
+	various TYPE=dyn, TYPE=dyng and so on, yet compiles jam as
+	multi threaded.
+	
+Change 9943 2007/09/05 
+
+	Build jam on Windows using NET 2005 in X86 mode.
+	This is the counter part to NET 2005 in X64 mode.
+	
+Change 9941 2006/11/06 
+
+	New jambase.c to follow new Jambase.
+	
+Change 9940 2005/07/29 
+
+	Fix jam HdrRule change 79346 -- it has horrible combinatoric
+	behavior when you have system include files that go like this:
+	
+		arpa/something includes
+		sys/something includes
+		machine/something includes
+		sys/something-else
+	
+	Now HdrRule tries to be as conservative as possible to avoid
+	building monster SEARCH lists.
+	
+	This is needed for AIX 5.3, where they apparently have such wild
+	include mazes.
+	
+Change 9939 2005/07/29 
+
+	An attempt at sorting out the various 64bit Windows builds.
+	
+	IA64 indicates the Intel Itanium 64bit Windows build.
+	X64 indicates the AMD64 and the Intel EM64T 64bit Windows build.
+	
+	It should not be necessary to set MSVCVer or OSPLAT for these builds.
+	
+	Hopefully these changes didn't break the AMD64 Linux build.
+	
+Change 9938 2005/06/23 
+
+	Jam changes for building on the AMD64 platform.  The .NET 2005
+	beta2 compiler requires several flags.  First it is necessary
+	to turn off the depreciation stuff, CRT functions like strcpy
+	sprintf and so on are now viewed as insecure by MS.  For now it
+	is still possible to use them with the correct application of
+	compile flags.  MS is making noises in line with taking these
+	functions away for good.
+	
+	The "Win64" token was used for 64 bit builds.  This is now a
+	bit ambiguous since it covers x64, ia64 and em64t.  With this
+	change Win64 has been retired and we use x64 for amd64, ia64
+	for the Itanium and em64t for the extended memory processors.
+	Set MSVCVer accordingly.  MSVCNT is set as always, to the
+	location of the VC directory, VC98, VC7 and now just VC.
+	
+	For the most part the x64 build works on amd64, the exception
+	being a template problem in nettcp.cc.  That problem will not
+	be corrected in this change.
+	
+Change 9937 2005/06/17 
+
+	jam and 2004.2 p4 client for AS/400. Built on AS/400 V5R2 with native 
+	ILE C/C++ compiler. Note, this build reports itself as 
+	P4/AS400/2004.2/76944 but this change contains porting changes that 
+	were required to make the build work so the changelist number is incorrect. 
+	This can be resolved with a clean build for 2005.1 at a later date.
+	
+	p4.sav and jam.sav are AS/400 "Save Files" that can be used to install
+	the software on an AS/400 machine. The p4.sav file includes the p4.cmd
+	and p4sync.cmd files we distributed with our older AS/400 builds. These
+	files define a forms-type interface for supplying the parameters to the
+	commands when you run them.
+	
+Change 9936 2005/05/06 
+
+	Fix to HdrRule to handle '#include "path/file"': if the included
+	file has a directory component, then SEARCH and HDRSEARCH are set
+	to include the previous HDRSEARCH with 'path' appended. Without
+	this, then any files included by "path/file" might not be found
+	by jam, as it didn't know to look in the 'path' subdirectory.
+	
+	This is needed for p4v's central 'windows' include file.
+	
+Change 9935 2013/11/25 
+
+	Build rules for jam on Darwin 9.0.
+
+Change 9934 2010/07/15 
+
+	Increase generic execcmd buffer to 20kib.
+
+Change 9933 2008/10/02 
+
+	zLinux porting changes. This is Linux running on an s390x platform,
+	the x means 64-bit. The only change required was to ensure that 
+	jam guessed the OSPLAT correctly.
+	
+	I left the old (32-bit) OSPLAT alone (390), but chose s390x for this
+	one as that's what 'uname -a' reports.
+	
+	Porting change only.
+	
+Change 9932 2007/01/05 
+
+	Make jam -dr an alias for jam -d+5 (turn on compile debugging).
+	
+Change 9931 2006/11/21 
+
+	Bump VMS command line length to 2048 so that we can build
+	the p4api.  Don't know the actual limit, but it appears not
+	to be 1024 anymore.
+
+Change 9930 2006/09/25 
+
+	Define OSPLAT=SPARC64 if building as a sparcv9 binary.
+	
+Change 9929 2006/05/18 
+
+	Set OSPLAT to X86_64 on non-windows adm64 platforms.
+	Set OSPLAT to X86 even on FreeBSD et al.
+	Report OSPLAT with jam -v.
+	
+	Now jam 2.5.2.
+
+Change 9928 2005/07/29 
+
+	An attempt at sorting out the various 64bit Windows builds.
+	
+	IA64 indicates the Intel Itanium 64bit Windows build.
+	X64 indicates the AMD64 and the Intel EM64T 64bit Windows build.
+	
+	It should not be necessary to set MSVCVer or OSPLAT for these builds.
+	
+	Hopefully these changes didn't break the AMD64 Linux build.
+	
+Change 9927 2005/06/17 
+
+	jam and 2004.2 p4 client for AS/400. Built on AS/400 V5R2 with native 
+	ILE C/C++ compiler. Note, this build reports itself as 
+	P4/AS400/2004.2/76944 but this change contains porting changes that 
+	were required to make the build work so the changelist number is incorrect. 
+	This can be resolved with a clean build for 2005.1 at a later date.
+	
+	p4.sav and jam.sav are AS/400 "Save Files" that can be used to install
+	the software on an AS/400 machine. The p4.sav file includes the p4.cmd
+	and p4sync.cmd files we distributed with our older AS/400 builds. These
+	files define a forms-type interface for supplying the parameters to the
+	commands when you run them.
+	
+Change 9926 2005/05/06 
+
+	Maximum command line length now determined by execmax() function,
+	which still just returns the compiled-in MAXLINE.
+
+Change 9925 2004/09/07 
+
+	Port Jam to Zeta. Zeta is a fork of BeOS so this port is
+	broadly the same as the BeOS port.
+	
+Change 9924 2004/06/23 
+
+	Nonstop unix changes from Kim Hae-Joo.
+	
+Change 9923 2004/05/06 
+
+	FreeBSD 5/AMD64 porting changes.
+
+Change 9922 2003/06/03 
+
+	OpenBSD porting changes from Michael Champigny.
+	
+Change 9921 2003/04/19 
+
+	HPUX 11 jam porting: a cast for exec() and include unistd.h.
+	
+Change 9920 2010/01/06 
+
+	Updated the Copyright to 2010.
+	
+Change 9919 2007/01/05 
+
+	Make jam -dr an alias for jam -d+5 (turn on compile debugging).
+	
+Change 9918 2006/05/18 
+
+	Set OSPLAT to X86_64 on non-windows adm64 platforms.
+	Set OSPLAT to X86 even on FreeBSD et al.
+	Report OSPLAT with jam -v.
+	
+	Now jam 2.5.2.
+	
+Change 9917 2014/08/06 
+
+	Take it to 2.6 for all the changes since 2.5 which are going to be rolled out to the workshop (public) site
+
+Change 9916 2013/11/25 
+
+	Build rules for jam on Darwin 9.0.
+	
+Change 9915 2013/11/15 
+
+	Update build rules for AIX53.
+	
+Change 9913 2006/03/05 
+
+	Use off_t instead of long for lseek(), as cygwin seems
+	to get confused if you use a long.
+	
+	Bug fix documented in RELNOTES.
+	
+Change 9912 2005/06/17 
+
+	jam and 2004.2 p4 client for AS/400. Built on AS/400 V5R2 with native 
+	ILE C/C++ compiler. Note, this build reports itself as 
+	P4/AS400/2004.2/76944 but this change contains porting changes that 
+	were required to make the build work so the changelist number is incorrect. 
+	This can be resolved with a clean build for 2005.1 at a later date.
+	
+	p4.sav and jam.sav are AS/400 "Save Files" that can be used to install
+	the software on an AS/400 machine. The p4.sav file includes the p4.cmd
+	and p4sync.cmd files we distributed with our older AS/400 builds. These
+	files define a forms-type interface for supplying the parameters to the
+	commands when you run them.
+	
+	Porting change only. No functional change.
+	
+Change 9911 2005/05/06 
+
+	Compute max line length on windows by OS type using GetVersionEx()
+	call in execmax() function.  Now instead of just 996 for the default,
+	Win NT 4.0 and Win 2K get 2047, and Win XP and 2003+ get 8191.
+	
+	The wheels of progress grind slowly.
+	
+	Bumped JAMVERSION to 2.5.1.
+	
+	New feature documented in RELNOTES.
+
+Change 9910 2004/09/07 
+
+	Port Jam to Zeta. Zeta is a fork of BeOS so this port is
+	broadly the same as the BeOS port.
+	
+Change 9909 2006/08/02 
+
+	Header path name generation uses PATH_DELIM and not / on NT now.
+	From Craig Allsop.
+	
+	Bug fix documented in RELNOTES.
+	
+Change 9908 2003/08/18 
+
+	Better string table support in file_archscan (filent.c),
+	to support GHS librarian.
+	
+	Porting change.
+	
+Change 9907 2014/04/02 
+
+	Build jam without so many warnings on macosxx86_64.
+	
+Change 9906 2008/10/02 
+
+	AS/400 Porting changes. Static variable intr wasn't declared on 
+	AS/400. This was the only change required to build Jam on that
+	platform.
+	
+Change 9905 2005/06/17 
+
+	jam and 2004.2 p4 client for AS/400. Built on AS/400 V5R2 with native 
+	ILE C/C++ compiler. Note, this build reports itself as 
+	P4/AS400/2004.2/76944 but this change contains porting changes that 
+	were required to make the build work so the changelist number is incorrect. 
+	This can be resolved with a clean build for 2005.1 at a later date.
+	
+	p4.sav and jam.sav are AS/400 "Save Files" that can be used to install
+	the software on an AS/400 machine. The p4.sav file includes the p4.cmd
+	and p4sync.cmd files we distributed with our older AS/400 builds. These
+	files define a forms-type interface for supplying the parameters to the
+	commands when you run them.
+	
+Change 9904 2008/09/10 
+
+	Port 2008.1 P4 to MVS Unix System Services. This is an onsite
+	port carried out at Bank of America in Croydon. 
+	
+	It's not pretty. There are some uglies in here which could 
+	probably be taken care of in better ways, but I was pressed
+	for time. Here's the background to each of the issues I found:
+	
+	1. The compiler really didn't like our Zeroconf
+	code, and since building Avahi on the mainframe wasn't top of
+	my agenda, I disabled it with some heinous ifdef's in client.cc.
+	Sorry. The compiler was bitching about types of arguments being
+	passed to zeroconf methods, and it wasn't obvious to me what the
+	problem was either. I think we could use a -DUSE_ZEROCONF in
+	our Jamrules for occasions like this; that would be cleaner than
+	a platform ifdef in client.cc. With more time, it might be 
+	possible to make the zeroconf code compile on MVS, but getting
+	dynamic loading working on that platform is ambitious I think.
+	
+	2. The mapping code needed ifdefs too (again, sorry!). On MVS,
+	C and C++ don't share the same linkage and qsort() is a C function
+	so it (apparently) can't take a pointer to a C++ function. So,
+	all the qsort() compare functions have to be declared as
+	'extern "C"'. See:
+	
+	http://publib.boulder.ibm.com/infocenter/zos/v1r9/index.jsp?topic=/com.ibm.zos.r9.bpxbd00/qsort.htm
+	
+	I didn't ifdef these as I don't think they'll do any harm on other
+	platforms.
+	
+	3. support/random.cc needed an ifdef (no big deal)
+	
+	4. sys/netaddr.cc had to have a (correct) const removed since
+	the MVS implementation of inet_addr takes a 'char *' argument
+	instead of 'const char *'. I ifdef'd that to keep it clean
+	on other platforms.
+	
+	5. zlib/zconf.h had some old pragmas that no longer apply. 
+	
+	6. Jamrules: I reinstated the old rules from MVS builds, and
+	made EBCDIC optional rather than compulsory. I also 
+	documented in it the environment variables we set to persuade
+	the compilers on BofA's machine to behave. These may, or may not
+	be required on other MVS boxes. No idea.
+	
+	Building Jam also had a few idiosyncracies:
+	
+	1. Best to assume the yacc on MVS is broken. It was there, but
+	not in great shape. I disabled it in Jambase and I think that's
+	a sensible thing to do going forward.
+	
+	2. yylineno() can't return a 'const int' on MVS. Not sure why
+	it's defined that way on other platforms so I changed it to
+	just returning an int. Hopefully that won't break elsewhere...
+	
+	
+	There are three binaries being submitted here:
+	
+		jam			- built from main
+		bin.mvs/p4		- EBCDIC client
+		bin.mvs/ascii/p4	- Non-EBCDIC client
+	
+	The ascii client identifies itself as such:
+	
+		P4/MVS/2008.1.ascii/164042
+	
+	While unconventional, I thought that was the best plan so that
+	if we take support calls on it, we'll get a clue.
+	
+Change 9903 2007/01/05 
+
+	Jam -dr now reports file/line numbers, at no small effort.
+	
+Change 9902 2014/04/02 
+
+	Build jam without so many warnings on macosxx86_64.
+	
+Change 9901 2005/05/06 
+
+	Compute max line length on windows by OS type using GetVersionEx()
+	call in execmax() function.  Now instead of just 996 for the default,
+	Win NT 4.0 and Win 2K get 2047, and Win XP and 2003+ get 8191.
+	
+	The wheels of progress grind slowly.
+	
+	Bumped JAMVERSION to 2.5.1.
+	
+Change 9900 2005/05/06 
+
+	Maximum command line length now determined by execmax() function,
+	which still just returns the compiled-in MAXLINE.
+	
+Change 9899 2004/09/07 
+
+	Port Jam to Zeta. Zeta is a fork of BeOS so this port is
+	broadly the same as the BeOS port.
+	
+Change 9898 2003/04/19 
+
+	HPUX 11 jam porting: a cast for exec() and include unistd.h
+	
+Change 9897 2011/03/17 
+
+	(make1d): Honor -q flag even when DEBUG_MAKE is 0.
+	
+Change 9896 2005/05/06 
+
+	Maximum command line length now determined by execmax() function,
+	which still just returns the compiled-in MAXLINE.
+	
+Change 9895 2013/11/25 
+
+	Build rules for jam on Darwin 9.0.
+
+Change 9894 2013/11/15 
+
+	Update build rules for AIX53.
+	
+Change 9893 2011/09/14 
+
+	On a Windows debug build the /MT flag was used in addition to
+	the /MTd flag.  Basically harmless except the compiler issued
+	a warning for every file compiled.
+	
+	Removed the use of the /MT flag in the jambase arena.  This
+	allows the Jamrules to properly set this flag as required.
+	
+	Also when doing a Smart Heap debug build, duplicate symbols
+	in the Smart Heap library conflicted with the standard
+	Windows CRT library.  Adding a /FORCE to the link line solves
+	this problem.  This is a very narrow case and should not effect
+	builds without Smart Heap.
+	
+	Jam must be rebuilt to remove the /MT and /MTd warning.
+	
+Change 9892 2011/08/17 
+
+	Clarify that Windows VS Net settings work for 2005, 2008 and 2010.
+	
+Change 9891 2007/09/06 
+
+	Move the /MT flag for NET 2005 into jam's Jamfile and out
+	of the Jambase file.  This removes the conflict with the
+	various TYPE=dyn, TYPE=dyng and so on, yet compiles jam as
+	multi threaded.
+	
+Change 9887 2005/07/28 
+
+	Add the _M_AMD64 flag to the amd64 build.  The rest does indeed
+	produce x64 binaries as verified by dumpbin /headers p4d.exe.
+	
+	With change 81112, the x64 p4d.exe no longer faults.
+	
+Change 9886 2005/06/25 
+
+	Change default build back to Unix from NT, correcting a previous mistake.
+	
+	Related to change 81710, amd64 build changes.
+	
+Change 9885 2005/06/23 
+
+	Jam changes for building on the AMD64 platform.  The .NET 2005
+	beta2 compiler requires several flags.  First it is necessary
+	to turn off the depreciation stuff, CRT functions like strcpy
+	sprintf and so on are now viewed as insecure by MS.  For now it
+	is still possible to use them with the correct application of
+	compile flags.  MS is making noises in line with taking these
+	functions away for good.
+	
+	The "Win64" token was used for 64 bit builds.  This is now a
+	bit ambiguous since it covers x64, ia64 and em64t.  With this
+	change Win64 has been retired and we use x64 for amd64, ia64
+	for the Itanium and em64t for the extended memory processors.
+	Set MSVCVer accordingly.  MSVCNT is set as always, to the
+	location of the VC directory, VC98, VC7 and now just VC.
+	
+	For the most part the x64 build works on amd64, the exception
+	being a template problem in nettcp.cc.  That problem will not
+	be corrected in this change.
+	
+Change 9883 2013/11/25 
+
+	Build rules for jam on Darwin 9.0.
+	
+Change 9882 2013/11/15 
+
+	Update build rules for AIX53.
+
+Change 9881 2012/10/05 
+
+	Eliminate hateful MSVCNT variable and the need to set it.
+	Consolidate all the Visual Studio configuration sections.
+
+Change 9880 2012/10/04 
+
+	Add defaults for NT ARM.
+	
+Change 9879 2011/09/14 
+
+	On a Windows debug build the /MT flag was used in addition to
+	the /MTd flag.  Basically harmless except the compiler issued
+	a warning for every file compiled.
+	
+	Removed the use of the /MT flag in the jambase arena.  This
+	allows the Jamrules to properly set this flag as required.
+	
+	Also when doing a Smart Heap debug build, duplicate symbols
+	in the Smart Heap library conflicted with the standard
+	Windows CRT library.  Adding a /FORCE to the link line solves
+	this problem.  This is a very narrow case and should not effect
+	builds without Smart Heap.
+	
+	Jam must be rebuilt to remove the /MT and /MTd warning.
+	
+Change 9877 2011/05/07 
+
+	*Significant* MD5 speedups
+	
+	This change requires a new Jambase, so, a new Jam, to take full
+	advantage.
+	
+	Jambase: Now we handle local variables OPTIM, SUBDIRC++FLAGS, and
+	SUBDIRCCFLAGS on targets correctly.  This was a change contemplated
+	ages ago on the jamming@ mailing list but never committed.
+	
+	md5.cc: We no longer do byte-swabbing on temporary buffers,
+	we use a union to treat buffers as char * or uint32 *. We have
+	re-ordered the MD5STEP macros to be faster slightly based on
+	Wei Dai's "Public Domain" crypto++ 5.6.1 routines.
+	
+	md5.h: We now align our buffers (per Wittenberg's recommendation) for
+	those machines both where it's faster to do so. Windows will be next?
+	
+	Mostly reviewed by development.
+	
+	Infrastructure change.
+	
+Change 9876 2011/01/17 
+
+	Add shell command definitions for MINGW.
+
+Change 9875 2010/01/04 
+
+	Added Objective-C and Objective-C++ support to the Jambase.
+	
+Change 9873 2008/06/12 
+
+	Don't hardcode paths to SDK libraries on ia64.
+	The LIB search path should come from the environment.
+	
+Change 9872 2008/06/12 
+
+	Remove -D_CRT_SECURE_NO_DEPRECATE for ntia64.
+	Not supported.
+	
+Change 9871 2008/02/01 
+
+	Add settings for IA64 VS2005.
+	
+	Add /MT flags to other VS2005 sections and change libc.lib to libcmt.lib.
+	VS2005 doesn't have libc.lib anymore.
+	
+	Remove \\$(I) ia64 hack from VS6 section and from the other sections in
+	which it appears uninitialized.
+	
+Change 9869 2007/09/06 
+
+	Move the /MT flag for NET 2005 into jam's Jamfile and out
+	of the Jambase file.  This removes the conflict with the
+	various TYPE=dyn, TYPE=dyng and so on, yet compiles jam as
+	multi threaded.
+	
+Change 9866 2007/07/12 
+
+	Use $(MSVCNT:J=" ") and $(MSVC:J=" ") when constructing paths, since
+	spaces in the inherited environment variable are part of a scalar
+	value (a file name), not separators within an array.
+	
+	This is probably still going to blow chunks if MSVCNT contains a
+	path where there are two or more adjacent spaces somewhere (since
+	the join will result in a nonexistent filename), but that's an
+	unlikely case whereas single spaces in NT filenames are pervasive.
+	To really do this right, Jam needs a way to treat variables
+	inherited from the environment as a single value without any array
+	tokenization.  At least sometimes.
+	
+	For the MSVC/MSVCNT special case actions Cc, C++, and Link: put quotes
+	around the expansion of $(STDHDRS) and $(LINKLIBS) so the batch
+	interpreter won't split space-embedded pathnames into multiple
+	arguments.  Note that it's the operating system's command interpreter,
+	not Jam, which needs the quoting against whitespace this time.
+	Multiple values within these variables are still expanded correctly
+	at the Jam level.
+	
+Change 9865 2006/10/09 
+
+	* Build.com: Compile jamgram.c with /NOOPTIMIZE.
+	  The V7.2-021 cxx compiler on VMS8.2/IA64 has trouble with the parser
+	  produced by either (b)yacc or bison: when jamgram.c is compiled with
+	  optimization levels at or above /OPTIMIZE=(LEVEL=2), jam.exe crashes
+	  as soon as it begins to parse its internal copy of Jambase.  (The
+	  default optmization level is /OPTIMIZE=(LEVEL=4), by the way.)
+	
+	* Build.com: Display commands in build.com as they are executed, since
+	  there is no other progress notification.
+	
+	* Jambase ($(VMS)): Remove special cases for OS=OPENVMS and OS=VMS;
+	  Newer compilers do not accept "vaxc" as a C dialect, and vaxcrtl.olb
+	  does not exist on IA64.
+	
+	  There is no real difference between VMS and OPENVMS; the latter is
+	  just marketingspeak.  Having both OS=VMS and OS=OPENVMS switches is
+	  probably more confusing than helpful; if in the future these flags
+	  need to be restored, consider using some combination of OSPLAT and/or
+	  OSVER also.
+	
+Change 9863 2005/07/29 
+
+	Fix jam HdrRule change 79346 -- it has horrible combinatoric
+	behavior when you have system include files that go like this:
+	
+		arpa/something includes
+		sys/something includes
+		machine/something includes
+		sys/something-else
+	
+	Now HdrRule tries to be as conservative as possible to avoid
+	building monster SEARCH lists.
+	
+	This is needed for AIX 5.3, where they apparently have such wild
+	include mazes.
+	
+Change 9859 2005/06/23 
+
+	Jam changes for building on the AMD64 platform.  The .NET 2005
+	beta2 compiler requires several flags.  First it is necessary
+	to turn off the depreciation stuff, CRT functions like strcpy
+	sprintf and so on are now viewed as insecure by MS.  For now it
+	is still possible to use them with the correct application of
+	compile flags.  MS is making noises in line with taking these
+	functions away for good.
+	
+	The "Win64" token was used for 64 bit builds.  This is now a
+	bit ambiguous since it covers x64, ia64 and em64t.  With this
+	change Win64 has been retired and we use x64 for amd64, ia64
+	for the Itanium and em64t for the extended memory processors.
+	Set MSVCVer accordingly.  MSVCNT is set as always, to the
+	location of the VC directory, VC98, VC7 and now just VC.
+	
+	For the most part the x64 build works on amd64, the exception
+	being a template problem in nettcp.cc.  That problem will not
+	be corrected in this change.
+	
+Change 9858 2005/06/17 
+
+	Porting changes to support AS/400
+	
+Change 9857 2005/05/06 
+
+	Fix to HdrRule to handle '#include "path/file"': if the included
+	file has a directory component, then SEARCH and HDRSEARCH are set
+	to include the previous HDRSEARCH with 'path' appended. Without
+	this, then any files included by "path/file" might not be found
+	by jam, as it didn't know to look in the 'path' subdirectory.
+	
+	This is needed for p4v's central 'windows' include file.
+	
+
+Change 9856 2003/12/09 
+
+	Jam's Yacc rule now puts include dependencies on the generated
+	.c rather than on the .y.
+	
+	Bug fix documented in RELNOTES.
+	
+
+Change 9855 2006/10/09 
+
+	* Build.com: Compile jamgram.c with /NOOPTIMIZE.
+	  The V7.2-021 cxx compiler on VMS8.2/IA64 has trouble with the parser
+	  produced by either (b)yacc or bison: when jamgram.c is compiled with
+	  optimization levels at or above /OPTIMIZE=(LEVEL=2), jam.exe crashes
+	  as soon as it begins to parse its internal copy of Jambase.  (The
+	  default optmization level is /OPTIMIZE=(LEVEL=4), by the way.)
+	
+	* Build.com: Display commands in build.com as they are executed, since
+	  there is no other progress notification.
+	
+	* Jambase ($(VMS)): Remove special cases for OS=OPENVMS and OS=VMS;
+	  Newer compilers do not accept "vaxc" as a C dialect, and vaxcrtl.olb
+	  does not exist on IA64.
+	
+	  There is no real difference between VMS and OPENVMS; the latter is
+	  just marketingspeak.  Having both OS=VMS and OS=OPENVMS switches is
+	  probably more confusing than helpful; if in the future these flags
+	  need to be restored, consider using some combination of OSPLAT and/or
+	  OSVER also.
+
 
 ===============================================================================
 ===============================================================================
