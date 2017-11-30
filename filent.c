@@ -55,7 +55,11 @@
 # ifdef _M_IA64
 # define FINDTYPE long long
 # else
+# if defined(__BORLANDC__) && __BORLANDC__ < 0x550
 # define FINDTYPE long
+# else
+# define FINDTYPE intptr_t
+# endif
 # endif
 
 void
@@ -269,7 +273,7 @@ file_archscan(
 	    if( c = strrchr( name, '\\' ) )
 		name = c + 1;
 
-	    sprintf( buf, "%s(%.*s)", archive, endname - name, name );
+	    sprintf( buf, "%s(%.*s)", archive, (int)(endname - name), name );
 	    (*func)( closure, buf, 1 /* time valid */, (time_t)lar_date );
 
 	    offset += SARHDR + lar_size;

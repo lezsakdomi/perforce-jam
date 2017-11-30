@@ -137,6 +137,34 @@
 # endif
 
 /*
+ * Windows MinGW-w64
+ */
+
+# ifdef MINGW64
+
+# include <fcntl.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include <ctype.h>
+# include <malloc.h>
+# include <memory.h>
+# include <signal.h>
+# include <string.h>
+# include <time.h>
+
+# define OSMAJOR "MINGW64=true"
+# define OSMINOR "OS=MINGW64"
+# define OS_NT
+# define SPLITPATH ';'
+# define MAXLINE 996	/* longest execcmd() */
+# define USE_EXECUNIX
+# define USE_PATHUNIX
+# define PATH_DELIM '\\'
+# define DOWNSHIFT_PATHS
+
+# endif
+
+/*
  * AS400 - mostly unix-like superficially.
  */
 
